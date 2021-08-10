@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { createGlobalStyle } from "styled-components";
+import { ThemeProvider } from "styled-components";
+import LightTheme from "./styles/themes/LightTheme";
+
+const GlobalStyle = createGlobalStyle`
+  :root{
+    --primary: ${(props) => props.theme.primary};
+    --secondary: ${(props) => props.theme.secondary};
+    --success: ${(props) => props.theme.success};
+    --danger: ${(props) => props.theme.danger};
+    --warning: ${(props) => props.theme.warning};
+    --info: ${(props) => props.theme.info};
+    --gray1: ${(props) => props.theme.gray1};
+    --gray2: ${(props) => props.theme.gray2};
+    --gray3: ${(props) => props.theme.gray3};
+    --gray4: ${(props) => props.theme.gray4};
+    --text: ${(props) => props.theme.text};
+  }
+`;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={LightTheme}>
+      <GlobalStyle />
+      <div className="App"></div>
+    </ThemeProvider>
   );
 }
 

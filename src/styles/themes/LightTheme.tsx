@@ -1,4 +1,4 @@
-export default {
+const lightTheme = {
   primary: "#191489",
   secondary: "#F2994A",
   success: "#27AE60",
@@ -11,3 +11,5 @@ export default {
   gray4: "#FBFBFB",
   text: "#1B2124",
 };
+
+export default lightTheme;

@@ -2,8 +2,6 @@ import "./App.css";
 import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
 import LightTheme from "./styles/themes/LightTheme";
-import { Button } from "components/common";
-import { faHospital, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
 const GlobalStyle = createGlobalStyle`
   :root {

@@ -2,11 +2,12 @@ import "./App.css";
 import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
 import LightTheme from "./styles/themes/LightTheme";
+import { Button } from "components/common";
+import { faHospital, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
 const GlobalStyle = createGlobalStyle`
-  :root{
+  :root {
     --primary: ${(props) => props.theme.primary};
-    --secondary: ${(props) => props.theme.secondary};
     --success: ${(props) => props.theme.success};
     --danger: ${(props) => props.theme.danger};
     --warning: ${(props) => props.theme.warning};

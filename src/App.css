@@ -1,5 +1,6 @@
 * {
-  font-family: "Open Sans", sans-serif;
+  /* font-family: "Open Sans", sans-serif; */
+  font-family: "Quicksand", sans-serif;
 }
 *,
 *::before,
@@ -13,4 +14,18 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+body,
+.App {
+  overflow: hidden;
+}
+
+.App {
+  height: 100vh;
+  width: 100vw;
+}
+
+.svg-inline--fa.fa-fw {
+  width: 1em;
 }

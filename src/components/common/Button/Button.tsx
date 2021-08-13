@@ -42,7 +42,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       mainColor={themeContext[variant ?? "primary"]}
       textColor={"white"}
       size={SIZE_MAPPING[size ?? "md"]}
-      className={alternative ?? ""}
+      className={[alternative, !children ? "icon-button" : ""].join(" ")}
       ref={ref}
       rounded={!!rounded}
       {...rest}

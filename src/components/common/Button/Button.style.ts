@@ -35,7 +35,11 @@ export default styled.button<ButtonProps>`
     }
     &:only-child {
       margin: 0;
+      display: block;
     }
+  }
+  &.icon-button {
+    padding: calc(0.75em + 2px);
   }
   &.outline,
   &.reverse {

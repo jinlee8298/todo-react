@@ -6,7 +6,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 type ButtonProps = {
   variant?: "primary" | "success" | "danger" | "warning" | "info";
-  size?: "sm" | "md" | "lg";
+  size?: "sx" | "sm" | "md" | "lg";
   icon?: IconProp;
   onClick?: MouseEventHandler;
   alternative?: "outline" | "reverse";
@@ -17,6 +17,7 @@ type ButtonProps = {
 } & JSX.IntrinsicElements["button"];
 
 const SIZE_MAPPING = {
+  sx: "0.5rem",
   sm: "0.6875rem",
   md: "0.875rem",
   lg: "1rem",
@@ -25,7 +26,6 @@ const SIZE_MAPPING = {
 const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
   const {
     variant,
-    title,
     size,
     alternative,
     icon,
@@ -50,7 +50,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       {icon && iconPosition === "start" && (
         <FontAwesomeIcon icon={icon} fixedWidth />
       )}
-      {children && <span>children</span>}
+      {children && <span>{children}</span>}
       {icon && iconPosition === "end" && (
         <FontAwesomeIcon icon={icon} fixedWidth />
       )}

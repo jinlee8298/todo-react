@@ -39,7 +39,10 @@ export default styled.button<ButtonProps>`
     }
   }
   &.icon-button {
-    padding: calc(0.75em + 2px);
+    padding: 0.75em;
+    svg {
+      font-size: 1.5em;
+    }
   }
   &.outline,
   &.reverse {

@@ -1,6 +1,7 @@
+@import-normalize;
+
 * {
-  /* font-family: "Open Sans", sans-serif; */
-  font-family: "Quicksand", sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 *,
 *::before,
@@ -17,13 +18,11 @@ p {
 }
 
 body,
+html,
+#root,
 .App {
+  height: 100%;
   overflow: hidden;
-}
-
-.App {
-  height: 100vh;
-  width: 100vw;
 }
 
 .svg-inline--fa.fa-fw {

@@ -1,7 +1,7 @@
 import "./App.css";
 import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
-import LightTheme from "./styles/themes/LightTheme";
+import LightTheme from "../common/styles/themes/LightTheme";
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -15,6 +15,9 @@ const GlobalStyle = createGlobalStyle`
     --gray3: ${(props) => props.theme.gray3};
     --gray4: ${(props) => props.theme.gray4};
     --text: ${(props) => props.theme.text};
+  }
+  .App{
+    padding: 20px;
   }
 `;
 

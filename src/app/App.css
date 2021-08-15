@@ -2,11 +2,22 @@
 
 * {
   font-family: "Open Sans", sans-serif;
+  scrollbar-width: thin;
 }
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
 }
 
 body,

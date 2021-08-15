@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { shadow } from "styles/common/shadows";
+import { shadow } from "common/styles/shadows";
 
 type MenuStyleProps = {
   top: string;

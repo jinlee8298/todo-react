@@ -2,6 +2,7 @@ import "./App.css";
 import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
 import LightTheme from "../common/styles/themes/LightTheme";
+import TaskBoard from "features/taskBoard/components/TaskBoard/TaskBoard";
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -25,7 +26,9 @@ function App() {
   return (
     <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
-      <div className="App"></div>
+      <div className="App">
+        <TaskBoard></TaskBoard>
+      </div>
     </ThemeProvider>
   );
 }

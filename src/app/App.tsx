@@ -16,6 +16,7 @@ const GlobalStyle = createGlobalStyle`
     --gray3: ${(props) => props.theme.gray3};
     --gray4: ${(props) => props.theme.gray4};
     --text: ${(props) => props.theme.text};
+    --backdrop: #0000007f;
   }
   .App{
     padding: 20px;

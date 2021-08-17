@@ -4,7 +4,7 @@ import StyledButton from "./Button.style";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
-type ButtonProps = {
+export type ButtonProps = {
   variant?: "primary" | "success" | "danger" | "warning" | "info";
   size?: "sx" | "sm" | "md" | "lg";
   icon?: IconProp;

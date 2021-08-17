@@ -1,11 +1,5 @@
 import StyledMenuItem from "./Item.style";
-import {
-  FC,
-  useContext,
-  MouseEventHandler,
-  KeyboardEventHandler,
-  TouchEventHandler,
-} from "react";
+import { FC, useContext, MouseEventHandler, KeyboardEventHandler } from "react";
 import { ThemeContext } from "styled-components";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

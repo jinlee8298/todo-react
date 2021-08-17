@@ -2,13 +2,10 @@ import {
   FC,
   useEffect,
   useRef,
-  useState,
   DragEventHandler,
-  Fragment,
-  useLayoutEffect,
   FormEventHandler,
 } from "react";
-import { Button, Menu, Checkbox, Label } from "common/components";
+import { Button, Menu, Checkbox } from "common/components";
 import {
   faEllipsisH,
   faEdit,

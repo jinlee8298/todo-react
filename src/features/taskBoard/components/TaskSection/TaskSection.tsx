@@ -1,12 +1,4 @@
-import {
-  DragEventHandler,
-  useRef,
-  FC,
-  useState,
-  DragEvent,
-  Fragment,
-  useEffect,
-} from "react";
+import { DragEventHandler, useRef, FC, useState, DragEvent } from "react";
 import StyledTaskSection from "./TaskSection.style";
 import Task from "../Task/Task";
 import { Button } from "common/components";
@@ -14,13 +6,11 @@ import { faEllipsisH, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import {
   sectionSelector,
-  taskSelector,
-  addTask,
   repositionTask,
   insertTaskPlaceholder,
   removeTaskPlaceholder,
 } from "../../taskBoardSlice";
-import { shallowEqual, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "app/store";
 import { useDispatch } from "common/hooks";
 import TaskEditor from "../TaskEditor/TaskEditor";

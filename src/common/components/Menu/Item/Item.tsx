@@ -11,7 +11,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type MenuItemProps = {
-  onTrigger?: MouseEventHandler & KeyboardEventHandler & TouchEventHandler;
+  onClick?: MouseEventHandler & KeyboardEventHandler & TouchEventHandler;
   icon?: IconProp;
   description?: string;
   variant?: "primary" | "success" | "danger" | "warning" | "info";
@@ -21,13 +21,13 @@ const MenuItem: FC<MenuItemProps> = (props) => {
   const themeContext = useContext(ThemeContext);
 
   const onClick: MouseEventHandler<HTMLLIElement> = (e) => {
-    props.onTrigger?.(e);
+    props.onClick?.(e);
   };
 
   const onKeyDown: KeyboardEventHandler<HTMLLIElement> = (e) => {
     if (["Space", "Enter", "NumpadEnter"].includes(e.code)) {
       e.preventDefault();
-      props.onTrigger?.(e);
+      props.onClick?.(e);
     }
   };
 

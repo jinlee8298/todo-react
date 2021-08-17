@@ -1,3 +1,4 @@
 import useMenu from "./useMenu";
+import { useSelector, useDispatch } from "./storeHooks";
 
-export { useMenu };
+export { useMenu, useSelector, useDispatch };

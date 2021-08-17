@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import Task from "../Task/Task.style";
+import Placeholder from "../Placeholder/Placeholder.style";
 import { Button } from "common/components/style";
 
 export default styled.section`
@@ -14,7 +15,7 @@ export default styled.section`
   width: calc(var(--list-width) + 2rem);
   flex-shrink: 0;
 
-  ${Task} {
+  ${Task}, ${Placeholder} {
     width: var(--list-width);
     &:not(:last-child) {
       margin-block-end: 0.5rem;
@@ -51,6 +52,14 @@ export default styled.section`
     padding: 1em;
     flex-shrink: 1;
     overflow: hidden;
+    position: relative;
+    .dropzone-padding {
+      height: 1.5em;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+    }
     &:hover {
       overflow-y: auto;
     }

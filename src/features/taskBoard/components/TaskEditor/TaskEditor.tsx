@@ -1,13 +1,33 @@
-import { KeyboardEventHandler, useLayoutEffect, useRef, useState } from "react";
+import {
+  KeyboardEventHandler,
+  MouseEventHandler,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import TaskEditorContainer from "./TaskEditor.style";
 import { Button } from "common/components";
 import { faFlag, faBookmark } from "@fortawesome/free-regular-svg-icons";
+import { EntityId } from "@reduxjs/toolkit";
+import { Task } from "features/taskBoard/types";
+import { useDispatch } from "common/hooks";
+import { addTask } from "../../taskBoardSlice";
 
-const Task: React.FC = () => {
+type TaskEditorProps =
+  | {
+      mode: "add";
+      onCancel?: MouseEventHandler;
+      sectionId: EntityId;
+    }
+  | { mode: "edit"; onCancel?: MouseEventHandler; taskId: EntityId };
+
+const TaskEditor: React.FC<TaskEditorProps> = (props) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     if (titleInputRef.current) {
@@ -28,12 +48,30 @@ const Task: React.FC = () => {
     textarea.style.height = `${textarea.scrollHeight}px`;
   };
 
-  const preventNewLine: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
+  const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
+      addOrEditTask();
     }
   };
 
+  const addOrEditTask = () => {
+    if (props.mode === "add" && title.trim()) {
+      let newTask: Omit<Task, "id" | "order"> = {
+        createdAt: new Date().toString(),
+        title: title.trim(),
+        description,
+        updatedAt: new Date().toJSON(),
+      };
+      dispatch(addTask(props.sectionId, newTask));
+      reset();
+    }
+  };
+
+  const reset = () => {
+    setDescription("");
+    setTitle("");
+  };
   return (
     <TaskEditorContainer>
       <div className="input-wrapper">
@@ -44,7 +82,7 @@ const Task: React.FC = () => {
           ref={titleInputRef}
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          onKeyDown={preventNewLine}
+          onKeyDown={onEnter}
         />
         <textarea
           spellCheck={false}
@@ -70,14 +108,14 @@ const Task: React.FC = () => {
         />
       </div>
       <div className="button-group">
-        <Button size="sm" disabled={!title}>
+        <Button size="sm" disabled={!title} onClick={addOrEditTask}>
           Add task
         </Button>
-        <Button size="sm" alternative="reverse">
+        <Button size="sm" alternative="reverse" onClick={props.onCancel}>
           Cancel
         </Button>
       </div>
     </TaskEditorContainer>
   );
 };
-export default Task;
+export default TaskEditor;

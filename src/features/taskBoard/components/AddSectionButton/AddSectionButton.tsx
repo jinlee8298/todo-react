@@ -1,10 +1,10 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FC } from "react";
+import { FC, MouseEventHandler } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StyledAddSectionButton from "./AddSectionButton.style";
 
 type AddSectionButtonProps = {
-  onClick?: () => void;
+  onClick?: MouseEventHandler;
 };
 
 const AddSectionButton: FC<AddSectionButtonProps> = (props) => {

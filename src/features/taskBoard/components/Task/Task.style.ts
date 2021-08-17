@@ -4,12 +4,17 @@ import { Checkbox, Label, Button } from "common/components/style";
 
 export default styled.div`
   ${shadow};
+
   background: #fff;
   border-radius: 8px;
   padding: 1em;
   position: relative;
   transition: box-shadow 0.2s;
   border: 1px solid var(--gray4);
+
+  &.dragging {
+    display: none;
+  }
 
   ${Checkbox} {
     margin-inline-end: 0.5em;
@@ -31,7 +36,7 @@ export default styled.div`
     display: flex;
     align-items: flex-start;
   }
-  .task-details {
+  .task-details:not(:empty) {
     margin-block-start: 0.5em;
   }
   h3 {

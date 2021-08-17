@@ -114,7 +114,7 @@ export const taskBoardSlice = createSlice({
 
         if (section) {
           const taskIds = [...section?.taskIds];
-          taskIds.splice(index, 0, duplicatedTask.id);
+          taskIds.splice(index + 1, 0, duplicatedTask.id);
 
           sectionAdapter.updateOne(state.sections, {
             id: sectionId,

@@ -89,6 +89,17 @@ const Task: FC<TaskProps> = (props) => {
       );
     }
   };
+
+  const duplicateTaskHandler = () => {
+    dispatch(duplicateTask(props.sectionId, task, props.positionIndex));
+    closeMenu();
+  };
+
+  const deleteTaskHandler = () => {
+    dispatch(deleteTask(props.sectionId, props.taskId));
+    closeMenu();
+  };
+
   return (
     <StyledTask
       draggable
@@ -102,10 +113,7 @@ const Task: FC<TaskProps> = (props) => {
         <span>{task?.title}</span>
       </h3>
       {task?.description && <p>{task?.description}</p>}
-      <div className="task-details">
-        {/* <Label icon={faHospital}>20 Aug 2022</Label>
-      <Label icon={faPlus}>20 Aug 2022</Label> */}
-      </div>
+      <div className="task-details"></div>
       <Button
         ref={iconButtonRef}
         size="sx"
@@ -116,19 +124,13 @@ const Task: FC<TaskProps> = (props) => {
       />
       <Menu attachTo={iconButtonRef} open={showMenu} handleClose={closeMenu}>
         <Menu.Item icon={faEdit}>Edit task</Menu.Item>
-        <Menu.Item
-          icon={faCopy}
-          onClick={(e) => {
-            dispatch(duplicateTask(props.sectionId, task, props.positionIndex));
-            closeMenu();
-          }}
-        >
+        <Menu.Item icon={faCopy} onTrigger={duplicateTaskHandler}>
           Duplicate
         </Menu.Item>
         <Menu.Item
           variant="danger"
           icon={faTrash}
-          onClick={(e) => dispatch(deleteTask(props.sectionId, props.taskId))}
+          onTrigger={deleteTaskHandler}
         >
           Delete task
         </Menu.Item>

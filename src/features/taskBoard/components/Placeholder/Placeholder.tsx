@@ -5,7 +5,10 @@ type PlaceholderProps = {
   height: string;
 };
 const Placeholder: FC<PlaceholderProps> = (props) => {
-  return <StyledPlaceholder height={props.height}></StyledPlaceholder>;
+  const { height, ...rest } = props;
+  return (
+    <StyledPlaceholder height={props.height} {...rest}></StyledPlaceholder>
+  );
 };
 
 export default Placeholder;

@@ -4,6 +4,7 @@ import {
   useRef,
   DragEventHandler,
   FormEventHandler,
+  memo,
 } from "react";
 import { Button, Menu, Checkbox } from "common/components";
 import {
@@ -30,10 +31,9 @@ type TaskProps = {
   taskId: EntityId;
   sectionId: EntityId;
   onDragEnter?: DragEventHandler<HTMLDivElement>;
-  positionIndex: number;
 };
 
-const Task: FC<TaskProps> = (props) => {
+const Task: FC<TaskProps> = memo((props) => {
   const [showMenu, iconButtonRef, openMenu, closeMenu] =
     useMenu<HTMLButtonElement>();
   const task = useSelector((state: RootState) =>
@@ -55,20 +55,16 @@ const Task: FC<TaskProps> = (props) => {
 
   const onDragStart: DragEventHandler<HTMLDivElement> = (e) => {
     if (task) {
-      e.dataTransfer.setData("text/plain", task.title);
-      e.dataTransfer.setData("taskId", task.id.toString());
-      e.dataTransfer.setData("originSectionId", props.sectionId.toString());
-
       dispatch(
         setDraggingTaskData({
-          taskId: task.id,
-          sectionId: props.sectionId,
+          draggingTaskId: task.id,
+          originSectionId: props.sectionId,
           placeholderHeight: `${containerRef.current?.offsetHeight}px`,
         })
       );
 
       setTimeout(() => {
-        dispatch(insertTaskPlaceholder(props.sectionId, props.positionIndex));
+        dispatch(insertTaskPlaceholder(props.sectionId, props.taskId, null));
         containerRef.current?.classList.add("dragging");
       });
     }
@@ -81,6 +77,13 @@ const Task: FC<TaskProps> = (props) => {
     dispatch(setDraggingTaskData(null));
   };
 
+  const onDragEnterTask: DragEventHandler<HTMLElement> = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    dispatch(insertTaskPlaceholder(props.sectionId, props.taskId, null));
+  };
+
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
       const checkboxEle = e.target as HTMLInputElement;
@@ -91,7 +94,7 @@ const Task: FC<TaskProps> = (props) => {
   };
 
   const duplicateTaskHandler = () => {
-    dispatch(duplicateTask(props.sectionId, task, props.positionIndex));
+    dispatch(duplicateTask(props.sectionId, task));
     closeMenu();
   };
 
@@ -105,7 +108,7 @@ const Task: FC<TaskProps> = (props) => {
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onDragEnter={props.onDragEnter}
+      onDragEnter={onDragEnterTask}
       ref={containerRef}
     >
       <h3>
@@ -137,6 +140,6 @@ const Task: FC<TaskProps> = (props) => {
       </Menu>
     </StyledTask>
   );
-};
+});
 
 export default Task;

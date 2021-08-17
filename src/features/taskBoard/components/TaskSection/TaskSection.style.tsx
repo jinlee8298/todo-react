@@ -17,8 +17,11 @@ export default styled.section`
 
   ${Task}, ${Placeholder} {
     width: var(--list-width);
-    &:not(:last-child) {
-      margin-block-end: 0.5rem;
+    &:not(:first-child) {
+      margin-block-start: 0.5rem;
+    }
+    &.dragging:first-child + ${Task}, &.dragging:first-child + ${Placeholder} {
+      margin-block-start: 0;
     }
   }
   header {
@@ -53,16 +56,13 @@ export default styled.section`
     flex-shrink: 1;
     overflow: hidden;
     position: relative;
-    .dropzone-padding {
-      height: 1.5em;
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-      left: 0;
-    }
     &:hover {
       overflow-y: auto;
     }
+  }
+  .dropzone-padding {
+    height: 1em;
+    margin-block-end: -1em;
   }
   footer {
     flex-shrink: 0;

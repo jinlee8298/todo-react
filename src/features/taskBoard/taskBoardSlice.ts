@@ -19,8 +19,8 @@ const commentAdapter = createEntityAdapter<Comment>({
 const initialState = {
   tasks: taskAdapter.getInitialState<{
     draggingInfo: {
-      taskId: EntityId;
-      sectionId: EntityId;
+      draggingTaskId: EntityId;
+      originSectionId: EntityId;
       placeholderHeight: string;
       currentPlaceholderSecionId: EntityId | null;
     } | null;
@@ -90,18 +90,17 @@ export const taskBoardSlice = createSlice({
       taskAdapter.updateOne(state.tasks, action.payload);
     },
     duplicateTask: {
-      prepare: (sectionId, task, index) => ({
-        payload: { sectionId, task, index },
+      prepare: (sectionId, task) => ({
+        payload: { sectionId, task },
       }),
       reducer: (
         state,
         action: PayloadAction<{
           sectionId: EntityId;
           task: Task;
-          index: number;
         }>
       ) => {
-        const { sectionId, task, index } = action.payload;
+        const { sectionId, task } = action.payload;
         const duplicatedTask = {
           ...task,
           id: generateTaskId(),
@@ -114,6 +113,8 @@ export const taskBoardSlice = createSlice({
 
         if (section) {
           const taskIds = [...section?.taskIds];
+          const index = taskIds.indexOf(task.id);
+
           taskIds.splice(index + 1, 0, duplicatedTask.id);
 
           sectionAdapter.updateOne(state.sections, {
@@ -180,7 +181,7 @@ export const taskBoardSlice = createSlice({
             taskIds.splice(index, 0, taskId);
 
             if (state.tasks.draggingInfo) {
-              state.tasks.draggingInfo.sectionId = destinationSectionId;
+              state.tasks.draggingInfo.originSectionId = destinationSectionId;
             }
 
             sectionAdapter.updateMany(state.sections, [
@@ -222,41 +223,54 @@ export const taskBoardSlice = createSlice({
       },
     },
     insertTaskPlaceholder: {
-      prepare: (sectionId, index) => ({
+      prepare: (sectionId, taskId, index) => ({
         payload: {
           sectionId,
           index,
+          taskId,
         },
       }),
       reducer: (
         state,
-        action: PayloadAction<{ index: number; sectionId: EntityId }>
+        action: PayloadAction<
+          | {
+              sectionId: EntityId;
+              index: number;
+              taskId: null;
+            }
+          | {
+              sectionId: EntityId;
+              index: null;
+              taskId: EntityId;
+            }
+        >
       ) => {
-        const { index, sectionId } = action.payload;
+        const { index, taskId, sectionId } = action.payload;
+        console.log(index, taskId, sectionId);
         const section = sectionAdapter
           .getSelectors()
           .selectById(state.sections, sectionId);
         if (section) {
           const placeholderIndex = section.taskIds.indexOf("placeholder");
           const taskIds = [...section.taskIds];
-
+          let tempIndex = index || 0;
+          if (!tempIndex && taskId) {
+            tempIndex = taskIds.indexOf(taskId);
+          }
           if (placeholderIndex >= 0) {
             taskIds.splice(placeholderIndex, 1);
             taskIds.splice(
-              placeholderIndex > index ? index : index - 1,
+              placeholderIndex > tempIndex ? tempIndex : tempIndex - 1,
               0,
               "placeholder"
             );
           } else {
-            taskIds.splice(index, 0, "placeholder");
+            taskIds.splice(tempIndex, 0, "placeholder");
           }
-
           const draggingInfo = state.tasks.draggingInfo;
-
           if (draggingInfo) {
             draggingInfo.currentPlaceholderSecionId = sectionId;
           }
-
           sectionAdapter.updateOne(state.sections, {
             id: sectionId,
             changes: { taskIds },
@@ -286,8 +300,8 @@ export const taskBoardSlice = createSlice({
     setDraggingTaskData: (
       state,
       action: PayloadAction<{
-        taskId: EntityId;
-        sectionId: EntityId;
+        draggingTaskId: EntityId;
+        originSectionId: EntityId;
         placeholderHeight: string;
       } | null>
     ) => {

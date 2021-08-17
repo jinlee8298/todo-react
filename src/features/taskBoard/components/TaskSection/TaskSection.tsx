@@ -21,7 +21,7 @@ type TaskSectionProps = {
 };
 
 const TaskSection: FC<TaskSectionProps> = (props) => {
-  const [showTaskEdior, setTaskEditorVisibility] = useState(false);
+  const [showTaskEdior, setShowTaskEditor] = useState(false);
   const section = useSelector((state: RootState) =>
     sectionSelector.selectById(state, props.sectionId)
   );
@@ -38,23 +38,25 @@ const TaskSection: FC<TaskSectionProps> = (props) => {
   };
 
   const toggleTaskEditor = () => {
-    setTaskEditorVisibility((visibility) => !visibility);
+    setShowTaskEditor((visibility) => !visibility);
   };
 
   const onDragEnterTaskList: DragEventHandler<HTMLElement> = (e) => {
     e.preventDefault();
 
     const nonDraggingTaskIds = section?.taskIds.filter(
-      (id) => id !== draggingInfo?.taskId
+      (id) => id !== draggingInfo?.draggingTaskId
     );
     if (nonDraggingTaskIds?.length === 0) {
-      dispatch(insertTaskPlaceholder(props.sectionId, 0));
+      dispatch(insertTaskPlaceholder(props.sectionId, null, 0));
       return;
     }
 
     const targetEl = e.target as HTMLDivElement;
     if (targetEl.classList.contains("dropzone-padding")) {
-      dispatch(insertTaskPlaceholder(props.sectionId, section?.taskIds.length));
+      dispatch(
+        insertTaskPlaceholder(props.sectionId, null, section?.taskIds.length)
+      );
     }
   };
 
@@ -62,18 +64,11 @@ const TaskSection: FC<TaskSectionProps> = (props) => {
     e.preventDefault();
   };
 
-  const onDragEnterTask = (e: DragEvent<HTMLElement>, index: number) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    dispatch(insertTaskPlaceholder(props.sectionId, index));
-  };
-
   const onDrop: DragEventHandler<HTMLElement> = (e) => {
     e.preventDefault();
 
-    const taskId = e.dataTransfer.getData("taskId");
-    const originSectionId = e.dataTransfer.getData("originSectionId");
+    const taskId = draggingInfo?.draggingTaskId;
+    const originSectionId = draggingInfo?.originSectionId;
     const taskIndex = section?.taskIds.indexOf("placeholder");
 
     dispatch(
@@ -84,6 +79,7 @@ const TaskSection: FC<TaskSectionProps> = (props) => {
       dispatch(removeTaskPlaceholder());
     }
   };
+
   return (
     <StyledTaskSection ref={boardRef} draggable>
       <header>
@@ -99,23 +95,17 @@ const TaskSection: FC<TaskSectionProps> = (props) => {
         onDragOver={onDragOverTaskList}
         onDragEnter={onDragEnterTaskList}
       >
-        <div className="dropzone-padding"></div>
-        {section?.taskIds.map((taskId, index) =>
+        {section?.taskIds.map((taskId) =>
           taskId === "placeholder" ? (
             <Placeholder
               key="placeholder"
               height={draggingInfo ? draggingInfo.placeholderHeight : "0px"}
             />
           ) : (
-            <Task
-              key={taskId}
-              taskId={taskId}
-              sectionId={props.sectionId}
-              onDragEnter={(e) => onDragEnterTask(e, index)}
-              positionIndex={index}
-            />
+            <Task key={taskId} taskId={taskId} sectionId={props.sectionId} />
           )
         )}
+        <div className="dropzone-padding"></div>
       </div>
       <footer draggable onDragStart={preventDrag}>
         {showTaskEdior ? (

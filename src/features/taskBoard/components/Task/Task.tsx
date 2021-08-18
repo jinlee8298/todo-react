@@ -56,6 +56,7 @@ const Task: FC<TaskProps> = memo((props) => {
   const onDragStart: DragEventHandler<HTMLDivElement> = (e) => {
     if (task) {
       e.dataTransfer.setData("task", props.taskId.toString());
+      e.dataTransfer.setData("text/plain", task.title);
       dispatch(
         setDraggingTaskData({
           draggingTaskId: task.id,

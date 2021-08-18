@@ -122,6 +122,12 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
       );
     }
   };
+
+  const onDragLeave: DragEventHandler<HTMLElement> = (e) => {
+    if (e.currentTarget === e.target) {
+      dispatch(removeTaskPlaceholder());
+    }
+  };
   return (
     <StyledTaskSection
       draggable
@@ -130,6 +136,7 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
       onDragStart={onDragStartSection}
       onDragEnd={onDragEndSection}
       onDragOver={onSectionDragOver}
+      onDragLeave={onDragLeave}
     >
       <header>
         <h3>{section?.name}</h3>

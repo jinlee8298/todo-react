@@ -17,7 +17,7 @@ export default styled.div`
   > ${TaskList}, > ${Placeholder} {
     margin-inline-end: 1.5rem;
   }
-  ${Placeholder} {
+  > ${Placeholder} {
     width: calc(var(--list-width) + 2rem);
     flex-shrink: 0;
   }

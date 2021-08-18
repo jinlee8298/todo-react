@@ -26,14 +26,16 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
   );
   const dispatch = useDispatch();
 
-  const removePlaceholder: DragEventHandler<HTMLDivElement> = (e) => {
+  const onDragEnter: DragEventHandler<HTMLDivElement> = (e) => {
     if (e.target === e.currentTarget) {
       dispatch(removeTaskPlaceholder());
     }
 
-    const targetEl = e.target as HTMLDivElement;
-    if (targetEl.classList.contains("dropzone-padding")) {
-      dispatch(insertSectionPlaceholder("2021", null, -1));
+    if (e.dataTransfer.types.includes("section")) {
+      const targetEl = e.target as HTMLDivElement;
+      if (targetEl.classList.contains("dropzone-padding")) {
+        dispatch(insertSectionPlaceholder("2021", null, -1));
+      }
     }
   };
 
@@ -58,7 +60,7 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
     <StyledTaskBoard
       onDrop={onSectionDrop}
       onDragOver={onDragSectionOver}
-      onDragEnter={removePlaceholder}
+      onDragEnter={onDragEnter}
     >
       <div className="dropzone-padding"></div>
       {project?.sectionIds.map((id, index) => (

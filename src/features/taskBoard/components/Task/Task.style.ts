@@ -41,7 +41,7 @@ export default styled.div`
   }
   h3 {
     flex: 1;
-    font-size: 1rem;
+    font-size: 0.9rem;
     line-height: 1.5em;
   }
   p {

@@ -1,37 +1,17 @@
-import {
-  FC,
-  useEffect,
-  useRef,
-  DragEventHandler,
-  FormEventHandler,
-  memo,
-} from "react";
-import { Button, Menu, Checkbox } from "common/components";
-import {
-  faEllipsisH,
-  faEdit,
-  faCopy,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { FC, useRef, DragEventHandler, FormEventHandler, memo } from "react";
+import { Checkbox } from "common/components";
 import StyledTask from "./Task.style";
-import {
-  useConfirmDialog,
-  useDispatch,
-  useMenu,
-  useSelector,
-} from "common/hooks";
+import { useDispatch, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
 import {
   taskSelector,
-  deleteTask,
-  duplicateTask,
   setDraggingTaskData,
   removeTaskPlaceholder,
   insertTaskPlaceholder,
   updateTask,
 } from "features/taskBoard/taskBoardSlice";
 import { RootState } from "app/store";
-import { ConfirmDialog } from "common/components";
+import TaskMenu from "./TaskItemMenu/TaskMenu";
 
 type TaskProps = {
   taskId: EntityId;
@@ -40,26 +20,11 @@ type TaskProps = {
 };
 
 const Task: FC<TaskProps> = memo((props) => {
-  const [showMenu, iconButtonRef, openMenu, closeMenu] =
-    useMenu<HTMLButtonElement>();
-  const [showConfirm, closeConfirm, configConfirm, confirmDialogProps] =
-    useConfirmDialog();
   const task = useSelector((state: RootState) =>
     taskSelector.selectById(state.taskBoard, props.taskId)
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (showMenu) {
-      iconButtonRef.current?.classList.add("showing");
-    } else {
-      // 200 is transition time for menu
-      setTimeout(() => {
-        iconButtonRef.current?.classList.remove("showing");
-      }, 200);
-    }
-  }, [showMenu, iconButtonRef]);
 
   const onDragStart: DragEventHandler<HTMLDivElement> = (e) => {
     if (task) {
@@ -102,33 +67,7 @@ const Task: FC<TaskProps> = memo((props) => {
     }
   };
 
-  const duplicateTaskHandler = () => {
-    dispatch(duplicateTask(props.sectionId, task));
-    closeMenu();
-  };
-
-  const deleteTaskHandler = () => {
-    configConfirm({
-      backdropClick: closeConfirm,
-      handleClose: closeConfirm,
-      onReject: closeConfirm,
-      onConfirm: () => dispatch(deleteTask(props.sectionId, props.taskId)),
-      title: "Delete task?",
-      message: (
-        <span>
-          Are you sure you want to delete task: <strong>"{task?.title}"</strong>
-          ?
-        </span>
-      ),
-      acceptButtonLabel: "Delete",
-      rejectButtonLabel: "Cancel",
-      acceptButtonConfig: { variant: "danger" },
-    });
-    showConfirm();
-    closeMenu();
-  };
-
-  return (
+  return task ? (
     <StyledTask
       draggable
       onDragStart={onDragStart}
@@ -142,30 +81,9 @@ const Task: FC<TaskProps> = memo((props) => {
       </h3>
       {task?.description && <p>{task?.description}</p>}
       <div className="task-details"></div>
-      <Button
-        ref={iconButtonRef}
-        size="sx"
-        icon={faEllipsisH}
-        onClick={openMenu}
-        alternative="reverse"
-        rounded
-      />
-      <Menu attachTo={iconButtonRef} open={showMenu} handleClose={closeMenu}>
-        <Menu.Item icon={faEdit}>Edit task</Menu.Item>
-        <Menu.Item icon={faCopy} onTrigger={duplicateTaskHandler}>
-          Duplicate
-        </Menu.Item>
-        <Menu.Item
-          variant="danger"
-          icon={faTrashAlt}
-          onTrigger={deleteTaskHandler}
-        >
-          Delete task
-        </Menu.Item>
-      </Menu>
-      <ConfirmDialog {...confirmDialogProps} />
+      <TaskMenu sectionId={props.sectionId} task={task} />
     </StyledTask>
-  );
+  ) : null;
 });
 
 export default Task;

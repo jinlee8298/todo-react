@@ -17,8 +17,9 @@ import { RootState } from "app/store";
 
 type TaskBoardProps = {};
 let cachedOrder = 0;
+
 const TaskBoard: FC<TaskBoardProps> = (props) => {
-  const project = useSelector((state: RootState) =>
+  const project = useSelector((state) =>
     projectSelector.selectById(state.taskBoard, "2021")
   );
   const draggingSectionInfo = useSelector(

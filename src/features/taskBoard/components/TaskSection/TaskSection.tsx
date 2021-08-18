@@ -1,23 +1,18 @@
-import { DragEventHandler, FC, DragEvent, useRef, memo } from "react";
+import { DragEventHandler, FC, useRef, memo } from "react";
 import StyledTaskSection from "./TaskSection.style";
-import Task from "../Task/Task";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import {
   sectionSelector,
-  repositionTask,
-  insertTaskPlaceholder,
   removeTaskPlaceholder,
   insertSectionPlaceholder,
   removeSectionPlaceholder,
   setDraggingSectionData,
 } from "../../taskBoardSlice";
-import { useSelector } from "react-redux";
-import { RootState } from "app/store";
 import { Button } from "common/components";
-import { useDispatch } from "common/hooks";
-import Placeholder from "../Placeholder/Placeholder";
+import { useDispatch, useSelector } from "common/hooks";
 import TaskSectionFooter from "./TaskSectionFooter/TaskSectionFooter";
+import TaskSectionBody from "./TaskSectionBody/TaskSectionBody";
 
 type TaskSectionProps = {
   sectionId: EntityId;
@@ -25,61 +20,11 @@ type TaskSectionProps = {
 };
 
 const TaskSection: FC<TaskSectionProps> = memo((props) => {
-  const section = useSelector((state: RootState) =>
+  const section = useSelector((state) =>
     sectionSelector.selectById(state.taskBoard, props.sectionId)
-  );
-  const draggingInfo = useSelector(
-    (state: RootState) => state.taskBoard.tasks.draggingInfo
   );
   const containerRef = useRef<HTMLElement>(null);
   const dispatch = useDispatch();
-
-  const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      e.preventDefault();
-    }
-  };
-
-  const onDragEnterTaskList: DragEventHandler<HTMLElement> = (e) => {
-    if (e.dataTransfer.types.includes("task")) {
-      e.preventDefault();
-
-      const nonDraggingTaskIds = section?.taskIds.filter(
-        (id) => id !== draggingInfo?.draggingTaskId
-      );
-      if (nonDraggingTaskIds?.length === 0) {
-        dispatch(insertTaskPlaceholder(props.sectionId, null, 0));
-        return;
-      }
-
-      const targetEl = e.target as HTMLDivElement;
-      if (targetEl.classList.contains("dropzone-padding")) {
-        dispatch(
-          insertTaskPlaceholder(props.sectionId, null, section?.taskIds.length)
-        );
-      }
-    }
-  };
-
-  const onDragOverTaskList = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault();
-  };
-
-  const onTaskDrop: DragEventHandler<HTMLElement> = (e) => {
-    e.preventDefault();
-
-    const taskId = draggingInfo?.draggingTaskId;
-    const originSectionId = draggingInfo?.originSectionId;
-    const taskIndex = section?.taskIds.indexOf("placeholder");
-
-    dispatch(
-      repositionTask(props.sectionId, originSectionId, taskId, taskIndex)
-    );
-
-    if (originSectionId !== draggingInfo?.currentPlaceholderSecionId) {
-      dispatch(removeTaskPlaceholder());
-    }
-  };
 
   const onSectionDragOver: DragEventHandler<HTMLElement> = (e) => {
     if (e.dataTransfer.types.includes("section")) {
@@ -140,29 +85,15 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
     >
       <header>
         <h3>{section?.name}</h3>
-        <span>{section?.taskIds.length}</span>
+        <span>
+          {section?.taskIds.filter((id) => id !== "placeholder").length}
+        </span>
         <Button icon={faEllipsisH} size="sx" rounded alternative="reverse" />
       </header>
-      <div
-        className="task-list"
-        draggable
-        onDrop={onTaskDrop}
-        onDragStart={preventDrag}
-        onDragOver={onDragOverTaskList}
-        onDragEnter={onDragEnterTaskList}
-      >
-        {section?.taskIds.map((taskId) =>
-          taskId === "placeholder" ? (
-            <Placeholder
-              key="placeholder"
-              height={draggingInfo ? draggingInfo.placeholderHeight : "0px"}
-            />
-          ) : (
-            <Task key={taskId} taskId={taskId} sectionId={props.sectionId} />
-          )
-        )}
-        <div className="dropzone-padding"></div>
-      </div>
+      <TaskSectionBody
+        sectionId={props.sectionId}
+        taskIds={section?.taskIds ?? []}
+      />
       <TaskSectionFooter sectionId={props.sectionId} />
     </StyledTaskSection>
   );

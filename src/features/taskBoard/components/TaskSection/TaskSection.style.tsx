@@ -1,6 +1,4 @@
 import styled from "styled-components";
-import Task from "../Task/Task.style";
-import Placeholder from "../Placeholder/Placeholder.style";
 import { Button } from "common/components/style";
 
 export default styled.section`
@@ -19,15 +17,6 @@ export default styled.section`
     display: none;
   }
 
-  ${Task}, ${Placeholder} {
-    width: var(--list-width);
-    &:not(:first-child) {
-      margin-block-start: 0.5rem;
-    }
-    &.dragging:first-child + ${Task}, &.dragging:first-child + ${Placeholder} {
-      margin-block-start: 0;
-    }
-  }
   header {
     border-radius: 8px 8px 0 0;
     padding: 0.5em 1em;
@@ -53,20 +42,6 @@ export default styled.section`
       border-radius: 100rem;
       margin-inline-start: auto;
     }
-  }
-  .task-list {
-    background: var(--gray4);
-    padding: 1em;
-    flex-shrink: 1;
-    overflow: hidden;
-    position: relative;
-    &:hover {
-      overflow-y: auto;
-    }
-  }
-  .dropzone-padding {
-    height: 1em;
-    margin-block-end: -1em;
   }
   footer {
     flex-shrink: 0;

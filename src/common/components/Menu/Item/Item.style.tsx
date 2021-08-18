@@ -4,7 +4,6 @@ export default styled.li`
   --color: ${(props) => props.color};
 
   padding: 0.5em 1em;
-  font-weight: bold;
   color: var(--text);
   min-width: 184px;
   display: flex;

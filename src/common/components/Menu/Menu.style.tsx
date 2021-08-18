@@ -15,6 +15,7 @@ export default styled.div<MenuStyleProps>`
   top: 0;
   left: 0;
   position: fixed;
+  font-size: 0.9rem;
 
   ul {
     ${shadow};

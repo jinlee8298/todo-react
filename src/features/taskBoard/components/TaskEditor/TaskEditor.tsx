@@ -3,14 +3,13 @@ import {
   MouseEventHandler,
   useLayoutEffect,
   useRef,
-  useState,
 } from "react";
 import TaskEditorContainer from "./TaskEditor.style";
 import { Button } from "common/components";
 import { faFlag, faBookmark } from "@fortawesome/free-regular-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Task } from "features/taskBoard/types";
-import { useDispatch } from "common/hooks";
+import { useDispatch, useInput } from "common/hooks";
 import { addTask } from "../../taskBoardSlice";
 
 type TaskEditorProps =
@@ -22,11 +21,20 @@ type TaskEditorProps =
   | { mode: "edit"; onCancel?: MouseEventHandler; taskId: EntityId };
 
 const TaskEditor: React.FC<TaskEditorProps> = (props) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, titleErrors, resetTitle, onTitleChange] =
+    useInput<HTMLTextAreaElement>("", {
+      validate: validateTitle,
+    });
+  const [
+    description,
+    descriptionErrors,
+    resetDescription,
+    onDescriptionChange,
+  ] = useInput<HTMLTextAreaElement>("", {
+    validate: validateDesc,
+  });
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
-
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -64,14 +72,31 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
         updatedAt: new Date().toJSON(),
       };
       dispatch(addTask(props.sectionId, newTask));
-      reset();
+      resetTitle();
+      resetDescription();
     }
   };
 
-  const reset = () => {
-    setDescription("");
-    setTitle("");
-  };
+  function validateTitle(v: string) {
+    return [
+      {
+        valid: v.length <= 500,
+        errorMessage: `Task name character limit: ${v.length}/500`,
+        errorType: "maxLength",
+      },
+    ];
+  }
+
+  function validateDesc(v: string) {
+    return [
+      {
+        valid: v.length <= 1000,
+        errorMessage: `Task description character limit: ${v.length}/1000`,
+        errorType: "maxLength",
+      },
+    ];
+  }
+
   return (
     <TaskEditorContainer>
       <div className="input-wrapper">
@@ -81,7 +106,7 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
           placeholder="Task's title"
           ref={titleInputRef}
           value={title}
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={onTitleChange}
           onKeyDown={onEnter}
         />
         <textarea
@@ -89,9 +114,13 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
           className="description"
           placeholder="Task's description"
           ref={descriptionInputRef}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={onDescriptionChange}
           value={description}
         />
+      </div>
+      <div className="error">
+        <p>{titleErrors?.["maxLength"]?.message}</p>
+        <p>{descriptionErrors?.["maxLength"]?.message}</p>
       </div>
       <div className="task-options">
         <Button

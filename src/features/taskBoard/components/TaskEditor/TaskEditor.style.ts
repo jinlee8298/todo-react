@@ -44,4 +44,9 @@ export default styled.div`
       margin-inline-end: 1em;
     }
   }
+  .error {
+    color: var(--danger);
+    font-size: 0.75rem;
+    margin-block-end: 0.75em;
+  }
 `;

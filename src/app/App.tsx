@@ -18,9 +18,6 @@ const GlobalStyle = createGlobalStyle`
     --text: ${(props) => props.theme.text};
     --backdrop: #0000007f;
   }
-  .App{
-    padding: 20px;
-  }
 `;
 
 function App() {

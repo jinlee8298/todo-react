@@ -5,8 +5,9 @@ import {
   Update,
   EntityId,
 } from "@reduxjs/toolkit";
-import { RootState } from "app/store";
-import { Task, TaskSection, Comment } from "./types";
+import { Task, TaskSection, Comment, Project } from "./types";
+
+const projectAdapter = createEntityAdapter<Project>();
 
 const sectionAdapter = createEntityAdapter<TaskSection>();
 
@@ -27,9 +28,31 @@ const initialState = {
   }>({
     draggingInfo: null,
   }),
-  sections: sectionAdapter.getInitialState(),
+  sections: sectionAdapter.getInitialState<{
+    draggingInfo: {
+      draggingSectionId: EntityId;
+      placeholderHeight: string;
+    } | null;
+  }>({ draggingInfo: null }),
+  projects: projectAdapter.getInitialState({
+    ids: ["2021"],
+    entities: { "2021": { id: "2021", name: "Welcome", sectionIds: [] } },
+  }),
   comments: commentAdapter.getInitialState(),
 };
+
+export const taskSelector = taskAdapter.getSelectors(
+  (state: typeof initialState) => state.tasks
+);
+export const sectionSelector = sectionAdapter.getSelectors(
+  (state: typeof initialState) => state.sections
+);
+export const commentSelector = commentAdapter.getSelectors(
+  (state: typeof initialState) => state.comments
+);
+export const projectSelector = projectAdapter.getSelectors(
+  (state: typeof initialState) => state.projects
+);
 
 const generateTaskId = (): EntityId => {
   return Date.now().toString();
@@ -246,7 +269,6 @@ export const taskBoardSlice = createSlice({
         >
       ) => {
         const { index, taskId, sectionId } = action.payload;
-        console.log(index, taskId, sectionId);
         const section = sectionAdapter
           .getSelectors()
           .selectById(state.sections, sectionId);
@@ -314,47 +336,178 @@ export const taskBoardSlice = createSlice({
         state.tasks.draggingInfo = null;
       }
     },
-    addSection: (state, action: PayloadAction<TaskSection>) => {
-      sectionAdapter.addOne(state.sections, action.payload);
-    },
-    addSectionAt: (state, action: PayloadAction<number>) => {
-      const sections = sectionAdapter.getSelectors().selectAll(state.sections);
-      const newSection: TaskSection = {
-        id: generateTaskId(),
-        projectId: generateTaskId(),
-        taskIds: [],
-        name: generateTaskId().toString(),
-      };
-      sections.splice(action.payload, 0, newSection);
+    addSection: {
+      prepare: (projectId, section, index = -1) => ({
+        payload: { projectId, section, index },
+      }),
+      reducer: (
+        state,
+        action: PayloadAction<{
+          projectId: EntityId;
+          section: Omit<TaskSection, "id" | "taskIds">;
+          index: number;
+        }>
+      ) => {
+        const { projectId, section, index } = action.payload;
+        const project = projectAdapter
+          .getSelectors()
+          .selectById(state.projects, projectId);
 
-      sectionAdapter.upsertMany(
-        state.sections,
-        sections.map((s, index) => ({ ...s, order: index }))
-      );
+        if (!project) {
+          return;
+        }
+
+        const newSection: TaskSection = {
+          ...section,
+          id: generateTaskId(),
+          taskIds: [],
+        };
+        const sectionIds = [...project.sectionIds];
+        sectionIds.splice(
+          index >= 0 ? index : project.sectionIds.length,
+          0,
+          newSection.id
+        );
+
+        sectionAdapter.addOne(state.sections, newSection);
+        projectAdapter.updateOne(state.projects, {
+          id: projectId,
+          changes: { sectionIds },
+        });
+      },
     },
-    updateSection: (state, action: PayloadAction<Update<TaskSection>>) => {
+    updateSection: (
+      state,
+      action: PayloadAction<Update<Omit<TaskSection, "id">>>
+    ) => {
       sectionAdapter.updateOne(state.sections, action.payload);
     },
-    deleteSection: (state, action: PayloadAction<TaskSection>) => {
-      const deleteSection = action.payload;
-      deleteSection.taskIds.forEach((taskId) => {
-        deleteChildTasks(state, taskId);
-        taskAdapter.removeOne(state.tasks, taskId);
-      });
+    deleteSection: {
+      prepare: (projectId, sectionId) => ({
+        payload: { projectId, sectionId },
+      }),
+      reducer: (
+        state,
+        action: PayloadAction<{ projectId: EntityId; sectionId: EntityId }>
+      ) => {
+        const { projectId, sectionId } = action.payload;
+        const project = projectSelector.selectById(state, projectId);
 
-      sectionAdapter.removeOne(state.sections, deleteSection.id);
+        projectAdapter.updateOne(state.projects, {
+          id: projectId,
+          changes: {
+            sectionIds: project?.sectionIds.filter((id) => id !== sectionId),
+          },
+        });
+        sectionAdapter.removeOne(state.sections, sectionId);
+      },
     },
     repositionSection: {
-      prepare: (section, newOrder) => ({
+      prepare: (projectId, sectionId, index) => ({
+        payload: { projectId, sectionId, index },
+      }),
+      reducer: (
+        state,
+        action: PayloadAction<{
+          projectId: EntityId;
+          sectionId: EntityId;
+          index: number;
+        }>
+      ) => {
+        const { projectId, sectionId, index } = action.payload;
+        const project = projectSelector.selectById(state, projectId);
+        if (project) {
+          const currentSectionIndex = project.sectionIds.indexOf(sectionId);
+
+          if (currentSectionIndex === index) {
+            return;
+          }
+
+          const sectionIds = [...project.sectionIds];
+          sectionIds.splice(currentSectionIndex, 1);
+          sectionIds.splice(
+            currentSectionIndex > index ? index : index - 1,
+            0,
+            sectionId
+          );
+
+          projectAdapter.updateOne(state.projects, {
+            id: projectId,
+            changes: { sectionIds },
+          });
+        }
+      },
+    },
+    setDraggingSectionData: (
+      state,
+      action: PayloadAction<{
+        draggingSectionId: EntityId;
+        placeholderHeight: string;
+      } | null>
+    ) => {
+      state.sections.draggingInfo = action.payload;
+    },
+    insertSectionPlaceholder: {
+      prepare: (projectId, sectionId, index) => ({
         payload: {
-          section,
-          newOrder,
+          projectId,
+          sectionId,
+          index,
         },
       }),
       reducer: (
         state,
-        action: PayloadAction<{ section: TaskSection; newOrder: number }>
-      ) => {},
+        action: PayloadAction<{
+          projectId: EntityId;
+          sectionId: EntityId | null;
+          index: number | null;
+        }>
+      ) => {
+        const { index, projectId, sectionId } = action.payload;
+        const project = projectSelector.selectById(state, projectId);
+        if (project) {
+          const placeholderIndex = project.sectionIds.indexOf("placeholder");
+          const sectionIds = [...project.sectionIds];
+
+          let tempIndex = index ?? -1;
+          if (tempIndex < 0 && sectionId) {
+            tempIndex = sectionIds.indexOf(sectionId);
+          }
+          console.log(index, tempIndex);
+
+          if (placeholderIndex >= 0) {
+            sectionIds.splice(placeholderIndex, 1);
+            sectionIds.splice(
+              placeholderIndex > tempIndex ? tempIndex + 1 : tempIndex,
+              0,
+              "placeholder"
+            );
+          } else {
+            sectionIds.splice(tempIndex + 1, 0, "placeholder");
+          }
+
+          projectAdapter.updateOne(state.projects, {
+            id: projectId,
+            changes: { sectionIds },
+          });
+        }
+      },
+    },
+    removeSectionPlaceholder: (state, action: PayloadAction<EntityId>) => {
+      const project = projectSelector.selectById(state, action.payload);
+      if (project) {
+        const placeholderIndex = project.sectionIds.indexOf("placeholder");
+        if (placeholderIndex >= 0) {
+          projectAdapter.updateOne(state.projects, {
+            id: project.id,
+            changes: {
+              sectionIds: project.sectionIds.filter(
+                (id) => id !== "placeholder"
+              ),
+            },
+          });
+        }
+      }
     },
     addComment: (state, action: PayloadAction<Comment>) => {
       commentAdapter.addOne(state.comments, action.payload);
@@ -368,16 +521,6 @@ export const taskBoardSlice = createSlice({
   },
 });
 
-export const taskSelector = taskAdapter.getSelectors(
-  (state: RootState) => state.taskBoard.tasks
-);
-export const sectionSelector = sectionAdapter.getSelectors(
-  (state: RootState) => state.taskBoard.sections
-);
-export const commentSelector = commentAdapter.getSelectors(
-  (state: RootState) => state.taskBoard.comments
-);
-
 export const {
   addTask,
   updateTask,
@@ -388,9 +531,12 @@ export const {
   removeTaskPlaceholder,
   setDraggingTaskData,
   addSection,
-  addSectionAt,
   updateSection,
   deleteSection,
+  repositionSection,
+  setDraggingSectionData,
+  insertSectionPlaceholder,
+  removeSectionPlaceholder,
   addComment,
   updateComment,
   deleteComment,

@@ -7,48 +7,87 @@ import { useDispatch, useSelector } from "common/hooks";
 import AddSectionTrigger from "../AddSectionButton/AddSectionButton";
 import {
   addSection,
-  sectionSelector,
-  addSectionAt,
+  insertSectionPlaceholder,
+  projectSelector,
   removeTaskPlaceholder,
+  repositionSection,
 } from "../../taskBoardSlice";
-import { shallowEqual } from "react-redux";
+import Placeholder from "../Placeholder/Placeholder";
+import { RootState } from "app/store";
 
 type TaskBoardProps = {};
 let cachedOrder = 0;
 const TaskBoard: FC<TaskBoardProps> = (props) => {
-  const sections = useSelector(sectionSelector.selectIds, shallowEqual);
+  const project = useSelector((state: RootState) =>
+    projectSelector.selectById(state.taskBoard, "2021")
+  );
+  const draggingSectionInfo = useSelector(
+    (state: RootState) => state.taskBoard.sections.draggingInfo
+  );
   const dispatch = useDispatch();
 
   const removePlaceholder: DragEventHandler<HTMLDivElement> = (e) => {
     if (e.target === e.currentTarget) {
       dispatch(removeTaskPlaceholder());
     }
+
+    const targetEl = e.target as HTMLDivElement;
+    if (targetEl.classList.contains("dropzone-padding")) {
+      dispatch(insertSectionPlaceholder("2021", null, -1));
+    }
+  };
+
+  const onSectionDrop: DragEventHandler<HTMLDivElement> = (e) => {
+    if (e.dataTransfer.types.includes("section")) {
+      e.preventDefault();
+
+      const sectionId = draggingSectionInfo?.draggingSectionId;
+      const sectionIndex = project?.sectionIds.indexOf("placeholder");
+
+      dispatch(repositionSection("2021", sectionId, sectionIndex));
+    }
+  };
+
+  const onDragSectionOver: DragEventHandler<HTMLDivElement> = (e) => {
+    if (e.dataTransfer.types.includes("section")) {
+      e.preventDefault();
+    }
   };
 
   return (
-    <StyledTaskBoard onDragEnter={removePlaceholder}>
-      {sections.map((sectionId, index) => (
-        <Fragment key={sectionId}>
-          <TaskSection key={sectionId} sectionId={sectionId} />
-          {index !== sections.length - 1 && (
+    <StyledTaskBoard
+      onDrop={onSectionDrop}
+      onDragOver={onDragSectionOver}
+      onDragEnter={removePlaceholder}
+    >
+      <div className="dropzone-padding"></div>
+      {project?.sectionIds.map((id, index) => (
+        <Fragment key={id}>
+          {id === "placeholder" ? (
+            <Placeholder
+              height={draggingSectionInfo?.placeholderHeight ?? "100%"}
+            />
+          ) : (
+            <TaskSection key={id} sectionId={id} projectId="2021" />
+          )}
+
+          {index !== project?.sectionIds.length - 1 && (
             <AddSectionTrigger
               onClick={(e) => {
-                dispatch(addSectionAt(index + 1));
+                dispatch(addSection("2021", { name: "test2" }, index + 1));
               }}
             />
           )}
         </Fragment>
       ))}
+
       <Button
         alternative="reverse"
         icon={faPlusSquare}
         onClick={(e) =>
           dispatch(
-            addSection({
-              projectId: cachedOrder,
-              id: new Date().getTime().toString(),
-              name: "test" + cachedOrder,
-              taskIds: [],
+            addSection("2021", {
+              name: "test" + cachedOrder++,
             })
           )
         }

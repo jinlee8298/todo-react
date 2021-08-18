@@ -37,7 +37,7 @@ const Task: FC<TaskProps> = memo((props) => {
   const [showMenu, iconButtonRef, openMenu, closeMenu] =
     useMenu<HTMLButtonElement>();
   const task = useSelector((state: RootState) =>
-    taskSelector.selectById(state, props.taskId)
+    taskSelector.selectById(state.taskBoard, props.taskId)
   );
   const containerRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
@@ -55,6 +55,7 @@ const Task: FC<TaskProps> = memo((props) => {
 
   const onDragStart: DragEventHandler<HTMLDivElement> = (e) => {
     if (task) {
+      e.dataTransfer.setData("task", props.taskId.toString());
       dispatch(
         setDraggingTaskData({
           draggingTaskId: task.id,
@@ -77,11 +78,10 @@ const Task: FC<TaskProps> = memo((props) => {
     dispatch(setDraggingTaskData(null));
   };
 
-  const onDragEnterTask: DragEventHandler<HTMLElement> = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    dispatch(insertTaskPlaceholder(props.sectionId, props.taskId, null));
+  const onDragEnter: DragEventHandler<HTMLElement> = (e) => {
+    if (e.dataTransfer.types.includes("task")) {
+      dispatch(insertTaskPlaceholder(props.sectionId, props.taskId, null));
+    }
   };
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
@@ -108,11 +108,11 @@ const Task: FC<TaskProps> = memo((props) => {
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onDragEnter={onDragEnterTask}
+      onDragEnter={onDragEnter}
       ref={containerRef}
     >
       <h3>
-        <Checkbox checked={task?.finished} onChange={onTickCheckbox} />
+        <Checkbox checked={task?.finished ?? false} onChange={onTickCheckbox} />
         <span>{task?.title}</span>
       </h3>
       {task?.description && <p>{task?.description}</p>}

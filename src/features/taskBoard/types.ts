@@ -35,7 +35,12 @@ export interface Task {
 
 export interface TaskSection {
   id: EntityId;
-  projectId: EntityId;
   name: string;
   taskIds: EntityId[];
+}
+
+export interface Project {
+  id: EntityId;
+  sectionIds: EntityId[];
+  name: string;
 }

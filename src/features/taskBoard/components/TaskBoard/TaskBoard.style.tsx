@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { Button } from "common/components/style";
 import TaskList from "../TaskSection/TaskSection.style";
+import Placeholder from "../Placeholder/Placeholder.style";
+import AddSectionButton from "../AddSectionButton/AddSectionButton.style";
 
 export default styled.div`
   --list-width: 17rem;
@@ -9,20 +11,28 @@ export default styled.div`
   height: 100%;
   overflow-y: auto;
   display: flex;
-  padding: 0.5rem;
+  padding: 2rem;
   align-items: flex-start;
-  ${TaskList} {
-    margin-inline: 0.75rem;
-    &:first-child {
-      margin-inline-start: 0;
-    }
-    &:last-child {
-      margin-inline-end: 0;
-    }
+
+  > ${TaskList}, > ${Placeholder} {
+    margin-inline-end: 1.5rem;
+  }
+  ${Placeholder} {
+    width: calc(var(--list-width) + 2rem);
+    flex-shrink: 0;
   }
   > ${Button} {
-    margin-inline-start: 0.75rem;
     flex-shrink: 0;
-    width: var(--list-width);
+    width: calc(var(--list-width) + 2rem);
+  }
+  ${AddSectionButton} {
+    position: relative;
+    right: 0.75rem;
+  }
+  > .dropzone-padding {
+    height: 100%;
+    width: 2rem;
+    margin-inline-start: -2rem;
+    flex-shrink: 0;
   }
 `;

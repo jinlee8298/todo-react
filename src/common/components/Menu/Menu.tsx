@@ -107,11 +107,7 @@ const Menu: MenuType = (props) => {
             onClick={onClickBackdrop}
             onKeyDown={onPressEsc}
           >
-            <ul
-              role="menu"
-              ref={listRef}
-              onAnimationEnd={(e) => console.log(e)}
-            >
+            <ul role="menu" ref={listRef}>
               {props.children}
             </ul>
           </StyledMenu>

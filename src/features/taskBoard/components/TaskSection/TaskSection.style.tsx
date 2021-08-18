@@ -15,6 +15,10 @@ export default styled.section`
   width: calc(var(--list-width) + 2rem);
   flex-shrink: 0;
 
+  &.dragging {
+    display: none;
+  }
+
   ${Task}, ${Placeholder} {
     width: var(--list-width);
     &:not(:first-child) {

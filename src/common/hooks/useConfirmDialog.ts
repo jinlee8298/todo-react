@@ -6,24 +6,17 @@ const useConfirmDialog = () => {
     open: false,
   });
 
-  const configDialog = (config: Omit<ConfirmDialogProps, "open">) => {
-    const openState = dialogProp.open;
-
-    setDialogProp({ ...config, open: openState });
-  };
-
-  const show = () => {
-    setDialogProp((v) => ({ ...v, open: true }));
+  const show = (config: Omit<ConfirmDialogProps, "open">) => {
+    setDialogProp({ ...config, open: true });
   };
 
   const hide = () => {
     setDialogProp((v) => ({ ...v, open: false }));
   };
 
-  return [show, hide, configDialog, dialogProp] as [
-    () => void,
-    () => void,
+  return [show, hide, dialogProp] as [
     (config: Omit<ConfirmDialogProps, "open">) => void,
+    () => void,
     ConfirmDialogProps
   ];
 };

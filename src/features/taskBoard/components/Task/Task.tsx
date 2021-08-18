@@ -11,10 +11,15 @@ import {
   faEllipsisH,
   faEdit,
   faCopy,
-  faTrash,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import StyledTask from "./Task.style";
-import { useDispatch, useMenu, useSelector } from "common/hooks";
+import {
+  useConfirmDialog,
+  useDispatch,
+  useMenu,
+  useSelector,
+} from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
 import {
   taskSelector,
@@ -26,6 +31,7 @@ import {
   updateTask,
 } from "features/taskBoard/taskBoardSlice";
 import { RootState } from "app/store";
+import { ConfirmDialog } from "common/components";
 
 type TaskProps = {
   taskId: EntityId;
@@ -36,6 +42,8 @@ type TaskProps = {
 const Task: FC<TaskProps> = memo((props) => {
   const [showMenu, iconButtonRef, openMenu, closeMenu] =
     useMenu<HTMLButtonElement>();
+  const [showConfirm, closeConfirm, configConfirm, confirmDialogProps] =
+    useConfirmDialog();
   const task = useSelector((state: RootState) =>
     taskSelector.selectById(state.taskBoard, props.taskId)
   );
@@ -100,7 +108,23 @@ const Task: FC<TaskProps> = memo((props) => {
   };
 
   const deleteTaskHandler = () => {
-    dispatch(deleteTask(props.sectionId, props.taskId));
+    configConfirm({
+      backdropClick: closeConfirm,
+      handleClose: closeConfirm,
+      onReject: closeConfirm,
+      onConfirm: () => dispatch(deleteTask(props.sectionId, props.taskId)),
+      title: "Delete task?",
+      message: (
+        <span>
+          Are you sure you want to delete task: <strong>"{task?.title}"</strong>
+          ?
+        </span>
+      ),
+      acceptButtonLabel: "Delete",
+      rejectButtonLabel: "Cancel",
+      acceptButtonConfig: { variant: "danger" },
+    });
+    showConfirm();
     closeMenu();
   };
 
@@ -133,12 +157,13 @@ const Task: FC<TaskProps> = memo((props) => {
         </Menu.Item>
         <Menu.Item
           variant="danger"
-          icon={faTrash}
+          icon={faTrashAlt}
           onTrigger={deleteTaskHandler}
         >
           Delete task
         </Menu.Item>
       </Menu>
+      <ConfirmDialog {...confirmDialogProps} />
     </StyledTask>
   );
 });

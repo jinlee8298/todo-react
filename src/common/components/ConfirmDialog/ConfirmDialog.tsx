@@ -1,17 +1,14 @@
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import Button from "../Button/Button";
 import StyledConfirmDialog from "./ConfirmDialog.style";
 import { ButtonProps } from "../Button/Button";
 
-type ConfirmDialogProps = {
+export type ConfirmDialogProps = {
   open: boolean;
   title?: string;
-  titleIcon?: IconProp;
-  message?: string;
-  acceptButtonLabel?: string;
-  rejectButtonLabel?: string;
+  message?: string | ReactNode;
+  acceptButtonLabel?: string | ReactNode;
+  rejectButtonLabel?: string | ReactNode;
   acceptButtonConfig?: ButtonProps;
   rejectButtonConfig?: ButtonProps;
   handleClose?: () => void;
@@ -23,7 +20,6 @@ type ConfirmDialogProps = {
 const ConfirmDialog: FC<ConfirmDialogProps> = (props) => {
   const {
     title,
-    titleIcon,
     message,
     acceptButtonConfig,
     rejectButtonConfig,
@@ -35,10 +31,7 @@ const ConfirmDialog: FC<ConfirmDialogProps> = (props) => {
   } = props;
   return (
     <StyledConfirmDialog {...rest}>
-      <h2>
-        {titleIcon && <FontAwesomeIcon icon={titleIcon} />}
-        {title}
-      </h2>
+      <h2>{title}</h2>
       <div className="message">{message}</div>
       <div className="action-group">
         <Button

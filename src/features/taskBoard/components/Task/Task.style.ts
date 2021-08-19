@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { shadow, mediumShadow } from "common/styles/common";
+import { mediumShadow } from "common/styles/common";
 import { Checkbox, Label, Button } from "common/components/style";
 
 export default styled.div`

@@ -4,5 +4,6 @@ import Label from "./Label/Label.style";
 import Menu from "./Menu/Menu.style";
 import Modal from "./Modal/Modal.style";
 import ConfirmDialog from "./ConfirmDialog/ConfirmDialog.style";
+import Popover from "./Popover/Popover.style";
 
-export { Button, Checkbox, Label, Menu, Modal, ConfirmDialog };
+export { Button, Checkbox, Label, Menu, Modal, ConfirmDialog, Popover };

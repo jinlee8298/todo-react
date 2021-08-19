@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { transtionTiming } from "common/styles/common";
 import { shadow } from "common/styles/shadows";
 
 export default styled.div`
@@ -15,12 +16,13 @@ export default styled.div`
   height: 100%;
   padding-block: 2em;
   transition: opacity 0.2s;
+  ${transtionTiming};
 
   &.showing {
     section,
     .backdrop {
       opacity: 1;
-      transform: translateY(0);
+      transform: scale(1);
     }
   }
 
@@ -44,6 +46,7 @@ export default styled.div`
     background: #fff;
     transition: transform 0.2s, opacity 0.2s;
     opacity: 0;
-    transform: translateY(-25px);
+    transform: scale(0.9);
+    transform-origin: 50% 50%;
   }
 `;

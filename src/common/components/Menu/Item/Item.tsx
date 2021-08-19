@@ -27,6 +27,7 @@ const MenuItem: FC<MenuItemProps> = (props) => {
 
   return (
     <StyledMenuItem
+      role="menuitem"
       className={props.variant === "danger" ? "danger" : ""}
       tabIndex={1}
       onClick={onClick}

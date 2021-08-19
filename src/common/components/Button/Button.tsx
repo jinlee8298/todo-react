@@ -30,6 +30,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     children,
     rounded,
     iconPosition = "start",
+    className,
     ...rest
   } = props;
   const themeContext = useContext(ThemeContext);
@@ -39,7 +40,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       mainColor={themeContext[variant]}
       textColor={"white"}
       size={SIZE_MAPPING[size]}
-      className={[alternative, !children ? "icon-button" : ""].join(" ")}
+      className={[alternative, !children ? "icon-button" : "", className].join(
+        " "
+      )}
       rounded={!!rounded}
       ref={ref}
       {...rest}

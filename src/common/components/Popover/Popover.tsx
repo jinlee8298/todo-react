@@ -1,3 +1,4 @@
+import FocusTrap from "focus-trap-react";
 import {
   FC,
   useState,
@@ -7,6 +8,7 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useLayoutEffect,
 } from "react";
 import { createPortal } from "react-dom";
 import StyledPopover, { PopoverStyleProps } from "./Popover.style";
@@ -21,10 +23,15 @@ type PopoverProps = {
   isShown?: boolean;
   position?: Position;
   trigger?: "click" | "hover";
-  getPopoverRef?: (e: HTMLDivElement | null) => void;
+  getPopoverRef?: (
+    popoverRef: HTMLDivElement | null,
+    targetRef: HTMLElement | null
+  ) => void;
   onOpen?: () => void;
   onClose?: () => void;
   onClickOutside?: () => void;
+  onOpenFinished?: () => void;
+  onCloseFinished?: () => void;
 };
 
 const Popover: FC<PopoverProps> = ({
@@ -37,6 +44,8 @@ const Popover: FC<PopoverProps> = ({
   onClose,
   getPopoverRef,
   onClickOutside,
+  onOpenFinished,
+  onCloseFinished,
   ...props
 }) => {
   const [isShown, setIsShown] = useState<boolean>(!!props.isShown);
@@ -91,6 +100,12 @@ const Popover: FC<PopoverProps> = ({
   useEffect(() => {
     const handleBodyClick = (event: MouseEvent) => {
       if (
+        targetRef.current &&
+        targetRef.current.contains(event.target as Node)
+      ) {
+        return;
+      }
+      if (
         popoverRef.current &&
         popoverRef.current.contains(event.target as Node)
       ) {
@@ -100,14 +115,15 @@ const Popover: FC<PopoverProps> = ({
       if (closeOnClickOutside && typeof props.isShown !== "boolean") {
         togglePopover();
       }
+
       onClickOutside?.();
     };
 
     if (isShown) {
-      document.addEventListener("click", handleBodyClick);
+      document.body.addEventListener("mousedown", handleBodyClick);
     }
     return () => {
-      document.removeEventListener("click", handleBodyClick);
+      document.body.removeEventListener("mousedown", handleBodyClick);
     };
   }, [
     isShown,
@@ -138,6 +154,14 @@ const Popover: FC<PopoverProps> = ({
     }
   }, [render, position]);
 
+  useLayoutEffect(() => {
+    if (render) {
+      onOpenFinished?.();
+    } else {
+      onCloseFinished?.();
+    }
+  }, [render, onOpenFinished, onCloseFinished]);
+
   const renderContent = cloneElement(children as ReactElement, {
     ref: targetRef,
     onClick: togglePopover,
@@ -147,22 +171,29 @@ const Popover: FC<PopoverProps> = ({
   const getRef = useCallback(
     (e: HTMLDivElement) => {
       popoverRef.current = e;
-      getPopoverRef?.(e);
+      getPopoverRef?.(e, targetRef.current);
     },
     [getPopoverRef]
   );
+
   return (
     <>
       {renderContent}
       {render &&
         createPortal(
-          <StyledPopover
-            {...popoverPosition}
-            onMouseLeave={handleCloseHover}
-            ref={getRef}
-          >
-            {typeof content === "function" ? content({ open, close }) : content}
-          </StyledPopover>,
+          <>
+            <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
+              <StyledPopover
+                {...popoverPosition}
+                onMouseLeave={handleCloseHover}
+                ref={getRef}
+              >
+                {typeof content === "function"
+                  ? content({ open, close })
+                  : content}
+              </StyledPopover>
+            </FocusTrap>
+          </>,
           document.getElementById("popover-container") || document.body
         )}
     </>

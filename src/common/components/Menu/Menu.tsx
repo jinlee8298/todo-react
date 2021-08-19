@@ -1,120 +1,103 @@
 import StyledMenu from "./Menu.style";
 import MenuItem from "./Item/Item";
 import MenuDivider from "./Divider.style";
-import {
-  FC,
-  useEffect,
-  useLayoutEffect,
-  useState,
-  MouseEventHandler,
-  useRef,
-  KeyboardEventHandler,
-  MutableRefObject,
-} from "react";
+import { FC, useEffect, useRef } from "react";
 import FocusTrap from "focus-trap-react";
-import { createPortal } from "react-dom";
 
-type MenuProps = {
-  open?: Boolean;
-  handleClose?: Function;
-  attachTo?: MutableRefObject<HTMLElement | null>;
-};
-
-type MenuType = FC<MenuProps> & {
+type MenuType = FC & {
   Item: typeof MenuItem;
   Divider: typeof MenuDivider;
 };
 
 const Menu: MenuType = (props) => {
-  const [top, setTop] = useState("0");
-  const [left, setLeft] = useState("0");
-  const [render, setRender] = useState(false);
-  const listRef = useRef<HTMLUListElement>(null);
+  const menuContainerRef = useRef<HTMLUListElement>(null);
+  const childRefs = useRef<HTMLElement[]>([]);
+  const currentFocusIndex = useRef<number>(0);
 
   useEffect(() => {
-    if (props.open) {
-      setRender(true);
-    } else {
-      listRef.current?.classList.remove("showing");
-      setTimeout(() => setRender(false), 200);
+    const currentMenuRef = menuContainerRef.current;
+
+    const menuChilds: HTMLLIElement[] = [];
+    if (currentMenuRef) {
+      currentMenuRef
+        .querySelectorAll<HTMLLIElement>('[role="menuitem"]:not(:disabled)')
+        .forEach((child) => menuChilds.push(child));
     }
-  }, [props.open]);
+    childRefs.current = menuChilds;
 
-  useLayoutEffect(() => {
-    if (props.attachTo?.current && listRef.current && render) {
-      let { top, left } = calculateAttachPosition(
-        props.attachTo.current,
-        listRef.current
-      );
-      setTop(`${top}px`);
-      setLeft(`${left}px`);
-    }
-    if (render) {
-      listRef.current?.classList.add("showing");
-    }
-  }, [render, props.attachTo]);
-
-  const calculateAttachPosition = (
-    element: HTMLElement,
-    attachElement: HTMLElement
-  ) => {
-    let eleRect = element.getBoundingClientRect();
-    let attachRect = attachElement.getBoundingClientRect();
-
-    let top = 0;
-    let left = 0;
-
-    let attachMiddle = attachRect.width / 2;
-    if (eleRect.x > attachMiddle) {
-      let elementMiddle = (eleRect.left + eleRect.right) / 2;
-      if (elementMiddle + attachMiddle > window.innerWidth) {
-        left = window.innerWidth - attachRect.width;
+    const moveUp = () => {
+      const currentIndex = currentFocusIndex.current;
+      if (currentIndex > 0) {
+        childRefs.current[currentIndex - 1].focus();
       } else {
-        left = elementMiddle - attachMiddle;
+        childRefs.current[childRefs.current.length - 1].focus();
       }
-    }
-
-    if (window.innerHeight - eleRect.bottom < attachRect.height) {
-      top = window.innerHeight - attachRect.height;
-    } else {
-      top = eleRect.bottom + 5;
-    }
-
-    return {
-      top,
-      left,
     };
-  };
 
-  const onClickBackdrop: MouseEventHandler<HTMLDivElement> = (e) => {
-    if (props.handleClose && e.target === e.currentTarget) {
-      props.handleClose();
-    }
-  };
+    const moveDown = () => {
+      const currentIndex = currentFocusIndex.current;
+      if (currentIndex < childRefs.current.length - 1) {
+        childRefs.current[currentIndex + 1].focus();
+      } else {
+        childRefs.current[0].focus();
+      }
+    };
 
-  const onPressEsc: KeyboardEventHandler<HTMLDivElement> = (e) => {
-    if (["Escape"].includes(e.code)) {
-      props.handleClose?.();
-    }
-  };
+    const childFocused = (e: FocusEvent) => {
+      currentFocusIndex.current = childRefs.current.indexOf(
+        e.target as HTMLLIElement
+      );
+    };
 
-  return render
-    ? createPortal(
-        <FocusTrap>
-          <StyledMenu
-            top={top}
-            left={left}
-            onClick={onClickBackdrop}
-            onKeyDown={onPressEsc}
-          >
-            <ul role="menu" ref={listRef}>
-              {props.children}
-            </ul>
-          </StyledMenu>
-        </FocusTrap>,
-        document.body
-      )
-    : null;
+    const onKeypress = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+
+      if (!childRefs.current.includes(target)) {
+        return;
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        moveDown();
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        moveUp();
+      }
+
+      if (e.key === "Home") {
+        e.preventDefault();
+        childRefs.current[0].focus();
+      }
+
+      if (e.key === "End") {
+        e.preventDefault();
+        childRefs.current[childRefs.current.length - 1].focus();
+      }
+    };
+
+    currentMenuRef?.addEventListener("keydown", onKeypress);
+
+    childRefs.current.forEach((child) =>
+      child.addEventListener("focus", childFocused)
+    );
+
+    return () => {
+      childRefs.current.forEach((child) =>
+        child.removeEventListener("focus", childFocused)
+      );
+      currentMenuRef?.removeEventListener("keydown", onKeypress);
+    };
+  }, [menuContainerRef]);
+
+  return (
+    <FocusTrap>
+      <StyledMenu ref={menuContainerRef} role="menu">
+        {props.children}
+      </StyledMenu>
+    </FocusTrap>
+  );
 };
 
 Menu.Item = MenuItem;

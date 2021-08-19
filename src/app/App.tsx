@@ -1,7 +1,7 @@
 import "./App.css";
 import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
-import LightTheme from "../common/styles/themes/LightTheme";
+import LightTheme from "common/styles/themes/LightTheme";
 import TaskBoard from "features/taskBoard/components/TaskBoard/TaskBoard";
 
 const GlobalStyle = createGlobalStyle`
@@ -26,6 +26,7 @@ function App() {
       <GlobalStyle />
       <div className="App">
         <TaskBoard></TaskBoard>
+
         <div id="popover-container"></div>
       </div>
     </ThemeProvider>

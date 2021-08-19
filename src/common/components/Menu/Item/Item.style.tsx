@@ -5,7 +5,6 @@ export default styled.li`
 
   padding: 0.5em 1em;
   color: var(--text);
-  min-width: 184px;
   display: flex;
   align-items: center;
   transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;

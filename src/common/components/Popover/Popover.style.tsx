@@ -1,4 +1,3 @@
-import { shadow2 } from "common/styles/shadows";
 import { transtionTiming } from "common/styles/common";
 import styled from "styled-components";
 
@@ -9,10 +8,6 @@ export type PopoverStyleProps = {
 };
 
 export default styled.div<PopoverStyleProps>`
-  ${shadow2}
-
-  background: #fff;
-
   position: fixed;
   top: ${(props) => `${props.top}px`};
   left: ${(props) => `${props.left}px`};

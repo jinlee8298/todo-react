@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { transtionTiming } from "common/styles/common";
-import { shadow } from "common/styles/shadows";
+import { transtionTiming, shadow } from "common/styles/common";
 
 export default styled.div`
   width: 100%;

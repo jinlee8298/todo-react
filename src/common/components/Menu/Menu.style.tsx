@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import { shadow2 } from "common/styles/shadows";
+import { shadow } from "common/styles/common";
 
 export default styled.ul`
-  ${shadow2};
+  ${shadow};
 
   background: #fff;
   border-radius: 10px;

@@ -119,11 +119,19 @@ const Popover: FC<PopoverProps> = ({
       onClickOutside?.();
     };
 
+    const onEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        togglePopover();
+      }
+    };
+
     if (isShown) {
       document.body.addEventListener("mousedown", handleBodyClick);
+      document.body.addEventListener("keydown", onEsc);
     }
     return () => {
       document.body.removeEventListener("mousedown", handleBodyClick);
+      document.body.removeEventListener("keydown", onEsc);
     };
   }, [
     isShown,

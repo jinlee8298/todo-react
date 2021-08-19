@@ -27,12 +27,14 @@ const useInput = <InputType extends HTMLTextAreaElement | HTMLInputElement>(
     if (options?.validate) {
       const validateResults = options.validate(inputValue);
       validateResults.forEach(({ valid, errorType, errorMessage }) => {
-        if (!valid) {
+        const currentError = errors[errorType];
+        if (!valid && !currentError) {
           setErrors((value) => ({
             ...value,
             [errorType]: { type: errorType, message: errorMessage },
           }));
-        } else {
+        }
+        if (valid && currentError) {
           setErrors((value) => {
             value[errorType] = undefined;
             return {

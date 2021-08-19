@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { shadow, smoothShadow } from "common/styles/shadows";
+import { shadow, mediumShadow } from "common/styles/common";
 import { Checkbox, Label, Button } from "common/components/style";
 
 export default styled.div`
-  ${shadow};
+  ${mediumShadow};
 
   background: #fff;
   border-radius: 8px;
@@ -54,7 +54,6 @@ export default styled.div`
   }
 
   &:hover {
-    ${smoothShadow};
     cursor: pointer;
   }
   &:focus-within,

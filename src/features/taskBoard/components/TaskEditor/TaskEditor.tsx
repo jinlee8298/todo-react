@@ -114,7 +114,7 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
         </p>
         <p>
           {descriptionErrors?.["maxLength"] &&
-            `Description: ${titleErrors?.["maxLength"]}`}
+            `Description: ${descriptionErrors?.["maxLength"]}`}
         </p>
       </div>
       <div className="task-options">

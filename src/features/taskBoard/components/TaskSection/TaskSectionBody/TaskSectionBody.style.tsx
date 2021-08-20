@@ -3,7 +3,7 @@ import Placeholder from "../../Placeholder/Placeholder.style";
 import Task from "../../Task/Task.style";
 
 export default styled.div`
-  background: var(--gray4);
+  background: var(--gray3);
   padding: 1em;
   flex-shrink: 1;
   overflow: hidden;

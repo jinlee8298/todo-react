@@ -1,6 +1,8 @@
 import { ChangeEventHandler, useState } from "react";
 
 type OptionsType = {
+  maxLength?: { value: number; message?: string };
+  minLength?: { value: number; message?: string };
   validate?: (changedeValue: string) => {
     valid: boolean;
     errorType: string;
@@ -8,8 +10,8 @@ type OptionsType = {
   }[];
 };
 
-type InputError = {
-  [id: string]: { type: string; message: string } | undefined;
+export type InputError = {
+  [id: string]: string | null;
 };
 
 const useInput = <InputType extends HTMLTextAreaElement | HTMLInputElement>(
@@ -19,29 +21,47 @@ const useInput = <InputType extends HTMLTextAreaElement | HTMLInputElement>(
   const [value, setValue] = useState(initialValue);
   const [errors, setErrors] = useState<InputError>({});
 
+  const updateError = (message: string | null, type: string) => {
+    if (message && !errors[type]) {
+      setErrors((value) => ({
+        ...value,
+        [type]: message,
+      }));
+    }
+    if (!message && errors[type]) {
+      setErrors((value) => ({
+        ...value,
+        [type]: null,
+      }));
+    }
+  };
+
   const onChange: ChangeEventHandler<InputType> = (e) => {
     const target = e.target as InputType;
 
     const inputValue = target.value;
-
+    if (options?.maxLength) {
+      updateError(
+        inputValue.length > options.maxLength.value
+          ? options.maxLength.message ||
+              `Maximum character limit exceeded: ${options.maxLength.value}`
+          : null,
+        "maxLength"
+      );
+    }
+    if (options?.minLength) {
+      updateError(
+        inputValue.length < options.minLength.value
+          ? options.minLength.message ||
+              `Maximum character limit exceeded: ${options.minLength.value}`
+          : null,
+        "minLength"
+      );
+    }
     if (options?.validate) {
       const validateResults = options.validate(inputValue);
       validateResults.forEach(({ valid, errorType, errorMessage }) => {
-        const currentError = errors[errorType];
-        if (!valid && !currentError) {
-          setErrors((value) => ({
-            ...value,
-            [errorType]: { type: errorType, message: errorMessage },
-          }));
-        }
-        if (valid && currentError) {
-          setErrors((value) => {
-            value[errorType] = undefined;
-            return {
-              ...value,
-            };
-          });
-        }
+        updateError(valid ? null : errorMessage, errorType);
       });
     }
 
@@ -53,10 +73,10 @@ const useInput = <InputType extends HTMLTextAreaElement | HTMLInputElement>(
   };
 
   return [value, errors, reset, onChange] as [
-    string,
-    InputError,
-    () => void,
-    ChangeEventHandler<InputType>
+    value: string,
+    errors: InputError,
+    reset: () => void,
+    onChange: ChangeEventHandler<InputType>
   ];
 };
 

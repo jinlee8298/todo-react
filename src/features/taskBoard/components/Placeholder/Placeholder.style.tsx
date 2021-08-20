@@ -7,5 +7,5 @@ type PlaceholderContainerProps = {
 export default styled.div<PlaceholderContainerProps>`
   height: ${(props) => props.height};
   border-radius: 8px;
-  background: var(--gray3);
+  background: var(--gray2);
 `;

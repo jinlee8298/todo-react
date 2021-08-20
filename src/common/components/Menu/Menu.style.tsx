@@ -9,7 +9,6 @@ export default styled.ul`
   list-style: none;
   margin: 0;
   max-height: 20rem;
-  overflow: hidden;
   padding: 0.5rem 0;
   width: 184px;
   &:hover {

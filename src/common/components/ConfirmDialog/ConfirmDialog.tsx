@@ -17,18 +17,17 @@ export type ConfirmDialogProps = {
   onReject?: () => void;
 };
 
-const ConfirmDialog: FC<ConfirmDialogProps> = (props) => {
-  const {
-    title,
-    message,
-    acceptButtonConfig,
-    rejectButtonConfig,
-    acceptButtonLabel,
-    rejectButtonLabel,
-    onConfirm,
-    onReject,
-    ...rest
-  } = props;
+const ConfirmDialog: FC<ConfirmDialogProps> = ({
+  title,
+  message,
+  acceptButtonConfig,
+  rejectButtonConfig,
+  acceptButtonLabel,
+  rejectButtonLabel,
+  onConfirm,
+  onReject,
+  ...rest
+}) => {
   return (
     <StyledConfirmDialog {...rest}>
       <h2>{title}</h2>

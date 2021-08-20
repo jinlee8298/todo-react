@@ -2,10 +2,11 @@ import {
   KeyboardEventHandler,
   MouseEventHandler,
   useLayoutEffect,
+  useMemo,
   useRef,
 } from "react";
 import TaskEditorContainer from "./TaskEditor.style";
-import { Button } from "common/components";
+import { Button, TextArea } from "common/components";
 import { faFlag, faBookmark } from "@fortawesome/free-regular-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Task } from "features/taskBoard/types";
@@ -23,7 +24,7 @@ type TaskEditorProps =
 const TaskEditor: React.FC<TaskEditorProps> = (props) => {
   const [title, titleErrors, resetTitle, onTitleChange] =
     useInput<HTMLTextAreaElement>("", {
-      validate: validateTitle,
+      maxLength: { value: 500 },
     });
   const [
     description,
@@ -31,7 +32,7 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
     resetDescription,
     onDescriptionChange,
   ] = useInput<HTMLTextAreaElement>("", {
-    validate: validateDesc,
+    maxLength: { value: 1000 },
   });
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
@@ -77,50 +78,44 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
     }
   };
 
-  function validateTitle(v: string) {
-    return [
-      {
-        valid: v.length <= 500,
-        errorMessage: `Task name character limit: ${v.length}/500`,
-        errorType: "maxLength",
-      },
-    ];
-  }
-
-  function validateDesc(v: string) {
-    return [
-      {
-        valid: v.length <= 1000,
-        errorMessage: `Task description character limit: ${v.length}/1000`,
-        errorType: "maxLength",
-      },
-    ];
-  }
+  const checkError = useMemo(() => {
+    const titleErrorCount = Object.values(titleErrors).filter((x) => x).length;
+    const descriptionErrorCount = Object.values(descriptionErrors).filter(
+      (x) => x
+    ).length;
+    console.log(1);
+    return titleErrorCount > 0 || descriptionErrorCount > 0;
+  }, [descriptionErrors, titleErrors]);
 
   return (
     <TaskEditorContainer>
       <div className="input-wrapper">
-        <textarea
-          spellCheck={false}
-          className="title"
-          placeholder="Task's title"
-          ref={titleInputRef}
-          value={title}
+        <TextArea
+          errors={titleErrors}
+          hideErrorMessage
+          label="Title"
           onChange={onTitleChange}
           onKeyDown={onEnter}
-        />
-        <textarea
           spellCheck={false}
-          className="description"
-          placeholder="Task's description"
-          ref={descriptionInputRef}
+          value={title}
+        />
+        <TextArea
+          errors={descriptionErrors}
+          hideErrorMessage
+          label="Description"
           onChange={onDescriptionChange}
+          spellCheck={false}
           value={description}
         />
       </div>
       <div className="error">
-        <p>{titleErrors?.["maxLength"]?.message}</p>
-        <p>{descriptionErrors?.["maxLength"]?.message}</p>
+        <p>
+          {titleErrors?.["maxLength"] && `Title: ${titleErrors?.["maxLength"]}`}
+        </p>
+        <p>
+          {descriptionErrors?.["maxLength"] &&
+            `Description: ${titleErrors?.["maxLength"]}`}
+        </p>
       </div>
       <div className="task-options">
         <Button
@@ -137,7 +132,11 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
         />
       </div>
       <div className="button-group">
-        <Button size="sm" disabled={!title} onClick={addOrEditTask}>
+        <Button
+          size="sm"
+          disabled={!title || checkError}
+          onClick={addOrEditTask}
+        >
           Add task
         </Button>
         <Button size="sm" alternative="reverse" onClick={props.onCancel}>

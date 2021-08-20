@@ -15,7 +15,7 @@ type TaskSectionBodyProps = {
   taskIds: EntityId[];
 };
 
-const TaskSectionBody: FC<TaskSectionBodyProps> = (props) => {
+const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
   const draggingInfo = useSelector(
     (state) => state.taskBoard.tasks.draggingInfo
   );
@@ -32,11 +32,9 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = (props) => {
 
     const taskId = draggingInfo?.draggingTaskId;
     const originSectionId = draggingInfo?.originSectionId;
-    const taskIndex = props.taskIds.indexOf("placeholder");
+    const taskIndex = taskIds.indexOf("placeholder");
 
-    dispatch(
-      repositionTask(props.sectionId, originSectionId, taskId, taskIndex)
-    );
+    dispatch(repositionTask(sectionId, originSectionId, taskId, taskIndex));
 
     if (originSectionId !== draggingInfo?.currentPlaceholderSecionId) {
       dispatch(removeTaskPlaceholder());
@@ -47,19 +45,17 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = (props) => {
     if (e.dataTransfer.types.includes("task")) {
       e.preventDefault();
 
-      const nonDraggingTaskIds = props.taskIds.filter(
+      const nonDraggingTaskIds = taskIds.filter(
         (id) => id !== draggingInfo?.draggingTaskId
       );
       if (nonDraggingTaskIds?.length === 0) {
-        dispatch(insertTaskPlaceholder(props.sectionId, null, 0));
+        dispatch(insertTaskPlaceholder(sectionId, null, 0));
         return;
       }
 
       const targetEl = e.target as HTMLDivElement;
       if (targetEl.classList.contains("dropzone-padding")) {
-        dispatch(
-          insertTaskPlaceholder(props.sectionId, null, props.taskIds.length)
-        );
+        dispatch(insertTaskPlaceholder(sectionId, null, taskIds.length));
       }
     }
   };
@@ -77,14 +73,14 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = (props) => {
       onDragOver={onDragOverTaskList}
       onDragEnter={onDragEnterTaskList}
     >
-      {props.taskIds.map((taskId) =>
+      {taskIds.map((taskId) =>
         taskId === "placeholder" ? (
           <Placeholder
             key="placeholder"
             height={draggingInfo ? draggingInfo.placeholderHeight : "0px"}
           />
         ) : (
-          <Task key={taskId} taskId={taskId} sectionId={props.sectionId} />
+          <Task key={taskId} taskId={taskId} sectionId={sectionId} />
         )
       )}
       <div className="dropzone-padding"></div>

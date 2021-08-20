@@ -21,41 +21,47 @@ const SIZE_MAPPING = {
   lg: "1rem",
 };
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-  const {
-    variant = "primary",
-    size = "md",
-    alternative,
-    icon,
-    children,
-    rounded,
-    iconPosition = "start",
-    className,
-    ...rest
-  } = props;
-  const themeContext = useContext(ThemeContext);
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = "primary",
+      size = "md",
+      alternative,
+      icon,
+      children,
+      rounded,
+      iconPosition = "start",
+      className,
+      ...rest
+    },
+    ref
+  ) => {
+    const themeContext = useContext(ThemeContext);
 
-  return (
-    <StyledButton
-      mainColor={themeContext[variant]}
-      textColor={"white"}
-      size={SIZE_MAPPING[size]}
-      className={[alternative, !children ? "icon-button" : "", className].join(
-        " "
-      )}
-      rounded={!!rounded}
-      ref={ref}
-      {...rest}
-    >
-      {icon && iconPosition === "start" && (
-        <FontAwesomeIcon icon={icon} fixedWidth />
-      )}
-      {children && <span>{children}</span>}
-      {icon && iconPosition === "end" && (
-        <FontAwesomeIcon icon={icon} fixedWidth />
-      )}
-    </StyledButton>
-  );
-});
+    return (
+      <StyledButton
+        mainColor={themeContext[variant]}
+        textColor={"white"}
+        size={SIZE_MAPPING[size]}
+        className={[
+          alternative,
+          !children ? "icon-button" : "",
+          className,
+        ].join(" ")}
+        rounded={!!rounded}
+        ref={ref}
+        {...rest}
+      >
+        {icon && iconPosition === "start" && (
+          <FontAwesomeIcon icon={icon} fixedWidth />
+        )}
+        {children && <span>{children}</span>}
+        {icon && iconPosition === "end" && (
+          <FontAwesomeIcon icon={icon} fixedWidth />
+        )}
+      </StyledButton>
+    );
+  }
+);
 
 export default Button;

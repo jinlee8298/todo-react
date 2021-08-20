@@ -8,8 +8,8 @@ type ButtonProps = {
 };
 
 export default styled.button<ButtonProps>`
-  --button-color: ${(props) => props.mainColor};
   --text-color: ${(props) => props.textColor};
+  --button-color: ${(props) => props.mainColor};
   --button-color-80: ${(props) => `${props.mainColor}CC`};
   --button-color-20: ${(props) => `${props.mainColor}33`};
   --button-color-10: ${(props) => `${props.mainColor}1A`};
@@ -77,19 +77,20 @@ export default styled.button<ButtonProps>`
     box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--button-color);
   }
   &:disabled {
-    background: var(--gray3);
+    background: var(--gray2);
+    color: #fff;
     &:hover {
       cursor: default;
     }
     &.outline {
-      background: var(--gray4);
+      background: var(--gray3);
       border-color: var(--gray2);
-      color: var(--gray2);
+      color: var(--gray1);
     }
     &.reverse {
-      background: var(--gray4);
+      background: var(--gray3);
       border-color: transparent;
-      color: var(--gray2);
+      color: var(--gray1);
     }
   }
 `;

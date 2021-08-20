@@ -6,7 +6,7 @@ export default styled.section`
   --primary-70: ${(props) => `${props.theme.primary}B3`};
 
   border-radius: 8px;
-  border: 1px solid var(--gray3);
+  border: 1px solid var(--gray2);
   display: flex;
   flex-direction: column;
   max-height: 100%;
@@ -20,7 +20,7 @@ export default styled.section`
   header {
     border-radius: 8px 8px 0 0;
     padding: 0.5em 1em;
-    border-bottom: 1px solid var(--gray3);
+    border-bottom: 1px solid var(--gray2);
     display: flex;
     align-items: center;
     background: #fff;

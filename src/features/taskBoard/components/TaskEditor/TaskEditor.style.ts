@@ -1,40 +1,24 @@
 import styled from "styled-components";
-import { Button } from "common/components/style";
+import { Button, TextArea } from "common/components/style";
 
 export default styled.div`
   padding: 1em;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--gray3);
-  .input-wrapper {
+  > .input-wrapper {
     max-height: min(10rem, 50vh);
+    border-radius: 4px;
     flex-shrink: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     margin-bottom: 0.5em;
+    &:hover {
+      overflow-y: auto;
+    }
   }
   .task-options {
     flex-shrink: 0;
     ${Button} {
       margin-inline-end: 1em;
-    }
-  }
-  textarea {
-    border: none;
-    display: block;
-    outline: none;
-    overflow: hidden;
-    padding: 0;
-    resize: none;
-    width: 100%;
-    &.title {
-      font-weight: bold;
-      margin-bottom: 0.4em;
-    }
-    &.description {
-      margin-bottom: 0.6em;
-    }
-    &::placeholder {
-      color: var(--gray2);
     }
   }
   .button-group {
@@ -48,5 +32,13 @@ export default styled.div`
     color: var(--danger);
     font-size: 0.75rem;
     margin-block-end: 0.75em;
+  }
+  ${TextArea} {
+    &:first-child {
+      font-weight: bold;
+      textarea {
+        font-weight: bold;
+      }
+    }
   }
 `;

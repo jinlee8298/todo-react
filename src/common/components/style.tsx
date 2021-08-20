@@ -5,5 +5,17 @@ import Menu from "./Menu/Menu.style";
 import Modal from "./Modal/Modal.style";
 import ConfirmDialog from "./ConfirmDialog/ConfirmDialog.style";
 import Popover from "./Popover/Popover.style";
+import TextInput from "./TextInput/TextInput.style";
+import TextArea from "./TextArea/TextArea.style";
 
-export { Button, Checkbox, Label, Menu, Modal, ConfirmDialog, Popover };
+export {
+  Button,
+  Checkbox,
+  Label,
+  Menu,
+  Modal,
+  ConfirmDialog,
+  Popover,
+  TextInput,
+  TextArea,
+};

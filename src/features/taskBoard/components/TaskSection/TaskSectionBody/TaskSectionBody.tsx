@@ -5,10 +5,11 @@ import {
   removeTaskPlaceholder,
   repositionTask,
 } from "features/taskBoard/taskBoardSlice";
-import { FC, DragEventHandler, DragEvent } from "react";
+import { FC, DragEventHandler, DragEvent, useState, useCallback } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
 import Placeholder from "../../Placeholder/Placeholder";
 import Task from "../../Task/Task";
+import TaskDetailsModal from "../../TaskDetailsModal/TaskDetailsModal";
 
 type TaskSectionBodyProps = {
   sectionId: EntityId;
@@ -19,6 +20,8 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
   const draggingInfo = useSelector(
     (state) => state.taskBoard.tasks.draggingInfo
   );
+  const [showTaskDetails, setShowTaskDetails] = useState<boolean>(false);
+  const [currentTaskId, setCurrentTaskId] = useState<EntityId>(0);
   const dispatch = useDispatch();
 
   const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
@@ -64,6 +67,15 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
     e.preventDefault();
   };
 
+  const openTaskDetailsModal = useCallback((taskId: EntityId) => {
+    setCurrentTaskId(taskId);
+    setShowTaskDetails((v) => !v);
+  }, []);
+
+  const toggleTaskDetailsModal = useCallback(() => {
+    setShowTaskDetails((v) => !v);
+  }, []);
+
   return (
     <StyledTaskSectionBody
       className="task-list"
@@ -80,10 +92,20 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
             height={draggingInfo ? draggingInfo.placeholderHeight : "0px"}
           />
         ) : (
-          <Task key={taskId} taskId={taskId} sectionId={sectionId} />
+          <Task
+            key={taskId}
+            onClick={openTaskDetailsModal}
+            taskId={taskId}
+            sectionId={sectionId}
+          />
         )
       )}
       <div className="dropzone-padding"></div>
+      <TaskDetailsModal
+        isShown={showTaskDetails}
+        taskId={currentTaskId}
+        handleClose={toggleTaskDetailsModal}
+      />
     </StyledTaskSectionBody>
   );
 };

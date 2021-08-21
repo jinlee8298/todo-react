@@ -1,20 +1,13 @@
 import { transtionTiming } from "common/styles/common";
 import styled from "styled-components";
 
-export type PopoverStyleProps = {
-  top: number;
-  left: number;
-  transformOrigin: { x: number; y: number };
-};
-
-export default styled.div<PopoverStyleProps>`
+export default styled.div`
   position: fixed;
-  top: ${(props) => `${props.top}px`};
-  left: ${(props) => `${props.left}px`};
+  top: var(--top);
+  left: var(--left);
 
   transition: transform 0.2s, opacity 0.2s;
-  transform-origin: ${({ transformOrigin }) =>
-    `${transformOrigin.x}px ${transformOrigin.y}px`};
+  transform-origin: var(--origin-x) var(--origin-y);
   ${transtionTiming};
   transform: scale(0.9);
   opacity: 0;

@@ -11,7 +11,7 @@ import {
   useLayoutEffect,
 } from "react";
 import { createPortal } from "react-dom";
-import StyledPopover, { PopoverStyleProps } from "./Popover.style";
+import StyledPopover from "./Popover.style";
 import { calculateAttachPosition, Position } from "./positionUtil";
 
 type PopoverProps = {
@@ -34,6 +34,8 @@ type PopoverProps = {
   onCloseFinished?: () => void;
 };
 
+const FOCUS_TRAP_OPTION = { allowOutsideClick: true };
+
 const Popover: FC<PopoverProps> = ({
   children,
   closeOnClickOutside,
@@ -49,11 +51,6 @@ const Popover: FC<PopoverProps> = ({
   ...props
 }) => {
   const [isShown, setIsShown] = useState<boolean>(!!props.isShown);
-  const [popoverPosition, setPopoverPosition] = useState<PopoverStyleProps>({
-    top: 0,
-    left: 0,
-    transformOrigin: { x: 0, y: 0 },
-  });
   const [render, setRender] = useState<boolean>(false);
   const targetRef = useRef<HTMLElement>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
@@ -156,9 +153,16 @@ const Popover: FC<PopoverProps> = ({
 
   useEffect(() => {
     if (render && targetRef.current && popoverRef.current) {
-      setPopoverPosition(
-        calculateAttachPosition(targetRef.current, popoverRef.current, position)
+      const { top, left, transformOrigin } = calculateAttachPosition(
+        targetRef.current,
+        popoverRef.current,
+        position
       );
+      const popoverStyle = popoverRef.current.style;
+      popoverStyle.setProperty("--top", `${top}px`);
+      popoverStyle.setProperty("--left", `${left}px`);
+      popoverStyle.setProperty("--origin-x", `${transformOrigin.x}px`);
+      popoverStyle.setProperty("--origin-y", `${transformOrigin.y}px`);
     }
   }, [render, position]);
 
@@ -193,12 +197,8 @@ const Popover: FC<PopoverProps> = ({
       {render &&
         createPortal(
           <>
-            <FocusTrap focusTrapOptions={{ allowOutsideClick: true }}>
-              <StyledPopover
-                {...popoverPosition}
-                onMouseLeave={handleCloseHover}
-                ref={getRef}
-              >
+            <FocusTrap focusTrapOptions={FOCUS_TRAP_OPTION}>
+              <StyledPopover onMouseLeave={handleCloseHover} ref={getRef}>
                 {typeof content === "function"
                   ? content({ open, close })
                   : content}

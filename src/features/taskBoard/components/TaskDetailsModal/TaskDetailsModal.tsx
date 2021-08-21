@@ -1,6 +1,13 @@
 import StyledModal from "./TaskDetailsModal.style";
 import { Button, Checkbox, Tabs } from "common/components";
-import { FC, useState, memo, useEffect, FormEventHandler } from "react";
+import {
+  FC,
+  useState,
+  memo,
+  useEffect,
+  FormEventHandler,
+  KeyboardEventHandler,
+} from "react";
 import {
   faCircle,
   faEllipsisH,
@@ -73,8 +80,18 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
       }
     };
 
+    const onEscape: KeyboardEventHandler = (e) => {
+      if (e.key === "Escape") {
+        onCloseModal();
+      }
+    };
+
     return (
-      <StyledModal backdropClick={onCloseModal} isShown={isShown}>
+      <StyledModal
+        onKeyDown={onEscape}
+        backdropClick={onCloseModal}
+        isShown={isShown}
+      >
         <div className="header">
           <a href="/">
             <FontAwesomeIcon icon={faCircle} />

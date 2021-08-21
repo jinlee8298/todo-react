@@ -1,7 +1,6 @@
 import {
   faEllipsisH,
   faCopy,
-  faEdit,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FC, useRef } from "react";
@@ -30,6 +29,7 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
     showConfirm({
       backdropClick: closeConfirm,
       onReject: closeConfirm,
+      onEsc: closeConfirm,
       onConfirm: () => {
         dispatch(deleteTask(props.sectionId, props.task.id));
       },
@@ -69,7 +69,6 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
         closeOnClickOutside={true}
         content={({ close }) => (
           <Menu>
-            <Menu.Item icon={faEdit}>Edit task</Menu.Item>
             <Menu.Item
               icon={faCopy}
               onTrigger={() => {

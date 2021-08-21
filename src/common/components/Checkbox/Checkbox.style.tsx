@@ -38,7 +38,7 @@ export default styled.label`
     }
     &:focus ~ .decoration {
       border: 1px solid var(--primary);
-      box-shadow: 0 0 0 1px #fff, 0 0 0 2px var(--primary);
+      box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px var(--primary);
     }
   }
   .decoration {

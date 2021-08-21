@@ -1,10 +1,18 @@
 import FocusTrap from "focus-trap-react";
-import { FC, MouseEventHandler, useEffect, useRef, useState } from "react";
+import {
+  FC,
+  KeyboardEventHandler,
+  MouseEventHandler,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import StyledModal from "./Modal.style";
 
 type ModalProps = {
   isShown: boolean;
+  onKeyDown?: KeyboardEventHandler;
   backdropClick?: MouseEventHandler;
 };
 
@@ -30,7 +38,12 @@ const Modal: FC<ModalProps> = (props) => {
   return render
     ? createPortal(
         <FocusTrap>
-          <StyledModal {...props} onClick={stopPropagation} ref={sectionRef}>
+          <StyledModal
+            onKeyDown={props.onKeyDown}
+            {...props}
+            onClick={stopPropagation}
+            ref={sectionRef}
+          >
             <div className="backdrop" onClick={props.backdropClick}></div>
             <section>{props.children}</section>
           </StyledModal>

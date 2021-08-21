@@ -65,6 +65,7 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
             handleClose?.();
           },
           backdropClick: closeConfirm,
+          onEsc: closeConfirm,
           onReject: closeConfirm,
         });
       } else {

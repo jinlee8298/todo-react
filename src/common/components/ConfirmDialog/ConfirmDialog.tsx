@@ -1,4 +1,4 @@
-import { FC, MouseEventHandler, ReactNode } from "react";
+import { FC, KeyboardEventHandler, MouseEventHandler, ReactNode } from "react";
 import Button from "../Button/Button";
 import StyledConfirmDialog from "./ConfirmDialog.style";
 import { ButtonProps } from "../Button/Button";
@@ -14,6 +14,7 @@ export type ConfirmDialogProps = {
   backdropClick?: MouseEventHandler;
   onConfirm?: MouseEventHandler;
   onReject?: MouseEventHandler;
+  onEsc?: KeyboardEventHandler;
 };
 
 const ConfirmDialog: FC<ConfirmDialogProps> = ({
@@ -23,12 +24,19 @@ const ConfirmDialog: FC<ConfirmDialogProps> = ({
   rejectButtonConfig,
   acceptButtonLabel,
   rejectButtonLabel,
+  onEsc,
   onConfirm,
   onReject,
   ...rest
 }) => {
+  const onKeyDown: KeyboardEventHandler = (e) => {
+    if (e.key === "Escape" && onEsc) {
+      onEsc(e);
+    }
+  };
+
   return (
-    <StyledConfirmDialog {...rest}>
+    <StyledConfirmDialog onKeyDown={onKeyDown} {...rest}>
       <h2>{title}</h2>
       <div className="message">{message}</div>
       <div className="action-group">

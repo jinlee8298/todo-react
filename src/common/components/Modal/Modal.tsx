@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import StyledModal from "./Modal.style";
 
 type ModalProps = {
-  open: boolean;
+  isShown: boolean;
   handleClose?: () => void;
   backdropClick?: () => void;
 };
@@ -14,7 +14,7 @@ const Modal: FC<ModalProps> = (props) => {
   const [render, setRender] = useState(false);
 
   useEffect(() => {
-    if (props.open) {
+    if (props.isShown) {
       setTimeout(() => {
         sectionRef.current?.classList.add("showing");
       });
@@ -23,7 +23,7 @@ const Modal: FC<ModalProps> = (props) => {
       sectionRef.current?.classList.remove("showing");
       setTimeout(() => setRender(false), 200);
     }
-  }, [props.open]);
+  }, [props.isShown]);
 
   return render
     ? createPortal(

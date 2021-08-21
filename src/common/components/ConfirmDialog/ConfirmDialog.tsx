@@ -4,7 +4,7 @@ import StyledConfirmDialog from "./ConfirmDialog.style";
 import { ButtonProps } from "../Button/Button";
 
 export type ConfirmDialogProps = {
-  open: boolean;
+  isShown: boolean;
   title?: string;
   message?: string | ReactNode;
   acceptButtonLabel?: string | ReactNode;

@@ -18,8 +18,8 @@ export default styled.div`
   ${transtionTiming};
 
   &.showing {
-    section,
-    .backdrop {
+    > section,
+    > .backdrop {
       opacity: 1;
       transform: scale(1);
     }
@@ -36,7 +36,7 @@ export default styled.div`
     left: 0;
   }
 
-  section {
+  > section {
     ${shadow};
     width: 100%;
     max-width: 650px;

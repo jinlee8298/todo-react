@@ -11,7 +11,9 @@ export default styled.ul`
   max-height: 20rem;
   padding: 0.5rem 0;
   width: 184px;
-  &:hover {
+  &:hover,
+  &:focus-within {
     overflow: auto;
+    overflow-x: show;
   }
 `;

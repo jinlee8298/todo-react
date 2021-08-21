@@ -3,19 +3,19 @@ import { ConfirmDialogProps } from "common/components/ConfirmDialog/ConfirmDialo
 
 const useConfirmDialog = () => {
   const [dialogProp, setDialogProp] = useState<ConfirmDialogProps>({
-    open: false,
+    isShown: false,
   });
 
-  const show = (config: Omit<ConfirmDialogProps, "open">) => {
-    setDialogProp({ ...config, open: true });
+  const show = (config: Omit<ConfirmDialogProps, "isShown">) => {
+    setDialogProp({ ...config, isShown: true });
   };
 
   const hide = () => {
-    setDialogProp((v) => ({ ...v, open: false }));
+    setDialogProp((v) => ({ ...v, isShown: false }));
   };
 
   return [show, hide, dialogProp] as [
-    (config: Omit<ConfirmDialogProps, "open">) => void,
+    (config: Omit<ConfirmDialogProps, "isShown">) => void,
     () => void,
     ConfirmDialogProps
   ];

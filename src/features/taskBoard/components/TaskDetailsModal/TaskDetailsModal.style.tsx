@@ -53,6 +53,10 @@ export default styled(Modal)`
       p {
         white-space: break-spaces;
       }
+      &:focus {
+        outline: none;
+        box-shadow: inset 0 0 0 1px var(--primary);
+      }
       &:hover {
         cursor: text;
       }

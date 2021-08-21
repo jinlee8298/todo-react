@@ -59,7 +59,6 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       );
     }
   }, [title]);
-
   useLayoutEffect(() => {
     if (descriptionInputRef.current) {
       if (!descriptionLineHeight.current) {
@@ -79,6 +78,17 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       );
     }
   }, [description]);
+  useLayoutEffect(() => {
+    // Focus then put cursor to the end of line
+    // Normally when you focus to input, cursor will stay at the beginning of line
+    // Reassign value to make the cursor place at the end of line
+    if (titleInputRef.current) {
+      titleInputRef.current.focus();
+      const value = titleInputRef.current.value;
+      titleInputRef.current.value = "";
+      titleInputRef.current.value = value;
+    }
+  }, []);
 
   const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === "Enter") {

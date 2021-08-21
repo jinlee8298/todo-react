@@ -7,6 +7,7 @@ import {
   useEffect,
   FormEventHandler,
   KeyboardEventHandler,
+  useCallback,
 } from "react";
 import {
   faCircle,
@@ -60,7 +61,7 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
         );
       }
     };
-    const onCloseModal = () => {
+    const onCloseModal = useCallback(() => {
       if (isEdit) {
         showConfirm({
           title: "Dicard changes?",
@@ -78,11 +79,20 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
       } else {
         handleClose?.();
       }
-    };
+    }, [showConfirm, closeConfirm, handleClose, isEdit]);
 
-    const onEscape: KeyboardEventHandler = (e) => {
-      if (e.key === "Escape") {
-        onCloseModal();
+    const onEscape: KeyboardEventHandler = useCallback(
+      (e) => {
+        if (e.key === "Escape") {
+          onCloseModal();
+        }
+      },
+      [onCloseModal]
+    );
+
+    const onKeyPressEditable: KeyboardEventHandler = (e) => {
+      if (e.key === "Space" || e.key === "Enter" || e.key === "NumpadEnter") {
+        toggleEdit();
       }
     };
 
@@ -119,7 +129,12 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
                   checked={task?.finished ?? false}
                   onChange={onTickCheckbox}
                 />
-                <div className="editable" onClick={toggleEdit}>
+                <div
+                  className="editable"
+                  tabIndex={0}
+                  onKeyPress={onKeyPressEditable}
+                  onClick={toggleEdit}
+                >
                   <h4>{task?.title}</h4>
                   <p>{task?.description}</p>
                 </div>

@@ -1,30 +1,28 @@
-import {
-  KeyboardEventHandler,
-  MouseEventHandler,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { KeyboardEventHandler, useLayoutEffect, useMemo, useRef } from "react";
 import TaskEditorContainer from "./TaskEditor.style";
 import { Button } from "common/components";
 import { faFlag, faTag } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Task } from "features/taskBoard/types";
 import { useDispatch, useInput } from "common/hooks";
-import { addTask } from "../../taskBoardSlice";
+import { addTask, updateTask } from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 
-type TaskEditorProps =
-  | {
-      mode: "add";
-      onCancel?: MouseEventHandler;
-      sectionId: EntityId;
-    }
-  | { mode: "edit"; onCancel?: MouseEventHandler; taskId: EntityId };
+type TaskEditorProps = {
+  mode: "add" | "edit";
+  onCancel?: () => void;
+  sectionId?: EntityId;
+  task?: Task;
+};
 
-const TaskEditor: React.FC<TaskEditorProps> = (props) => {
+const TaskEditor: React.FC<TaskEditorProps> = ({
+  mode,
+  sectionId,
+  task,
+  onCancel,
+}) => {
   const [title, titleErrors, resetTitle, onTitleChange] =
-    useInput<HTMLTextAreaElement>("", {
+    useInput<HTMLTextAreaElement>(task ? task.title : "", {
       maxLength: { value: 500 },
     });
   const [
@@ -32,9 +30,12 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
     descriptionErrors,
     resetDescription,
     onDescriptionChange,
-  ] = useInput<HTMLTextAreaElement>("", {
-    maxLength: { value: 1000 },
-  });
+  ] = useInput<HTMLTextAreaElement>(
+    task && task.description ? task.description : "",
+    {
+      maxLength: { value: 1000 },
+    }
+  );
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
   const titleLineHeight = useRef<number | null>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
@@ -87,16 +88,31 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
   };
 
   const addOrEditTask = () => {
-    if (props.mode === "add" && title.trim()) {
-      let newTask: Omit<Task, "id" | "order"> = {
+    if (!title.trim()) {
+      return;
+    }
+    if (mode === "add") {
+      let newTask: Omit<Task, "id"> = {
         createdAt: new Date().toString(),
         title: title.trim(),
-        description,
+        description: description.trim(),
         updatedAt: new Date().toJSON(),
       };
-      dispatch(addTask(props.sectionId, newTask));
+      dispatch(addTask(sectionId, newTask));
       resetTitle();
       resetDescription();
+    } else if (task) {
+      const changes: Partial<Task> = {};
+
+      if (task.title !== title) {
+        changes.title = title;
+      }
+      if (task.description !== description.trim()) {
+        changes.description = description;
+      }
+
+      dispatch(updateTask({ id: task.id, changes }));
+      onCancel?.();
     }
   };
 
@@ -105,7 +121,6 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
     const descriptionErrorCount = Object.values(descriptionErrors).filter(
       (x) => x
     ).length;
-    console.log(1);
     return titleErrorCount > 0 || descriptionErrorCount > 0;
   }, [descriptionErrors, titleErrors]);
 
@@ -154,12 +169,12 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
       <div className="button-group">
         <Button
           size="sm"
-          disabled={!title || checkError}
+          disabled={!title.trim() || checkError}
           onClick={addOrEditTask}
         >
-          Add task
+          {mode === "add" ? "Add task" : "Save"}
         </Button>
-        <Button size="sm" alternative="reverse" onClick={props.onCancel}>
+        <Button size="sm" alternative="reverse" onClick={onCancel}>
           Cancel
         </Button>
       </div>

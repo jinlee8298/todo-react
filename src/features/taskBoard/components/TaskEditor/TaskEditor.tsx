@@ -6,12 +6,13 @@ import {
   useRef,
 } from "react";
 import TaskEditorContainer from "./TaskEditor.style";
-import { Button, TextArea } from "common/components";
-import { faFlag, faBookmark } from "@fortawesome/free-regular-svg-icons";
+import { Button } from "common/components";
+import { faFlag, faTag } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Task } from "features/taskBoard/types";
 import { useDispatch, useInput } from "common/hooks";
 import { addTask } from "../../taskBoardSlice";
+import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 
 type TaskEditorProps =
   | {
@@ -35,27 +36,48 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
     maxLength: { value: 1000 },
   });
   const titleInputRef = useRef<HTMLTextAreaElement>(null);
+  const titleLineHeight = useRef<number | null>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
+  const descriptionLineHeight = useRef<number | null>(null);
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     if (titleInputRef.current) {
-      updateTextareaHeight(titleInputRef.current);
+      if (!titleLineHeight.current) {
+        const computedStyle = window.getComputedStyle(titleInputRef.current);
+        titleLineHeight.current = Number(
+          computedStyle.lineHeight.replace("px", "")
+        );
+      }
+      const lineHeight = titleLineHeight.current;
+      updateTextareaHeight(
+        titleInputRef.current,
+        lineHeight,
+        1,
+        Number.MAX_SAFE_INTEGER
+      );
     }
   }, [title]);
 
   useLayoutEffect(() => {
     if (descriptionInputRef.current) {
-      updateTextareaHeight(descriptionInputRef.current);
+      if (!descriptionLineHeight.current) {
+        const computedStyle = window.getComputedStyle(
+          descriptionInputRef.current
+        );
+        descriptionLineHeight.current = Number(
+          computedStyle.lineHeight.replace("px", "")
+        );
+      }
+      const lineHeight = descriptionLineHeight.current;
+      updateTextareaHeight(
+        descriptionInputRef.current,
+        lineHeight,
+        2,
+        Number.MAX_SAFE_INTEGER
+      );
     }
   }, [description]);
-
-  const updateTextareaHeight = (textarea: HTMLTextAreaElement) => {
-    // Skrink textarea in case its content shorten
-    textarea.style.height = "0px";
-    // Update textarea's height based on its content
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  };
 
   const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === "Enter") {
@@ -90,22 +112,20 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
   return (
     <TaskEditorContainer>
       <div className="input-wrapper">
-        <TextArea
-          errors={titleErrors}
-          hideErrorMessage
-          label="Title"
+        <textarea
           onChange={onTitleChange}
           onKeyDown={onEnter}
           spellCheck={false}
           value={title}
+          ref={titleInputRef}
+          placeholder="Task name"
         />
-        <TextArea
-          errors={descriptionErrors}
-          hideErrorMessage
-          label="Description"
+        <textarea
           onChange={onDescriptionChange}
           spellCheck={false}
           value={description}
+          ref={descriptionInputRef}
+          placeholder="Description"
         />
       </div>
       <div className="error">
@@ -120,7 +140,7 @@ const TaskEditor: React.FC<TaskEditorProps> = (props) => {
       <div className="task-options">
         <Button
           size="sx"
-          icon={faBookmark}
+          icon={faTag}
           title="Add label(s)"
           alternative="reverse"
         />

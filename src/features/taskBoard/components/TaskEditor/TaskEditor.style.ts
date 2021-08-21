@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Button, TextArea } from "common/components/style";
+import { Button } from "common/components/style";
 
 export default styled.div`
   padding: 1em;
@@ -9,10 +9,32 @@ export default styled.div`
     max-height: min(10rem, 50vh);
     border-radius: 4px;
     flex-shrink: 1;
-    overflow-y: hidden;
+    overflow-y: auto;
+    border: 1px solid var(--gray3);
     margin-bottom: 0.5em;
+    padding: 0.5rem;
+
     &:hover {
-      overflow-y: auto;
+      border: 1px solid var(--gray2);
+    }
+    &:focus-within {
+      border: 1px solid var(--primary);
+    }
+
+    textarea {
+      border: none;
+      padding: 0;
+      outline: none;
+      resize: none;
+      display: block;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      overflow: hidden;
+      width: 100%;
+      &:first-child {
+        margin-bottom: 0.5em;
+        font-weight: bold;
+      }
     }
   }
   .task-options {
@@ -32,13 +54,5 @@ export default styled.div`
     color: var(--danger);
     font-size: 0.75rem;
     margin-block-end: 0.75em;
-  }
-  ${TextArea} {
-    &:first-child {
-      font-weight: bold;
-      textarea {
-        font-weight: bold;
-      }
-    }
   }
 `;

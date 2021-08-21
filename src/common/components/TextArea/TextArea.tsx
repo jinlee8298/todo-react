@@ -8,11 +8,35 @@ import {
 import StyledTextArea from "./TextArea.style";
 import { InputError } from "common/hooks/useInput";
 
+export const updateTextareaHeight = (
+  textarea: HTMLTextAreaElement,
+  lineHeight: number,
+  minRows: number,
+  maxRows: number
+) => {
+  // Skrink textarea in case its content shorten
+  textarea.style.height = "0px";
+
+  const minHeight = minRows * lineHeight;
+  const maxHeight = maxRows;
+  const scrollHeight = textarea.scrollHeight;
+  // Update textarea's height based on its content
+  textarea.style.height = `${
+    scrollHeight > maxHeight
+      ? maxHeight
+      : scrollHeight < minHeight
+      ? minHeight
+      : scrollHeight
+  }px`;
+};
+
 type TextAreaProps = JSX.IntrinsicElements["textarea"] & {
   label?: string;
   errors?: InputError;
-  onChange?: ChangeEventHandler<HTMLTextAreaElement>;
   hideErrorMessage?: boolean;
+  minRows?: number;
+  maxRows?: number;
+  onChange?: ChangeEventHandler<HTMLTextAreaElement>;
 };
 
 const TextArea: FC<TextAreaProps> = ({
@@ -20,10 +44,13 @@ const TextArea: FC<TextAreaProps> = ({
   errors,
   value,
   hideErrorMessage = false,
+  minRows = 1,
+  maxRows = null,
   onChange,
   ...rest
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textAreaLineHeight = useRef<number | null>(null);
 
   const mapError = useMemo(() => {
     return errors ? Object.values(errors).filter((x) => x) : [];
@@ -42,16 +69,21 @@ const TextArea: FC<TextAreaProps> = ({
 
   useLayoutEffect(() => {
     if (textareaRef.current) {
-      updateTextareaHeight(textareaRef.current);
+      if (!textAreaLineHeight.current) {
+        const computedStyle = window.getComputedStyle(textareaRef.current);
+        textAreaLineHeight.current = Number(
+          computedStyle.lineHeight.replace("px", "")
+        );
+      }
+      const lineHeight = textAreaLineHeight.current;
+      updateTextareaHeight(
+        textareaRef.current,
+        lineHeight,
+        minRows,
+        maxRows ? maxRows * lineHeight : Number.MAX_SAFE_INTEGER
+      );
     }
-  }, [value]);
-
-  const updateTextareaHeight = (textarea: HTMLTextAreaElement) => {
-    // Skrink textarea in case its content shorten
-    textarea.style.height = "0px";
-    // Update textarea's height based on its content
-    textarea.style.height = `${textarea.scrollHeight}px`;
-  };
+  }, [value, minRows, maxRows]);
 
   return (
     <StyledTextArea>

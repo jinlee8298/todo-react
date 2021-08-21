@@ -57,7 +57,7 @@ export default styled.label`
     font-size: 0.875rem;
     line-height: 1.5;
     outline: none;
-    overflow: hidden;
+    overflow: auto;
     padding: 0;
     resize: none;
     width: 100%;

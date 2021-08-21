@@ -1,5 +1,5 @@
 import StyledCheckbox from "./Checkbox.style";
-import { DetailedHTMLProps, FC } from "react";
+import { DetailedHTMLProps, FC, MouseEventHandler } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,8 +9,12 @@ const Checkbox: FC<
     HTMLInputElement
   >
 > = ({ children, ...rest }) => {
+  const stopPropagation: MouseEventHandler<HTMLLabelElement> = (e) => {
+    e.stopPropagation();
+  };
+
   return (
-    <StyledCheckbox>
+    <StyledCheckbox onClick={stopPropagation}>
       <input type="checkbox" {...rest} />
       <span className="decoration">
         <FontAwesomeIcon icon={faCheck} />

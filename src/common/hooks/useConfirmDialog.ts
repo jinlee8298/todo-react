@@ -15,9 +15,9 @@ const useConfirmDialog = () => {
   };
 
   return [show, hide, dialogProp] as [
-    (config: Omit<ConfirmDialogProps, "isShown">) => void,
-    () => void,
-    ConfirmDialogProps
+    show: (config: Omit<ConfirmDialogProps, "isShown">) => void,
+    hide: () => void,
+    dialogProp: ConfirmDialogProps
   ];
 };
 

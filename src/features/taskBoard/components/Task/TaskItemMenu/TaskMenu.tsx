@@ -29,9 +29,10 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
   const deleteTaskHandler = () => {
     showConfirm({
       backdropClick: closeConfirm,
-      handleClose: closeConfirm,
       onReject: closeConfirm,
-      onConfirm: () => dispatch(deleteTask(props.sectionId, props.task.id)),
+      onConfirm: () => {
+        dispatch(deleteTask(props.sectionId, props.task.id));
+      },
       title: "Delete task?",
       message: (
         <span>

@@ -1,7 +1,7 @@
 import StyledMenu from "./Menu.style";
 import MenuItem from "./Item/Item";
 import MenuDivider from "./Divider.style";
-import { FC, useEffect, useRef } from "react";
+import { FC, MouseEventHandler, useEffect, useRef } from "react";
 import FocusTrap from "focus-trap-react";
 
 type MenuType = FC & {
@@ -91,9 +91,13 @@ const Menu: MenuType = (props) => {
     };
   }, [menuContainerRef]);
 
+  const stopPropagation: MouseEventHandler<HTMLUListElement> = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <FocusTrap>
-      <StyledMenu ref={menuContainerRef} role="menu">
+      <StyledMenu ref={menuContainerRef} role="menu" onClick={stopPropagation}>
         {props.children}
       </StyledMenu>
     </FocusTrap>

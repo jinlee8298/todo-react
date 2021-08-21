@@ -7,6 +7,7 @@ import ConfirmDialog from "./ConfirmDialog/ConfirmDialog.style";
 import Popover from "./Popover/Popover.style";
 import TextInput from "./TextInput/TextInput.style";
 import TextArea from "./TextArea/TextArea.style";
+import Tabs from "./Tabs/Tabs.style";
 
 export {
   Button,
@@ -18,4 +19,5 @@ export {
   Popover,
   TextInput,
   TextArea,
+  Tabs,
 };

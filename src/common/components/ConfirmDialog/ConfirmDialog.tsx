@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { FC, MouseEventHandler, ReactNode } from "react";
 import Button from "../Button/Button";
 import StyledConfirmDialog from "./ConfirmDialog.style";
 import { ButtonProps } from "../Button/Button";
@@ -11,10 +11,9 @@ export type ConfirmDialogProps = {
   rejectButtonLabel?: string | ReactNode;
   acceptButtonConfig?: ButtonProps;
   rejectButtonConfig?: ButtonProps;
-  handleClose?: () => void;
-  backdropClick?: () => void;
-  onConfirm?: () => void;
-  onReject?: () => void;
+  backdropClick?: MouseEventHandler;
+  onConfirm?: MouseEventHandler;
+  onReject?: MouseEventHandler;
 };
 
 const ConfirmDialog: FC<ConfirmDialogProps> = ({

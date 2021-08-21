@@ -172,7 +172,10 @@ const Popover: FC<PopoverProps> = ({
 
   const renderContent = cloneElement(children as ReactElement, {
     ref: targetRef,
-    onClick: togglePopover,
+    onClick: (e: MouseEvent) => {
+      togglePopover();
+      e.stopPropagation();
+    },
     onMouseEnter: handleOpenHover,
   });
 

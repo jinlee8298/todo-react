@@ -1,4 +1,11 @@
-import { FC, useRef, DragEventHandler, FormEventHandler, memo } from "react";
+import {
+  FC,
+  useRef,
+  DragEventHandler,
+  FormEventHandler,
+  memo,
+  MouseEventHandler,
+} from "react";
 import { Checkbox } from "common/components";
 import StyledTask from "./Task.style";
 import { useDispatch, useSelector } from "common/hooks";
@@ -16,7 +23,7 @@ import TaskMenu from "./TaskItemMenu/TaskMenu";
 type TaskProps = {
   taskId: EntityId;
   sectionId: EntityId;
-  onDragEnter?: DragEventHandler<HTMLDivElement>;
+  onClick?: (taskId: EntityId) => void;
 };
 
 const Task: FC<TaskProps> = memo((props) => {
@@ -60,11 +67,14 @@ const Task: FC<TaskProps> = memo((props) => {
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      const checkboxEle = e.target as HTMLInputElement;
       dispatch(
-        updateTask({ id: task.id, changes: { finished: checkboxEle.checked } })
+        updateTask({ id: task.id, changes: { finished: !task.finished } })
       );
     }
+  };
+
+  const onClick: MouseEventHandler = (e) => {
+    props?.onClick?.(props.taskId);
   };
 
   return task ? (
@@ -73,6 +83,7 @@ const Task: FC<TaskProps> = memo((props) => {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragEnter={onDragEnter}
+      onClick={onClick}
       ref={containerRef}
     >
       <h3>

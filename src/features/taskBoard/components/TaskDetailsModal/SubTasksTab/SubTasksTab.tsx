@@ -1,6 +1,5 @@
 import StyledSubTasksTab from "./SubTasksTab.style";
 import TaskEditor from "../../TaskEditor/TaskEditor";
-import { Button } from "common/components";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";

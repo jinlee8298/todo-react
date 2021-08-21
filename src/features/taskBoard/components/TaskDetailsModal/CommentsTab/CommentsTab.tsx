@@ -3,7 +3,7 @@ import { Button, TextArea } from "common/components";
 import { useInput } from "common/hooks";
 
 const CommentsTab = () => {
-  const [value, errors, reset, onChange] = useInput("");
+  const [value, , , onChange] = useInput("");
   return (
     <StyledCommentsTab>
       <div className="comment-container"></div>

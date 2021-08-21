@@ -75,7 +75,7 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
     return (
       <StyledModal backdropClick={onCloseModal} isShown={isShown}>
         <div className="header">
-          <a href="#">
+          <a href="/">
             <FontAwesomeIcon icon={faCircle} />
             To some project
           </a>

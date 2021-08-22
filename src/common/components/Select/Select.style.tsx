@@ -1,5 +1,4 @@
 import { shadow } from "common/styles/common";
-import { TextInput } from "common/components/style";
 import styled from "styled-components";
 
 export default styled.ul`

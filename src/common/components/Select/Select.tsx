@@ -1,5 +1,5 @@
 import StyledSelect from "./Select.style";
-import { ChangeEventHandler, FC, ReactElement, useMemo, useRef } from "react";
+import { ChangeEventHandler, FC, ReactElement, useRef } from "react";
 import Popover from "../Popover/Popover";
 import { TextInput } from "common/components";
 import Item, { SelectItem } from "./SelectItem/SelectItem";
@@ -15,22 +15,6 @@ type SelecProps = {
   onSelect?: (selectItem: SelectItem) => void;
   onDeselect?: (deselectItem: SelectItem) => void;
   onFilterChange?: (filterValue: string) => void;
-};
-
-const compare = (a: SelectItem, b: SelectItem) => {
-  const aType = typeof a;
-  const bType = typeof b;
-  if (aType === bType) {
-    if (aType === "string") {
-      return a === b;
-    } else {
-      const { value: aValue } = a as { value: string };
-      const { value: bValue } = b as { value: string };
-      return aValue === bValue;
-    }
-  } else {
-    return false;
-  }
 };
 
 const Select: FC<SelecProps> = ({

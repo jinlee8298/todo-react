@@ -5,6 +5,11 @@ import {
   Update,
   EntityId,
 } from "@reduxjs/toolkit";
+import {
+  generateTaskId,
+  deleteTask as delTask,
+  duplicateTask as dupTask,
+} from "./store/TaskHelper";
 import { Task, TaskSection, Comment, Project, Label } from "./types";
 
 export const projectAdapter = createEntityAdapter<Project>();
@@ -19,7 +24,7 @@ export const commentAdapter = createEntityAdapter<Comment>({
   sortComparer: (a, b) => a.createdAt.localeCompare(b.createdAt),
 });
 
-const initialState = {
+export const initialState = {
   tasks: taskAdapter.getInitialState<{
     draggingInfo: {
       draggingTaskId: EntityId;
@@ -63,24 +68,6 @@ export const labelSelector = labelAdapter.getSelectors(
   (state: typeof initialState) => state.labels
 );
 
-const generateTaskId = (): EntityId => {
-  return Date.now().toString();
-};
-
-const deleteChildTasks = (state: typeof initialState, taskId: EntityId) => {
-  let childTasks = taskAdapter
-    .getSelectors()
-    .selectAll(state.tasks)
-    .filter((t) => t.parentTaskId === taskId);
-
-  if (childTasks.length > 0) {
-    childTasks.forEach((t) => {
-      taskAdapter.removeOne(state.tasks, t.id);
-      deleteChildTasks(state, t.id);
-    });
-  }
-};
-
 export const taskBoardSlice = createSlice({
   name: "taskBoard",
   initialState,
@@ -107,6 +94,9 @@ export const taskBoardSlice = createSlice({
           id: generateTaskId(),
           createdAt,
           updatedAt: createdAt,
+          commentIds: [],
+          labelIds: [],
+          subTaskIds: [],
         };
 
         taskAdapter.addOne(state.tasks, newTask);
@@ -141,6 +131,9 @@ export const taskBoardSlice = createSlice({
           createdAt,
           updatedAt: createdAt,
           parentTaskId,
+          commentIds: [],
+          labelIds: [],
+          subTaskIds: [],
         };
         const parentSubTaskIds = [...(parentTask.subTaskIds || []), newTask.id];
 
@@ -160,38 +153,19 @@ export const taskBoardSlice = createSlice({
       taskAdapter.updateOne(state.tasks, action.payload);
     },
     duplicateTask: {
-      prepare: (sectionId, task) => ({
-        payload: { sectionId, task },
+      prepare: (sectionId, taskId, duplicateComments = false) => ({
+        payload: { sectionId, taskId, duplicateComments },
       }),
       reducer: (
         state,
         action: PayloadAction<{
-          sectionId: EntityId;
-          task: Task;
+          sectionId: EntityId | null;
+          taskId: EntityId;
+          duplicateComments: boolean;
         }>
       ) => {
-        const { sectionId, task } = action.payload;
-        const duplicatedTask = {
-          ...task,
-          id: generateTaskId(),
-        };
-        taskAdapter.addOne(state.tasks, duplicatedTask);
-
-        const section = sectionAdapter
-          .getSelectors()
-          .selectById(state.sections, sectionId);
-
-        if (section) {
-          const taskIds = [...section?.taskIds];
-          const index = taskIds.indexOf(task.id);
-
-          taskIds.splice(index + 1, 0, duplicatedTask.id);
-
-          sectionAdapter.updateOne(state.sections, {
-            id: sectionId,
-            changes: { taskIds },
-          });
-        }
+        const { sectionId, taskId, duplicateComments } = action.payload;
+        dupTask(state, sectionId, taskId, duplicateComments);
       },
     },
     deleteTask: {
@@ -201,20 +175,8 @@ export const taskBoardSlice = createSlice({
         action: PayloadAction<{ sectionId: EntityId; taskId: EntityId }>
       ) => {
         const { sectionId, taskId } = action.payload;
-        const section = sectionAdapter
-          .getSelectors()
-          .selectById(state.sections, sectionId);
 
-        if (section) {
-          const taskIds = [...section?.taskIds];
-          sectionAdapter.updateOne(state.sections, {
-            id: sectionId,
-            changes: { taskIds: taskIds.filter((id) => id !== taskId) },
-          });
-        }
-
-        deleteChildTasks(state, taskId);
-        taskAdapter.removeOne(state.tasks, taskId);
+        delTask(state, sectionId, taskId);
       },
     },
     repositionTask: {
@@ -452,9 +414,8 @@ export const taskBoardSlice = createSlice({
 
         if (deleteSection) {
           deleteSection.taskIds.forEach((taskId) => {
-            deleteChildTasks(state, taskId);
+            delTask(state, sectionId, taskId);
           });
-          taskAdapter.removeMany(state.tasks, deleteSection.taskIds);
         }
       },
     },
@@ -529,7 +490,6 @@ export const taskBoardSlice = createSlice({
           if (tempIndex < 0 && sectionId) {
             tempIndex = sectionIds.indexOf(sectionId);
           }
-          console.log(index, tempIndex);
 
           if (placeholderIndex >= 0) {
             sectionIds.splice(placeholderIndex, 1);

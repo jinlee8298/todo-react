@@ -21,18 +21,17 @@ export interface Comment {
 }
 
 export interface Task {
-  childOrder?: number;
-  commentIds?: EntityId[];
+  commentIds: EntityId[];
   createdAt: string;
   description?: string;
   finished?: boolean;
   id: EntityId;
-  labelIds?: EntityId[];
+  labelIds: EntityId[];
   parentTaskId?: EntityId;
   priority: TaskPriority;
   title: string;
   updatedAt: string;
-  subTaskIds?: EntityId[];
+  subTaskIds: EntityId[];
 }
 
 export interface TaskSection {

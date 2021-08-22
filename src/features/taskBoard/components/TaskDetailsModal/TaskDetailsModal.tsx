@@ -12,7 +12,6 @@ import {
 import {
   faCircle,
   faEllipsisH,
-  faFlag,
   faList,
   faTag,
   faTimes,
@@ -25,6 +24,9 @@ import { EntityId } from "@reduxjs/toolkit";
 import { taskSelector, updateTask } from "features/taskBoard/taskBoardSlice";
 import { useConfirmDialog, useDispatch, useSelector } from "common/hooks";
 import { ConfirmDialog } from "common/components";
+import TaskPrioritySelect from "../TaskEditor/TaskPrioritySelect/TaskPrioritySelect";
+import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
+import { TaskPriority } from "features/taskBoard/types";
 
 type TaskDetailsModalProps = {
   isShown: boolean;
@@ -96,6 +98,17 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
       }
     };
 
+    const onSelectPriority = (e: SelectItem) => {
+      if (task) {
+        dispatch(
+          updateTask({
+            id: task.id,
+            changes: { priority: e.value as TaskPriority },
+          })
+        );
+      }
+    };
+
     return (
       <StyledModal
         onKeyDown={onEscape}
@@ -142,7 +155,10 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
               <div className="task-actions">
                 <Button icon={faList} alternative="reverse" size="sx" />
                 <Button icon={faTag} alternative="reverse" size="sx" />
-                <Button icon={faFlag} alternative="reverse" size="sx" />
+                <TaskPrioritySelect
+                  onSelect={onSelectPriority}
+                  taskId={task?.id}
+                />
                 <Button icon={faEllipsisH} alternative="reverse" size="sx" />
               </div>
             </>

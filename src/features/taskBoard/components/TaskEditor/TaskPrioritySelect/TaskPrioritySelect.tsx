@@ -19,13 +19,13 @@ const PRIORITY_ITEM: SelectItem[] = [
     value: TaskPriority.Low,
     label: "Low",
     icon: faFlag,
-    iconColor: "#aaa",
+    iconColor: "var(--primary)",
   },
   {
     value: TaskPriority.Medium,
     label: "Medium",
     icon: faFlag,
-    iconColor: "var(--primary)",
+    iconColor: "var(--success)",
   },
   {
     value: TaskPriority.High,
@@ -44,12 +44,13 @@ const PRIORITY_ITEM: SelectItem[] = [
 const PRIORITY_COLOR_MAPPING = {
   [TaskPriority.Urgent]: "danger" as "danger",
   [TaskPriority.High]: "warning" as "warning",
-  [TaskPriority.Medium]: "primary" as "primary",
-  [TaskPriority.Low]: "gray1" as "gray1",
+  [TaskPriority.Medium]: "success" as "success",
+  [TaskPriority.Low]: "primary" as "primary",
 };
 
 type TaskPrioritySelectProps = {
   taskId?: EntityId;
+  onSelect?: (value: SelectItem) => void;
 };
 
 export type TaskPrioritySelectRef = {
@@ -60,7 +61,7 @@ export type TaskPrioritySelectRef = {
 const TaskPrioritySelect: ForwardRefRenderFunction<
   TaskPrioritySelectRef,
   TaskPrioritySelectProps
-> = ({ taskId = 0 }, ref) => {
+> = ({ taskId = 0, ...props }, ref) => {
   const [selected, setSelected] = useState<SelectItem>(PRIORITY_ITEM[0]);
   const task = useSelector((state) =>
     taskSelector.selectById(state.taskBoard, taskId)
@@ -86,10 +87,15 @@ const TaskPrioritySelect: ForwardRefRenderFunction<
     reset: reset,
   }));
 
+  const onSelect = (value: SelectItem) => {
+    setSelected(value);
+    props?.onSelect?.(value);
+  };
+
   return (
     <Select
       selected={selected}
-      onSelect={(e) => setSelected(e)}
+      onSelect={onSelect}
       items={PRIORITY_ITEM}
       closeOnSelect
     >

@@ -7,6 +7,7 @@ export default styled.div`
 
   background: #fff;
   border-radius: 8px;
+  overflow: hidden;
   padding: 1em;
   position: relative;
   transition: box-shadow 0.2s;
@@ -14,6 +15,28 @@ export default styled.div`
 
   &.dragging {
     display: none;
+  }
+  &.medium,
+  &.high,
+  &.urgent {
+    &::before {
+      display: block;
+      position: absolute;
+      height: 100%;
+      width: 0.5rem;
+      content: "";
+      top: 0;
+      left: 0;
+    }
+  }
+  &.medium::before {
+    background: var(--success);
+  }
+  &.high::before {
+    background: var(--warning);
+  }
+  &.urgent::before {
+    background: var(--danger);
   }
 
   ${Checkbox} {
@@ -43,6 +66,7 @@ export default styled.div`
     flex: 1;
     font-size: 0.9rem;
     line-height: 1.5em;
+    word-break: break-all;
   }
   p {
     margin-block: 0.25em 0;

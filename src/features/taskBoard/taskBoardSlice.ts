@@ -95,6 +95,8 @@ export const taskBoardSlice = createSlice({
         const newTask: Task = {
           ...task,
           id: generateTaskId(),
+          createdAt: new Date().toJSON(),
+          updatedAt: new Date().toJSON(),
         };
 
         taskAdapter.addOne(state.tasks, newTask);
@@ -109,7 +111,12 @@ export const taskBoardSlice = createSlice({
         }
       },
     },
-    updateTask: (state, action: PayloadAction<Update<Omit<Task, "id">>>) => {
+    updateTask: (
+      state,
+      action: PayloadAction<Update<Omit<Task, "id" | "updatedAt">>>
+    ) => {
+      const changes = action.payload as Update<Omit<Task, "id">>;
+      changes.changes.updatedAt = new Date().toJSON();
       taskAdapter.updateOne(state.tasks, action.payload);
     },
     duplicateTask: {

@@ -84,6 +84,7 @@ const Task: FC<TaskProps> = memo((props) => {
       onDragEnd={onDragEnd}
       onDragEnter={onDragEnter}
       onClick={onClick}
+      className={task.priority !== "low" ? task.priority : ""}
       ref={containerRef}
     >
       <h3>

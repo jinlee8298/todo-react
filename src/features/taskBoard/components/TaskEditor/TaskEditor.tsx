@@ -109,11 +109,9 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     if (mode === "add") {
       const selectedPriority =
         taskPriority?.current?.selected || TaskPriority.Low;
-      const newTask: Omit<Task, "id"> = {
-        createdAt: new Date().toString(),
+      const newTask: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
         title: title.trim(),
         description: description.trim(),
-        updatedAt: new Date().toJSON(),
         priority: selectedPriority,
       };
       dispatch(addTask(sectionId, newTask));

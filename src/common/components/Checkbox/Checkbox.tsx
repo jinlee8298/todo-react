@@ -8,13 +8,13 @@ const Checkbox: FC<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
   >
-> = ({ children, ...rest }) => {
+> = ({ children, className, ...rest }) => {
   const stopPropagation: MouseEventHandler<HTMLLabelElement> = (e) => {
     e.stopPropagation();
   };
 
   return (
-    <StyledCheckbox onClick={stopPropagation}>
+    <StyledCheckbox className={className} onClick={stopPropagation}>
       <input type="checkbox" {...rest} />
       <span className="decoration">
         <FontAwesomeIcon icon={faCheck} />

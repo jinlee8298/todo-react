@@ -170,7 +170,13 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
             title="Sub-tasks"
             content={<SubTasksTab />}
           />
-          <Tabs.Tab id="Comments" title="Comments" content={<CommentsTab />} />
+          <Tabs.Tab
+            id="Comments"
+            title="Comments"
+            content={
+              <CommentsTab commentIds={task?.commentIds} taskId={taskId} />
+            }
+          />
         </Tabs>
         <ConfirmDialog {...dialogProps} />
       </StyledModal>

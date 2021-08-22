@@ -15,5 +15,9 @@ export default styled.div`
       margin-block-start: 0.5em;
       text-align: right;
     }
+    .error-message {
+      font-size: 0.875rem;
+      color: var(--danger);
+    }
   }
 `;

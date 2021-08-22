@@ -516,14 +516,71 @@ export const taskBoardSlice = createSlice({
         }
       }
     },
-    addComment: (state, action: PayloadAction<Comment>) => {
-      commentAdapter.addOne(state.comments, action.payload);
+    addComment: {
+      prepare: (taskId, comment) => ({ payload: { taskId, comment } }),
+      reducer: (
+        state,
+        action: PayloadAction<{
+          taskId: EntityId;
+          comment: Omit<Comment, "id" | "updatedAt" | "createdAt">;
+        }>
+      ) => {
+        const { taskId, comment } = action.payload;
+        const task = taskSelector.selectById(state, taskId);
+        if (!task) {
+          return;
+        }
+
+        const createdAt = new Date().toJSON();
+        const newComment: Comment = {
+          ...comment,
+          id: generateTaskId(),
+          createdAt,
+          updatedAt: createdAt,
+        };
+        commentAdapter.addOne(state.comments, newComment);
+
+        const taskComments = [...(task.commentIds || []), newComment.id];
+        taskAdapter.updateOne(state.tasks, {
+          id: taskId,
+          changes: { commentIds: taskComments },
+        });
+      },
     },
-    updateComment: (state, action: PayloadAction<Update<Comment>>) => {
-      commentAdapter.updateOne(state.comments, action.payload);
+    updateComment: (
+      state,
+      action: PayloadAction<
+        Update<Omit<Comment, "id" | "createdAt" | "updatedAt">>
+      >
+    ) => {
+      const updatedComment = action.payload as Update<
+        Omit<Comment, "id" | "createdAt">
+      >;
+      updatedComment.changes.updatedAt = new Date().toJSON();
+      commentAdapter.updateOne(state.comments, updatedComment);
     },
-    deleteComment: (state, action: PayloadAction<EntityId>) => {
-      commentAdapter.removeOne(state.comments, action.payload);
+    deleteComment: {
+      prepare: (taskId, commentId) => ({ payload: { taskId, commentId } }),
+      reducer: (
+        state,
+        action: PayloadAction<{ taskId: EntityId; commentId: EntityId }>
+      ) => {
+        const { taskId, commentId } = action.payload;
+        const task = taskSelector.selectById(state, taskId);
+        if (!task) {
+          return;
+        }
+
+        const taskComments = [...(task.commentIds || [])];
+
+        taskAdapter.updateOne(state.tasks, {
+          id: taskId,
+          changes: {
+            commentIds: taskComments.filter((id) => id !== commentId),
+          },
+        });
+        commentAdapter.removeOne(state.comments, commentId);
+      },
     },
   },
 });

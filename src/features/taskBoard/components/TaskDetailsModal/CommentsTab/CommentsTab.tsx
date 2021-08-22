@@ -1,21 +1,16 @@
 import StyledCommentsTab from "./CommentsTab.style";
 import { Button, TextArea } from "common/components";
-import { useDispatch, useInput } from "common/hooks";
+import { useDispatch, useInput, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
-import { FC, useMemo } from "react";
+import { FC, useMemo, memo } from "react";
 import TaskComment from "./TaskComment/TaskComment";
-import { addComment } from "features/taskBoard/taskBoardSlice";
+import { addComment, taskSelector } from "features/taskBoard/taskBoardSlice";
 
 type CommentsTabProps = {
   taskId: EntityId;
-  commentIds?: EntityId[];
 };
 
-const CommentsTab: FC<CommentsTabProps> = ({
-  taskId,
-  commentIds = [],
-  ...props
-}) => {
+const CommentsTab: FC<CommentsTabProps> = memo(({ taskId }) => {
   const dispatch = useDispatch();
   const [value, errors, reset, onChange] = useInput("", {
     maxLength: {
@@ -23,6 +18,9 @@ const CommentsTab: FC<CommentsTabProps> = ({
       message: "Character limit: {{current}}/ 15000",
     },
   });
+  const commentIds = useSelector(
+    (state) => taskSelector.selectById(state.taskBoard, taskId)?.commentIds
+  );
 
   const mapError = useMemo(() => {
     return errors ? Object.values(errors).filter((x) => x) : [];
@@ -41,8 +39,8 @@ const CommentsTab: FC<CommentsTabProps> = ({
   return (
     <StyledCommentsTab>
       <div className="comment-container">
-        {commentIds.map((id) => (
-          <TaskComment taskId={taskId} commentId={id} />
+        {commentIds?.map((id) => (
+          <TaskComment key={id} taskId={taskId} commentId={id} />
         ))}
       </div>
       <div className="comment-actions">
@@ -73,6 +71,6 @@ const CommentsTab: FC<CommentsTabProps> = ({
       </div>
     </StyledCommentsTab>
   );
-};
+});
 
 export default CommentsTab;

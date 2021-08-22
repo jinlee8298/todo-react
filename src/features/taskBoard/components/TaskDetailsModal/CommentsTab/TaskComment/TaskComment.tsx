@@ -1,5 +1,5 @@
 import {
-  faEdit,
+  faPen,
   faTrashAlt,
   faUserCircle,
 } from "@fortawesome/free-solid-svg-icons";
@@ -32,7 +32,7 @@ const TaskComment: FC<TaskCommentProps> = ({ commentId, taskId, ...props }) => {
   );
   const [editing, setEditing] = useState<boolean>(false);
   const [showConfirm, hideConfirm, dialogProps] = useConfirmDialog();
-  const [value, errors, reset, onChange, setValue] = useInput("", {
+  const [value, errors, , onChange, setValue] = useInput("", {
     maxLength: { value: 15000, message: "Character limit: 15000" },
   });
   const dispatch = useDispatch();
@@ -114,7 +114,7 @@ const TaskComment: FC<TaskCommentProps> = ({ commentId, taskId, ...props }) => {
               <Button
                 size="sx"
                 alternative="reverse"
-                icon={faEdit}
+                icon={faPen}
                 onClick={toggleEdit}
               />
               <Button

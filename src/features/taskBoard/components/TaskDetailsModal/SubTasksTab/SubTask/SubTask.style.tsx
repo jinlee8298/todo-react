@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import Task from "features/taskBoard/components/Task/Task.style";
+import { Button } from "common/components/style";
 
 export default styled(Task)`
   box-shadow: none;
@@ -12,5 +13,10 @@ export default styled(Task)`
   }
   h3 {
     font-weight: normal;
+  }
+  > ${Button} {
+    position: absolute;
+    right: 1em;
+    top: 1em;
   }
 `;

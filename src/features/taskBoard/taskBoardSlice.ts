@@ -111,6 +111,36 @@ export const taskBoardSlice = createSlice({
         }
       },
     },
+    addSubTask: {
+      prepare: (parentTaskId, task) => ({ payload: { parentTaskId, task } }),
+      reducer: (
+        state,
+        action: PayloadAction<{ parentTaskId: EntityId; task: Task }>
+      ) => {
+        const { parentTaskId, task } = action.payload;
+        const parentTask = taskSelector.selectById(state, parentTaskId);
+
+        if (!parentTask) {
+          return;
+        }
+
+        const createdAt = new Date().toJSON();
+        const newTask: Task = {
+          ...task,
+          id: generateTaskId(),
+          createdAt,
+          updatedAt: createdAt,
+          parentTaskId,
+        };
+        const parentSubTaskIds = [...(parentTask.subTaskIds || []), newTask.id];
+
+        taskAdapter.addOne(state.tasks, newTask);
+        taskAdapter.updateOne(state.tasks, {
+          id: parentTaskId,
+          changes: { subTaskIds: parentSubTaskIds },
+        });
+      },
+    },
     updateTask: (
       state,
       action: PayloadAction<Update<Omit<Task, "id" | "updatedAt">>>
@@ -587,6 +617,7 @@ export const taskBoardSlice = createSlice({
 
 export const {
   addTask,
+  addSubTask,
   updateTask,
   duplicateTask,
   deleteTask,

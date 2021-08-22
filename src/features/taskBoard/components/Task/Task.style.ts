@@ -46,7 +46,7 @@ export default styled.div`
     margin-block-start: 0.5em;
     margin-inline-end: 0.5em;
   }
-  ${Button} {
+  > ${Button} {
     display: none;
     position: absolute;
     right: 0.25rem;

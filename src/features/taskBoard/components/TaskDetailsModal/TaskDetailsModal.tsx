@@ -164,18 +164,16 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
             </>
           )}
         </div>
-        <Tabs>
+        <Tabs renderActiveTabPanelOnly>
           <Tabs.Tab
             id="Sub-tasks"
             title="Sub-tasks"
-            content={<SubTasksTab />}
+            content={<SubTasksTab parentTaskId={taskId} />}
           />
           <Tabs.Tab
             id="Comments"
             title="Comments"
-            content={
-              <CommentsTab commentIds={task?.commentIds} taskId={taskId} />
-            }
+            content={<CommentsTab taskId={taskId} />}
           />
         </Tabs>
         <ConfirmDialog {...dialogProps} />

@@ -5,23 +5,25 @@ import { faTag } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Task, TaskPriority } from "features/taskBoard/types";
 import { useDispatch, useInput } from "common/hooks";
-import { addTask, updateTask } from "../../taskBoardSlice";
+import { addSubTask, addTask, updateTask } from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 import TaskPrioritySelect, {
   TaskPrioritySelectRef,
 } from "./TaskPrioritySelect/TaskPrioritySelect";
 
 type TaskEditorProps = {
-  mode: "add" | "edit";
+  mode: "add" | "edit" | "add-subtask";
   onCancel?: () => void;
   sectionId?: EntityId;
   task?: Task;
+  parentTaskId?: EntityId;
 };
 
 const TaskEditor: React.FC<TaskEditorProps> = ({
   mode,
   sectionId,
   task,
+  parentTaskId,
   onCancel,
 }) => {
   const [title, titleErrors, resetTitle, onTitleChange] =
@@ -95,9 +97,10 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   }, []);
 
   const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
+    console.log(mode === "add");
     if (event.key === "Enter") {
       event.preventDefault();
-      mode === "add" ? onAddTask() : onEditTask();
+      mode === "edit" ? onEditTask() : onAddTask();
     }
   };
 
@@ -107,7 +110,6 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     }
 
     const changes: Partial<Task> = {};
-
     if (task.title !== title) {
       changes.title = title;
     }
@@ -120,7 +122,6 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
 
     dispatch(updateTask({ id: task.id, changes }));
     onCancel?.();
-
     taskPriority?.current?.reset();
   };
 
@@ -136,7 +137,11 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       description: description.trim(),
       priority: selectedPriority,
     };
-    dispatch(addTask(sectionId, newTask));
+    if (mode === "add-subtask") {
+      dispatch(addSubTask(parentTaskId, newTask));
+    } else {
+      dispatch(addTask(sectionId, newTask));
+    }
     resetTitle();
     resetDescription();
     taskPriority?.current?.reset();
@@ -198,9 +203,9 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
         <Button
           size="sm"
           disabled={!title.trim() || checkError}
-          onClick={mode === "add" ? onAddTask : onEditTask}
+          onClick={mode === "edit" ? onEditTask : onAddTask}
         >
-          {mode === "add" ? "Add task" : "Save"}
+          {mode === "edit" ? "Save" : "Add task"}
         </Button>
         <Button size="sm" alternative="reverse" onClick={onCancel}>
           Cancel

@@ -50,6 +50,8 @@ export default styled(Modal)`
     }
     .editable {
       flex: 1;
+      max-height: 10rem;
+      overflow: auto;
       p {
         white-space: break-spaces;
       }
@@ -86,8 +88,9 @@ export default styled(Modal)`
       }
     }
   }
-
-  ${TaskEditor} {
-    padding: 0;
+  .edit-task {
+    ${TaskEditor} {
+      padding: 0;
+    }
   }
 `;

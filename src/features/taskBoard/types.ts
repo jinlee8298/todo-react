@@ -31,6 +31,7 @@ export interface Task {
   priority: TaskPriority;
   title: string;
   updatedAt: string;
+  subTaskIds?: EntityId[];
 }
 
 export interface TaskSection {

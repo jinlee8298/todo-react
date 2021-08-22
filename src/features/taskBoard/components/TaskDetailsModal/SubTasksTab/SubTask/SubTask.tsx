@@ -1,13 +1,14 @@
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { faCommentAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
-import { Button, Checkbox } from "common/components";
+import { Checkbox, Label } from "common/components";
 import { useDispatch, useSelector } from "common/hooks";
+import TaskMenu from "features/taskBoard/components/Task/TaskItemMenu/TaskMenu";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
 import {
   setCurrentViewTaskId,
   taskSelector,
 } from "features/taskBoard/taskBoardSlice";
-import { FC, useState, memo } from "react";
+import { FC, useState, memo, MouseEventHandler } from "react";
 import StyledSubTask from "./SubTask.style";
 
 type SubTaskProps = {
@@ -25,17 +26,23 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
     setEditing((v) => !v);
   };
 
-  const onClick = () => {
+  const onClickTask: MouseEventHandler = (e) => {
+    e.stopPropagation();
     dispatch(setCurrentViewTaskId(taskId));
+  };
+
+  const onClickEditor: MouseEventHandler = (e) => {
+    e.stopPropagation();
   };
 
   return task ? (
     <StyledSubTask
-      onClick={onClick}
+      onClick={onClickTask}
       className={task.priority !== "low" ? task.priority : ""}
     >
       {editing ? (
         <TaskEditor
+          onClick={onClickEditor}
           onCancel={toggleEditing}
           task={task}
           mode="edit"
@@ -47,13 +54,25 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
             <span>{task.title}</span>
           </h3>
           {task.description && <p>{task.description}</p>}
-          <Button
-            onClick={toggleEditing}
-            size="sx"
-            alternative="reverse"
-            icon={faPen}
-            rounded
-          />
+          <div className="task-details">
+            {task.subTaskIds.length > 0 && (
+              <Label
+                title={`${task.subTaskIds.length} sub-task(s)`}
+                icon={faLink}
+              >
+                {task.subTaskIds.length}
+              </Label>
+            )}
+            {task.commentIds.length > 0 && (
+              <Label
+                title={`${task.commentIds.length} comment(s)`}
+                icon={faCommentAlt}
+              >
+                {task.commentIds.length}
+              </Label>
+            )}
+          </div>
+          <TaskMenu onEdit={toggleEditing} task={task} />
         </>
       )}
     </StyledSubTask>

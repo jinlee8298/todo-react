@@ -2,6 +2,7 @@ import {
   faEllipsisH,
   faCopy,
   faTrashAlt,
+  faPen,
 } from "@fortawesome/free-solid-svg-icons";
 import { FC, useRef } from "react";
 import { Button, Menu, ConfirmDialog, Popover } from "common/components";
@@ -12,7 +13,8 @@ import { deleteTask, duplicateTask } from "features/taskBoard/taskBoardSlice";
 
 type TaskMenuProps = {
   task: Task;
-  sectionId: EntityId;
+  sectionId?: EntityId;
+  onEdit: () => void;
 };
 
 const TaskMenu: FC<TaskMenuProps> = (props) => {
@@ -22,7 +24,26 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
   const dispatch = useDispatch();
 
   const duplicateTaskHandler = () => {
-    dispatch(duplicateTask(props.sectionId, props.task));
+    if (props.task.commentIds.length > 0) {
+      showConfirm({
+        backdropClick: closeConfirm,
+        onReject: () => {
+          dispatch(duplicateTask(props.sectionId, props.task.id, false));
+          closeConfirm();
+        },
+        onEsc: closeConfirm,
+        onConfirm: () => {
+          dispatch(duplicateTask(props.sectionId, props.task.id, true));
+          closeConfirm();
+        },
+        title: "Duplicate comments?",
+        message: <span>Do you want to duplicate comments in this task?</span>,
+        acceptButtonLabel: "Duplicate comments",
+        rejectButtonLabel: "Exclude comments",
+      });
+    } else {
+      dispatch(duplicateTask(props.sectionId, props.task.id));
+    }
   };
 
   const deleteTaskHandler = () => {
@@ -36,7 +57,7 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
       title: "Delete task?",
       message: (
         <span>
-          Are you sure you want to delete task:{" "}
+          Are you sure you want to delete task:
           <strong>"{props.task.title}"</strong>?
         </span>
       ),
@@ -44,6 +65,11 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
       rejectButtonLabel: "Cancel",
       acceptButtonConfig: { variant: "danger", icon: faTrashAlt },
     });
+  };
+
+  const editTaskHandler = () => {
+    closeConfirm();
+    props.onEdit();
   };
 
   const getPopoverRef = (
@@ -69,6 +95,15 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
         closeOnClickOutside={true}
         content={({ close }) => (
           <Menu>
+            <Menu.Item
+              icon={faPen}
+              onTrigger={() => {
+                editTaskHandler();
+                close();
+              }}
+            >
+              Edit
+            </Menu.Item>
             <Menu.Item
               icon={faCopy}
               onTrigger={() => {

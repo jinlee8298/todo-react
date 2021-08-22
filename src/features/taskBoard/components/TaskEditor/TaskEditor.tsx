@@ -1,4 +1,10 @@
-import { KeyboardEventHandler, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  KeyboardEventHandler,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 import TaskEditorContainer from "./TaskEditor.style";
 import { Button } from "common/components";
 import { faTag } from "@fortawesome/free-solid-svg-icons";
@@ -17,7 +23,7 @@ type TaskEditorProps = {
   sectionId?: EntityId;
   task?: Task;
   parentTaskId?: EntityId;
-};
+} & ComponentPropsWithoutRef<"div">;
 
 const TaskEditor: React.FC<TaskEditorProps> = ({
   mode,
@@ -25,6 +31,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   task,
   parentTaskId,
   onCancel,
+  ...props
 }) => {
   const [title, titleErrors, resetTitle, onTitleChange] =
     useInput<HTMLTextAreaElement>(task ? task.title : "", {
@@ -97,7 +104,6 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   }, []);
 
   const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
-    console.log(mode === "add");
     if (event.key === "Enter") {
       event.preventDefault();
       mode === "edit" ? onEditTask() : onAddTask();
@@ -132,7 +138,15 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
 
     const selectedPriority =
       taskPriority?.current?.selected || TaskPriority.Low;
-    const newTask: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
+    const newTask: Omit<
+      Task,
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "commentIds"
+      | "labelIds"
+      | "subTaskIds"
+    > = {
       title: title.trim(),
       description: description.trim(),
       priority: selectedPriority,
@@ -163,7 +177,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   };
 
   return (
-    <TaskEditorContainer onKeyDown={onKeyDown}>
+    <TaskEditorContainer {...props} onKeyDown={onKeyDown}>
       <div className="input-wrapper">
         <textarea
           onChange={onTitleChange}

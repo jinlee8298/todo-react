@@ -17,7 +17,6 @@ import {
   insertTaskPlaceholder,
   updateTask,
 } from "features/taskBoard/taskBoardSlice";
-import { RootState } from "app/store";
 import TaskMenu from "./TaskItemMenu/TaskMenu";
 import { faCommentAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 
@@ -28,7 +27,7 @@ type TaskProps = {
 };
 
 const Task: FC<TaskProps> = memo((props) => {
-  const task = useSelector((state: RootState) =>
+  const task = useSelector((state) =>
     taskSelector.selectById(state.taskBoard, props.taskId)
   );
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,7 +73,7 @@ const Task: FC<TaskProps> = memo((props) => {
     }
   };
 
-  const onClick: MouseEventHandler = (e) => {
+  const openTaskDetailsModal = () => {
     props?.onClick?.(props.taskId);
   };
 
@@ -84,7 +83,7 @@ const Task: FC<TaskProps> = memo((props) => {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragEnter={onDragEnter}
-      onClick={onClick}
+      onClick={openTaskDetailsModal}
       className={task.priority !== "low" ? task.priority : ""}
       ref={containerRef}
     >
@@ -94,12 +93,12 @@ const Task: FC<TaskProps> = memo((props) => {
       </h3>
       {task?.description && <p>{task?.description}</p>}
       <div className="task-details">
-        {task.subTaskIds && (
+        {task.subTaskIds.length > 0 && (
           <Label title={`${task.subTaskIds.length} sub-task(s)`} icon={faLink}>
             {task.subTaskIds.length}
           </Label>
         )}
-        {task.commentIds && (
+        {task.commentIds.length > 0 && (
           <Label
             title={`${task.commentIds.length} comment(s)`}
             icon={faCommentAlt}
@@ -108,7 +107,11 @@ const Task: FC<TaskProps> = memo((props) => {
           </Label>
         )}
       </div>
-      <TaskMenu sectionId={props.sectionId} task={task} />
+      <TaskMenu
+        onEdit={openTaskDetailsModal}
+        sectionId={props.sectionId}
+        task={task}
+      />
     </StyledTask>
   ) : null;
 });

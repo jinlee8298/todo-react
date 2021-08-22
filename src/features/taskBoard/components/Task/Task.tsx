@@ -1,11 +1,4 @@
-import {
-  FC,
-  useRef,
-  DragEventHandler,
-  FormEventHandler,
-  memo,
-  MouseEventHandler,
-} from "react";
+import { FC, useRef, DragEventHandler, FormEventHandler, memo } from "react";
 import { Checkbox, Label } from "common/components";
 import StyledTask from "./Task.style";
 import { useDispatch, useSelector } from "common/hooks";

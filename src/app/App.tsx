@@ -26,6 +26,8 @@ function App() {
       <GlobalStyle />
       <div className="App">
         <TaskBoard></TaskBoard>
+
+        <div id="modal-container"></div>
         <div id="popover-container"></div>
       </div>
     </ThemeProvider>

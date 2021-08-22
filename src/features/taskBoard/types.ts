@@ -1,10 +1,10 @@
 import { EntityId } from "@reduxjs/toolkit";
 
 export enum TaskPriority {
-  Low,
-  Medium,
-  High,
-  Urgent,
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+  Urgent = "urgent",
 }
 export interface LabeL {
   id: EntityId;
@@ -28,7 +28,7 @@ export interface Task {
   id: EntityId;
   label?: EntityId[];
   parentTaskId?: EntityId;
-  priority?: TaskPriority;
+  priority: TaskPriority;
   title: string;
   updatedAt: string;
 }

@@ -1,12 +1,15 @@
 import { KeyboardEventHandler, useLayoutEffect, useMemo, useRef } from "react";
 import TaskEditorContainer from "./TaskEditor.style";
 import { Button } from "common/components";
-import { faFlag, faTag } from "@fortawesome/free-solid-svg-icons";
+import { faTag } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
-import { Task } from "features/taskBoard/types";
+import { Task, TaskPriority } from "features/taskBoard/types";
 import { useDispatch, useInput } from "common/hooks";
 import { addTask, updateTask } from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
+import TaskPrioritySelect, {
+  TaskPrioritySelectRef,
+} from "./TaskPrioritySelect/TaskPrioritySelect";
 
 type TaskEditorProps = {
   mode: "add" | "edit";
@@ -40,6 +43,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   const titleLineHeight = useRef<number | null>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
   const descriptionLineHeight = useRef<number | null>(null);
+  const taskPriority = useRef<TaskPrioritySelectRef>(null);
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -101,12 +105,16 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     if (!title.trim()) {
       return;
     }
+
     if (mode === "add") {
-      let newTask: Omit<Task, "id"> = {
+      const selectedPriority =
+        taskPriority?.current?.selected || TaskPriority.Low;
+      const newTask: Omit<Task, "id"> = {
         createdAt: new Date().toString(),
         title: title.trim(),
         description: description.trim(),
         updatedAt: new Date().toJSON(),
+        priority: selectedPriority,
       };
       dispatch(addTask(sectionId, newTask));
       resetTitle();
@@ -120,10 +128,14 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       if (task.description !== description.trim()) {
         changes.description = description;
       }
+      if (task.priority !== taskPriority?.current?.selected) {
+        changes.priority = taskPriority?.current?.selected;
+      }
 
       dispatch(updateTask({ id: task.id, changes }));
       onCancel?.();
     }
+    taskPriority?.current?.reset();
   };
 
   const checkError = useMemo(() => {
@@ -134,8 +146,15 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     return titleErrorCount > 0 || descriptionErrorCount > 0;
   }, [descriptionErrors, titleErrors]);
 
+  const onKeyDown: KeyboardEventHandler = (e) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onCancel?.();
+    }
+  };
+
   return (
-    <TaskEditorContainer>
+    <TaskEditorContainer onKeyDown={onKeyDown}>
       <div className="input-wrapper">
         <textarea
           onChange={onTitleChange}
@@ -169,12 +188,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
           title="Add label(s)"
           alternative="reverse"
         />
-        <Button
-          size="sx"
-          icon={faFlag}
-          title="Set priorities"
-          alternative="reverse"
-        />
+        <TaskPrioritySelect taskId={task?.id} ref={taskPriority} />
       </div>
       <div className="button-group">
         <Button

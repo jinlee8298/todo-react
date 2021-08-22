@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export type ButtonProps = {
-  variant?: "primary" | "success" | "danger" | "warning" | "info";
+  variant?: "primary" | "success" | "danger" | "warning" | "info" | "gray1";
   size?: "sx" | "sm" | "md" | "lg";
   icon?: IconProp;
   alternative?: "outline" | "reverse";

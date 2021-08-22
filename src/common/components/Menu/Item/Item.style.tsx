@@ -29,6 +29,5 @@ export default styled.li`
     outline: none;
     border: 1px solid var(--color);
     color: var(--color);
-    box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px var(--color);
   }
 `;

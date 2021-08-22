@@ -5,15 +5,15 @@ export default styled.ul`
   ${shadow};
 
   background: #fff;
-  border-radius: 10px;
+  border-radius: 4px;
   list-style: none;
   margin: 0;
   max-height: 20rem;
   padding: 0.5rem 0;
-  width: 184px;
+  width: 11.5rem;
+  overflow: hidden;
   &:hover,
   &:focus-within {
     overflow: auto;
-    overflow-x: show;
   }
 `;

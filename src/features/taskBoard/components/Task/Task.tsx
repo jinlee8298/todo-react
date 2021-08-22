@@ -6,7 +6,7 @@ import {
   memo,
   MouseEventHandler,
 } from "react";
-import { Checkbox } from "common/components";
+import { Checkbox, Label } from "common/components";
 import StyledTask from "./Task.style";
 import { useDispatch, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
@@ -19,6 +19,7 @@ import {
 } from "features/taskBoard/taskBoardSlice";
 import { RootState } from "app/store";
 import TaskMenu from "./TaskItemMenu/TaskMenu";
+import { faCommentAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 
 type TaskProps = {
   taskId: EntityId;
@@ -92,7 +93,14 @@ const Task: FC<TaskProps> = memo((props) => {
         <span>{task?.title}</span>
       </h3>
       {task?.description && <p>{task?.description}</p>}
-      <div className="task-details"></div>
+      <div className="task-details">
+        {task.subTaskIds && (
+          <Label icon={faLink}>{task.subTaskIds.length}</Label>
+        )}
+        {task.commentIds && (
+          <Label icon={faCommentAlt}>{task.commentIds.length}</Label>
+        )}
+      </div>
       <TaskMenu sectionId={props.sectionId} task={task} />
     </StyledTask>
   ) : null;

@@ -25,6 +25,7 @@ export default styled.div`
     }
     .content {
       font-size: 0.875rem;
+      white-space: break-spaces;
     }
     > ${Button} {
       margin-block-start: 0.5em;

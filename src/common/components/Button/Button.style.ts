@@ -74,7 +74,12 @@ export default styled.button<ButtonProps>`
     background: var(--button-color);
   }
   &:focus {
-    box-shadow: inset 0 0 0 2px var(--button-color);
+    box-shadow: inset 0 0 0 2px #fff;
+
+    &.reverse,
+    &.outline {
+      box-shadow: inset 0 0 0 2px var(--button-color);
+    }
   }
   &:disabled {
     background: var(--gray2);

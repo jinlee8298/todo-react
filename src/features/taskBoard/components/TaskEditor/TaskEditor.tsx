@@ -97,42 +97,48 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      addOrEditTask();
+      mode === "add" ? onAddTask() : onEditTask();
     }
   };
 
-  const addOrEditTask = () => {
+  const onEditTask = () => {
+    if (!title.trim() || !task) {
+      return;
+    }
+
+    const changes: Partial<Task> = {};
+
+    if (task.title !== title) {
+      changes.title = title;
+    }
+    if (task.description !== description.trim()) {
+      changes.description = description;
+    }
+    if (task.priority !== taskPriority?.current?.selected) {
+      changes.priority = taskPriority?.current?.selected;
+    }
+
+    dispatch(updateTask({ id: task.id, changes }));
+    onCancel?.();
+
+    taskPriority?.current?.reset();
+  };
+
+  const onAddTask = () => {
     if (!title.trim()) {
       return;
     }
 
-    if (mode === "add") {
-      const selectedPriority =
-        taskPriority?.current?.selected || TaskPriority.Low;
-      const newTask: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
-        title: title.trim(),
-        description: description.trim(),
-        priority: selectedPriority,
-      };
-      dispatch(addTask(sectionId, newTask));
-      resetTitle();
-      resetDescription();
-    } else if (task) {
-      const changes: Partial<Task> = {};
-
-      if (task.title !== title) {
-        changes.title = title;
-      }
-      if (task.description !== description.trim()) {
-        changes.description = description;
-      }
-      if (task.priority !== taskPriority?.current?.selected) {
-        changes.priority = taskPriority?.current?.selected;
-      }
-
-      dispatch(updateTask({ id: task.id, changes }));
-      onCancel?.();
-    }
+    const selectedPriority =
+      taskPriority?.current?.selected || TaskPriority.Low;
+    const newTask: Omit<Task, "id" | "createdAt" | "updatedAt"> = {
+      title: title.trim(),
+      description: description.trim(),
+      priority: selectedPriority,
+    };
+    dispatch(addTask(sectionId, newTask));
+    resetTitle();
+    resetDescription();
     taskPriority?.current?.reset();
   };
 
@@ -192,7 +198,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
         <Button
           size="sm"
           disabled={!title.trim() || checkError}
-          onClick={addOrEditTask}
+          onClick={mode === "add" ? onAddTask : onEditTask}
         >
           {mode === "add" ? "Add task" : "Save"}
         </Button>

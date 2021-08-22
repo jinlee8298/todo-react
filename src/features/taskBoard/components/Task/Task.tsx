@@ -95,10 +95,17 @@ const Task: FC<TaskProps> = memo((props) => {
       {task?.description && <p>{task?.description}</p>}
       <div className="task-details">
         {task.subTaskIds && (
-          <Label icon={faLink}>{task.subTaskIds.length}</Label>
+          <Label title={`${task.subTaskIds.length} sub-task(s)`} icon={faLink}>
+            {task.subTaskIds.length}
+          </Label>
         )}
         {task.commentIds && (
-          <Label icon={faCommentAlt}>{task.commentIds.length}</Label>
+          <Label
+            title={`${task.commentIds.length} comment(s)`}
+            icon={faCommentAlt}
+          >
+            {task.commentIds.length}
+          </Label>
         )}
       </div>
       <TaskMenu sectionId={props.sectionId} task={task} />

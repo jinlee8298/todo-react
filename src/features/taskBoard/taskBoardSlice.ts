@@ -5,15 +5,17 @@ import {
   Update,
   EntityId,
 } from "@reduxjs/toolkit";
-import { Task, TaskSection, Comment, Project } from "./types";
+import { Task, TaskSection, Comment, Project, Label } from "./types";
 
-const projectAdapter = createEntityAdapter<Project>();
+export const projectAdapter = createEntityAdapter<Project>();
 
-const sectionAdapter = createEntityAdapter<TaskSection>();
+export const sectionAdapter = createEntityAdapter<TaskSection>();
 
-const taskAdapter = createEntityAdapter<Task>();
+export const taskAdapter = createEntityAdapter<Task>();
 
-const commentAdapter = createEntityAdapter<Comment>({
+export const labelAdapter = createEntityAdapter<Label>();
+
+export const commentAdapter = createEntityAdapter<Comment>({
   sortComparer: (a, b) => a.createdAt.localeCompare(b.createdAt),
 });
 
@@ -39,6 +41,10 @@ const initialState = {
     entities: { "2021": { id: "2021", name: "Welcome", sectionIds: [] } },
   }),
   comments: commentAdapter.getInitialState(),
+  labels: labelAdapter.getInitialState(),
+  extras: {
+    currentViewTaskId: "0" as EntityId,
+  },
 };
 
 export const taskSelector = taskAdapter.getSelectors(
@@ -52,6 +58,9 @@ export const commentSelector = commentAdapter.getSelectors(
 );
 export const projectSelector = projectAdapter.getSelectors(
   (state: typeof initialState) => state.projects
+);
+export const labelSelector = labelAdapter.getSelectors(
+  (state: typeof initialState) => state.labels
 );
 
 const generateTaskId = (): EntityId => {
@@ -92,11 +101,12 @@ export const taskBoardSlice = createSlice({
           .getSelectors()
           .selectById(state.sections, sectionId);
 
+        const createdAt = new Date().toJSON();
         const newTask: Task = {
           ...task,
           id: generateTaskId(),
-          createdAt: new Date().toJSON(),
-          updatedAt: new Date().toJSON(),
+          createdAt,
+          updatedAt: createdAt,
         };
 
         taskAdapter.addOne(state.tasks, newTask);
@@ -429,6 +439,7 @@ export const taskBoardSlice = createSlice({
       ) => {
         const { projectId, sectionId } = action.payload;
         const project = projectSelector.selectById(state, projectId);
+        const deleteSection = sectionSelector.selectById(state, sectionId);
 
         projectAdapter.updateOne(state.projects, {
           id: projectId,
@@ -436,7 +447,15 @@ export const taskBoardSlice = createSlice({
             sectionIds: project?.sectionIds.filter((id) => id !== sectionId),
           },
         });
+
         sectionAdapter.removeOne(state.sections, sectionId);
+
+        if (deleteSection) {
+          deleteSection.taskIds.forEach((taskId) => {
+            deleteChildTasks(state, taskId);
+          });
+          taskAdapter.removeMany(state.tasks, deleteSection.taskIds);
+        }
       },
     },
     repositionSection: {
@@ -612,6 +631,16 @@ export const taskBoardSlice = createSlice({
         commentAdapter.removeOne(state.comments, commentId);
       },
     },
+    addLabel: (state, action: PayloadAction<Omit<Label, "id">>) => {
+      const newLabel = {
+        ...action.payload,
+        id: generateTaskId(),
+      };
+      labelAdapter.addOne(state.labels, newLabel);
+    },
+    setCurrentViewTaskId: (state, action: PayloadAction<EntityId>) => {
+      state.extras.currentViewTaskId = action.payload;
+    },
   },
 });
 
@@ -635,6 +664,8 @@ export const {
   addComment,
   updateComment,
   deleteComment,
+  addLabel,
+  setCurrentViewTaskId,
 } = taskBoardSlice.actions;
 
 export default taskBoardSlice.reducer;

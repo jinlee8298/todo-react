@@ -20,7 +20,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TaskEditor from "../TaskEditor/TaskEditor";
 import SubTasksTab from "./SubTasksTab/SubTasksTab";
 import CommentsTab from "./CommentsTab/CommentsTab";
-import { EntityId } from "@reduxjs/toolkit";
 import { taskSelector, updateTask } from "features/taskBoard/taskBoardSlice";
 import { useConfirmDialog, useDispatch, useSelector } from "common/hooks";
 import { ConfirmDialog } from "common/components";
@@ -30,13 +29,16 @@ import { TaskPriority } from "features/taskBoard/types";
 
 type TaskDetailsModalProps = {
   isShown: boolean;
-  taskId: EntityId;
   handleClose?: () => void;
 };
 
 const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
-  ({ isShown, taskId, handleClose }) => {
+  ({ isShown, handleClose }) => {
     const [isEdit, setIsEdit] = useState<boolean>(false);
+    const taskId = useSelector(
+      (state) => state.taskBoard.extras.currentViewTaskId
+    );
+
     const task = useSelector((state) =>
       taskSelector.selectById(state.taskBoard, taskId)
     );

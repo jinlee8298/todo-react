@@ -1,9 +1,12 @@
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Button, Checkbox } from "common/components";
-import { useSelector } from "common/hooks";
+import { useDispatch, useSelector } from "common/hooks";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
-import { taskSelector } from "features/taskBoard/taskBoardSlice";
+import {
+  setCurrentViewTaskId,
+  taskSelector,
+} from "features/taskBoard/taskBoardSlice";
 import { FC, useState, memo } from "react";
 import StyledSubTask from "./SubTask.style";
 
@@ -16,13 +19,21 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
     taskSelector.selectById(state.taskBoard, taskId)
   );
   const [editing, setEditing] = useState(false);
+  const dispatch = useDispatch();
 
   const toggleEditing = () => {
     setEditing((v) => !v);
   };
 
+  const onClick = () => {
+    dispatch(setCurrentViewTaskId(taskId));
+  };
+
   return task ? (
-    <StyledSubTask className={task.priority !== "low" ? task.priority : ""}>
+    <StyledSubTask
+      onClick={onClick}
+      className={task.priority !== "low" ? task.priority : ""}
+    >
       {editing ? (
         <TaskEditor
           onCancel={toggleEditing}

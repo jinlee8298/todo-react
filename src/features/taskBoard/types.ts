@@ -6,10 +6,11 @@ export enum TaskPriority {
   High = "high",
   Urgent = "urgent",
 }
-export interface LabeL {
+export interface Label {
   id: EntityId;
   name: string;
-  order: number;
+  labelColor?: string;
+  taskIds: EntityId[];
 }
 
 export interface Comment {
@@ -26,7 +27,7 @@ export interface Task {
   description?: string;
   finished?: boolean;
   id: EntityId;
-  label?: EntityId[];
+  labelIds?: EntityId[];
   parentTaskId?: EntityId;
   priority: TaskPriority;
   title: string;

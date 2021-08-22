@@ -4,6 +4,7 @@ import {
   insertTaskPlaceholder,
   removeTaskPlaceholder,
   repositionTask,
+  setCurrentViewTaskId,
 } from "features/taskBoard/taskBoardSlice";
 import { FC, DragEventHandler, DragEvent, useState, useCallback } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
@@ -21,7 +22,6 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
     (state) => state.taskBoard.tasks.draggingInfo
   );
   const [showTaskDetails, setShowTaskDetails] = useState<boolean>(false);
-  const [currentTaskId, setCurrentTaskId] = useState<EntityId>(0);
   const dispatch = useDispatch();
 
   const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
@@ -67,10 +67,13 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
     e.preventDefault();
   };
 
-  const openTaskDetailsModal = useCallback((taskId: EntityId) => {
-    setCurrentTaskId(taskId);
-    setShowTaskDetails((v) => !v);
-  }, []);
+  const openTaskDetailsModal = useCallback(
+    (taskId: EntityId) => {
+      dispatch(setCurrentViewTaskId(taskId));
+      setShowTaskDetails((v) => !v);
+    },
+    [dispatch]
+  );
 
   const toggleTaskDetailsModal = useCallback(() => {
     setShowTaskDetails((v) => !v);
@@ -103,7 +106,6 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
       <div className="dropzone-padding"></div>
       <TaskDetailsModal
         isShown={showTaskDetails}
-        taskId={currentTaskId}
         handleClose={toggleTaskDetailsModal}
       />
     </StyledTaskSectionBody>

@@ -1,3 +1,4 @@
+import { Button } from "common/components/style";
 import styled from "styled-components";
 
 export default styled.div`
@@ -16,6 +17,7 @@ export default styled.div`
     .user {
       font-weight: bold;
       margin-inline-end: 0.5em;
+      line-height: 2;
     }
     .time {
       color: var(--gray1);
@@ -23,6 +25,22 @@ export default styled.div`
     }
     .content {
       font-size: 0.875rem;
+    }
+    > ${Button} {
+      margin-block-start: 0.5em;
+      margin-inline-end: 0.5em;
+    }
+  }
+  .actions {
+    display: none;
+  }
+
+  &:hover {
+    .actions {
+      display: inline-block;
+      ${Button} {
+        margin-inline: 0.5em;
+      }
     }
   }
 `;

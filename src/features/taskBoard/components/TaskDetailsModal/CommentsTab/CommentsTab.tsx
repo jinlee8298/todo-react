@@ -42,7 +42,7 @@ const CommentsTab: FC<CommentsTabProps> = ({
     <StyledCommentsTab>
       <div className="comment-container">
         {commentIds.map((id) => (
-          <TaskComment commentId={id} />
+          <TaskComment taskId={taskId} commentId={id} />
         ))}
       </div>
       <div className="comment-actions">

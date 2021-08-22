@@ -31,6 +31,7 @@ const ConfirmDialog: FC<ConfirmDialogProps> = ({
 }) => {
   const onKeyDown: KeyboardEventHandler = (e) => {
     if (e.key === "Escape" && onEsc) {
+      e.stopPropagation();
       onEsc(e);
     }
   };

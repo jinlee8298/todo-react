@@ -72,11 +72,12 @@ const useInput = <InputType extends HTMLTextAreaElement | HTMLInputElement>(
     setValue(initialValue);
   };
 
-  return [value, errors, reset, onChange] as [
+  return [value, errors, reset, onChange, setValue] as [
     value: string,
     errors: InputError,
     reset: () => void,
-    onChange: ChangeEventHandler<InputType>
+    onChange: ChangeEventHandler<InputType>,
+    setValue: typeof setValue
   ];
 };
 

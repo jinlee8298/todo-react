@@ -36,13 +36,14 @@ type TextAreaProps = JSX.IntrinsicElements["textarea"] & {
   hideErrorMessage?: boolean;
   minRows?: number;
   maxRows?: number;
+  value: string;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
 };
 
 const TextArea: FC<TextAreaProps> = ({
   label,
   errors,
-  value,
+  value = "",
   hideErrorMessage = false,
   minRows = 1,
   maxRows = null,

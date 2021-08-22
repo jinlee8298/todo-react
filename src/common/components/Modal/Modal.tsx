@@ -48,7 +48,7 @@ const Modal: FC<ModalProps> = (props) => {
             <section>{props.children}</section>
           </StyledModal>
         </FocusTrap>,
-        document.body
+        document.getElementById("modal-container") || document.body
       )
     : null;
 };

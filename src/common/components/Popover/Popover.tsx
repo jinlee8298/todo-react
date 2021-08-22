@@ -9,6 +9,7 @@ import {
   useCallback,
   useMemo,
   useLayoutEffect,
+  KeyboardEventHandler,
 } from "react";
 import { createPortal } from "react-dom";
 import StyledPopover from "./Popover.style";
@@ -85,6 +86,13 @@ const Popover: FC<PopoverProps> = ({
   const handleCloseHover = useMemo(() => {
     return trigger === "hover" ? close : undefined;
   }, [trigger, close]);
+
+  const onKeyDown: KeyboardEventHandler = (e) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      togglePopover();
+    }
+  };
 
   useEffect(() => {
     if (typeof props.isShown !== "boolean" || props.isShown === isShown) {
@@ -198,7 +206,11 @@ const Popover: FC<PopoverProps> = ({
         createPortal(
           <>
             <FocusTrap focusTrapOptions={FOCUS_TRAP_OPTION}>
-              <StyledPopover onMouseLeave={handleCloseHover} ref={getRef}>
+              <StyledPopover
+                onKeyDown={onKeyDown}
+                onMouseLeave={handleCloseHover}
+                ref={getRef}
+              >
                 {typeof content === "function"
                   ? content({ open, close })
                   : content}

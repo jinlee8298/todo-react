@@ -9,7 +9,9 @@ import {
   generateTaskId,
   deleteTask as delTask,
   duplicateTask as dupTask,
-} from "./store/TaskHelper";
+  updateTask as updTask,
+  updateComment as updComment,
+} from "./store/storeHelper";
 import { Task, TaskSection, Comment, Project, Label } from "./types";
 
 export const projectAdapter = createEntityAdapter<Project>();
@@ -46,7 +48,13 @@ export const initialState = {
     entities: { "2021": { id: "2021", name: "Welcome", sectionIds: [] } },
   }),
   comments: commentAdapter.getInitialState(),
-  labels: labelAdapter.getInitialState(),
+  labels: labelAdapter.getInitialState({
+    ids: ["203325", "233664"],
+    entities: {
+      "203325": { id: "203325", name: "test", taskIds: [] },
+      "233664": { id: "233664", name: "tots", taskIds: [] },
+    },
+  }),
   extras: {
     currentViewTaskId: "0" as EntityId,
   },
@@ -80,7 +88,10 @@ export const taskBoardSlice = createSlice({
         state,
         action: PayloadAction<{
           sectionId: EntityId;
-          task: Omit<Task, "id">;
+          task: Omit<
+            Task,
+            "id" | "createdAt" | "updatedAt" | "commentIds" | "subTaskIds"
+          >;
         }>
       ) => {
         const { sectionId, task } = action.payload;
@@ -95,7 +106,6 @@ export const taskBoardSlice = createSlice({
           createdAt,
           updatedAt: createdAt,
           commentIds: [],
-          labelIds: [],
           subTaskIds: [],
         };
 
@@ -109,13 +119,30 @@ export const taskBoardSlice = createSlice({
             },
           });
         }
+        if (newTask.labelIds.length > 0) {
+          newTask.labelIds.forEach((labelId) => {
+            const label = labelSelector.selectById(state, labelId);
+            if (label) {
+              labelAdapter.updateOne(state.labels, {
+                id: labelId,
+                changes: { taskIds: [...label.taskIds, newTask.id] },
+              });
+            }
+          });
+        }
       },
     },
     addSubTask: {
       prepare: (parentTaskId, task) => ({ payload: { parentTaskId, task } }),
       reducer: (
         state,
-        action: PayloadAction<{ parentTaskId: EntityId; task: Task }>
+        action: PayloadAction<{
+          parentTaskId: EntityId;
+          task: Omit<
+            Task,
+            "id" | "createdAt" | "updatedAt" | "commentIds" | "subTaskIds"
+          >;
+        }>
       ) => {
         const { parentTaskId, task } = action.payload;
         const parentTask = taskSelector.selectById(state, parentTaskId);
@@ -132,13 +159,25 @@ export const taskBoardSlice = createSlice({
           updatedAt: createdAt,
           parentTaskId,
           commentIds: [],
-          labelIds: [],
           subTaskIds: [],
         };
         const parentSubTaskIds = [...(parentTask.subTaskIds || []), newTask.id];
 
         taskAdapter.addOne(state.tasks, newTask);
-        taskAdapter.updateOne(state.tasks, {
+
+        if (newTask.labelIds.length > 0) {
+          newTask.labelIds.forEach((labelId) => {
+            const label = labelSelector.selectById(state, labelId);
+            if (label) {
+              labelAdapter.updateOne(state.labels, {
+                id: labelId,
+                changes: { taskIds: [...label.taskIds, newTask.id] },
+              });
+            }
+          });
+        }
+
+        updTask(state, {
           id: parentTaskId,
           changes: { subTaskIds: parentSubTaskIds },
         });
@@ -148,9 +187,7 @@ export const taskBoardSlice = createSlice({
       state,
       action: PayloadAction<Update<Omit<Task, "id" | "updatedAt">>>
     ) => {
-      const changes = action.payload as Update<Omit<Task, "id">>;
-      changes.changes.updatedAt = new Date().toJSON();
-      taskAdapter.updateOne(state.tasks, action.payload);
+      updTask(state, action.payload);
     },
     duplicateTask: {
       prepare: (sectionId, taskId, duplicateComments = false) => ({
@@ -550,7 +587,7 @@ export const taskBoardSlice = createSlice({
         commentAdapter.addOne(state.comments, newComment);
 
         const taskComments = [...(task.commentIds || []), newComment.id];
-        taskAdapter.updateOne(state.tasks, {
+        updTask(state, {
           id: taskId,
           changes: { commentIds: taskComments },
         });
@@ -562,11 +599,7 @@ export const taskBoardSlice = createSlice({
         Update<Omit<Comment, "id" | "createdAt" | "updatedAt">>
       >
     ) => {
-      const updatedComment = action.payload as Update<
-        Omit<Comment, "id" | "createdAt">
-      >;
-      updatedComment.changes.updatedAt = new Date().toJSON();
-      commentAdapter.updateOne(state.comments, updatedComment);
+      updComment(state, action.payload);
     },
     deleteComment: {
       prepare: (taskId, commentId) => ({ payload: { taskId, commentId } }),
@@ -582,7 +615,7 @@ export const taskBoardSlice = createSlice({
 
         const taskComments = [...(task.commentIds || [])];
 
-        taskAdapter.updateOne(state.tasks, {
+        updTask(state, {
           id: taskId,
           changes: {
             commentIds: taskComments.filter((id) => id !== commentId),
@@ -591,12 +624,86 @@ export const taskBoardSlice = createSlice({
         commentAdapter.removeOne(state.comments, commentId);
       },
     },
-    addLabel: (state, action: PayloadAction<Omit<Label, "id">>) => {
+    addLabel: (state, action: PayloadAction<Omit<Label, "id" | "taskIds">>) => {
       const newLabel = {
         ...action.payload,
         id: generateTaskId(),
+        taskIds: [],
       };
       labelAdapter.addOne(state.labels, newLabel);
+    },
+    addLabelThenAssignToTask: {
+      prepare: (taskId, label) => ({ payload: { taskId, label } }),
+      reducer: (
+        state,
+        action: PayloadAction<{
+          taskId: EntityId;
+          label: Omit<Label, "id" | "taskIds">;
+        }>
+      ) => {
+        const { taskId, label } = action.payload;
+        const task = taskSelector.selectById(state, taskId);
+
+        if (task) {
+          const newLabel = {
+            ...label,
+            id: generateTaskId(),
+            taskIds: [taskId],
+          };
+
+          labelAdapter.addOne(state.labels, newLabel);
+          updTask(state, {
+            id: taskId,
+            changes: { labelIds: [...task.labelIds, newLabel.id] },
+          });
+        }
+      },
+    },
+    addLabelToTask: {
+      prepare: (taskId, labelId) => ({ payload: { taskId, labelId } }),
+      reducer: (
+        state,
+        action: PayloadAction<{ taskId: EntityId; labelId: EntityId }>
+      ) => {
+        const { taskId, labelId } = action.payload;
+        const task = taskSelector.selectById(state, taskId);
+        const label = labelSelector.selectById(state, labelId);
+        if (!task || !label) {
+          return;
+        }
+
+        updTask(state, {
+          id: taskId,
+          changes: { labelIds: [...task.labelIds, labelId] },
+        });
+        labelAdapter.updateOne(state.labels, {
+          id: labelId,
+          changes: { taskIds: [...label.taskIds, taskId] },
+        });
+      },
+    },
+    removeLabelFromTask: {
+      prepare: (taskId, labelId) => ({ payload: { taskId, labelId } }),
+      reducer: (
+        state,
+        action: PayloadAction<{ taskId: EntityId; labelId: EntityId }>
+      ) => {
+        const { taskId, labelId } = action.payload;
+        const task = taskSelector.selectById(state, taskId);
+        const label = labelSelector.selectById(state, labelId);
+        if (!task || !label) {
+          return;
+        }
+
+        updTask(state, {
+          id: taskId,
+          changes: { labelIds: task.labelIds.filter((id) => id !== labelId) },
+        });
+        labelAdapter.updateOne(state.labels, {
+          id: labelId,
+          changes: { taskIds: label.taskIds.filter((id) => id !== taskId) },
+        });
+      },
     },
     setCurrentViewTaskId: (state, action: PayloadAction<EntityId>) => {
       state.extras.currentViewTaskId = action.payload;
@@ -625,6 +732,9 @@ export const {
   updateComment,
   deleteComment,
   addLabel,
+  addLabelThenAssignToTask,
+  addLabelToTask,
+  removeLabelFromTask,
   setCurrentViewTaskId,
 } = taskBoardSlice.actions;
 

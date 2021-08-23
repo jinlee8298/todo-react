@@ -1,4 +1,4 @@
-import { EntityId } from "@reduxjs/toolkit";
+import { EntityId, Update } from "@reduxjs/toolkit";
 import {
   commentAdapter,
   commentSelector,
@@ -10,6 +10,7 @@ import {
   taskAdapter,
   taskSelector,
 } from "../taskBoardSlice";
+import { Task, Comment } from "../types";
 
 export const generateTaskId = (): EntityId => {
   return Date.now().toString() + Math.round(Math.random() * 10000);
@@ -164,4 +165,22 @@ export const duplicateTask = (
 
   taskAdapter.addOne(state.tasks, duplicatedTask);
   return duplicatedTask.id;
+};
+
+export const updateTask = (
+  state: typeof initialState,
+  update: Update<Omit<Task, "id" | "updatedAt">>
+) => {
+  const updateObj = update as Update<Omit<Task, "id">>;
+  updateObj.changes.updatedAt = new Date().toJSON();
+  taskAdapter.updateOne(state.tasks, updateObj);
+};
+
+export const updateComment = (
+  state: typeof initialState,
+  update: Update<Omit<Comment, "id" | "updatedAt">>
+) => {
+  const updateObj = update as Update<Omit<Comment, "id">>;
+  updateObj.changes.updatedAt = new Date().toJSON();
+  commentAdapter.updateOne(state.comments, updateObj);
 };

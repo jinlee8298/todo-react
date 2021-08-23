@@ -15,4 +15,10 @@ export default styled.span`
   color: var(--color);
   font-size: 0.75rem;
   padding: 0rem 0.25rem;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 15ch;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;

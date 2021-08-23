@@ -1,10 +1,15 @@
 import styled from "styled-components";
-import { Button } from "common/components/style";
+import { Button, Label } from "common/components/style";
 
 export default styled.div`
   padding: 1em;
   display: flex;
   flex-direction: column;
+  .label-wrapper {
+    ${Label}:not(:last-child) {
+      margin-inline-end: 0.5em;
+    }
+  }
   > .input-wrapper {
     max-height: min(10rem, 50vh);
     border-radius: 4px;

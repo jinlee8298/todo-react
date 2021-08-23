@@ -61,6 +61,7 @@ export default styled.div`
   }
   .task-details:not(:empty) {
     margin-block-start: 0.5em;
+    display: flex;
   }
   h3 {
     flex: 1;

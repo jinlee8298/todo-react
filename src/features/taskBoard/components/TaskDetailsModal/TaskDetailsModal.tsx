@@ -1,5 +1,10 @@
 import StyledModal from "./TaskDetailsModal.style";
-import { Button, Checkbox, Tabs } from "common/components";
+import {
+  Button,
+  Checkbox,
+  Label as LabelComponent,
+  Tabs,
+} from "common/components";
 import {
   FC,
   useState,
@@ -13,19 +18,24 @@ import {
   faCircle,
   faEllipsisH,
   faList,
-  faTag,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TaskEditor from "../TaskEditor/TaskEditor";
 import SubTasksTab from "./SubTasksTab/SubTasksTab";
 import CommentsTab from "./CommentsTab/CommentsTab";
-import { taskSelector, updateTask } from "features/taskBoard/taskBoardSlice";
+import {
+  labelSelector,
+  taskSelector,
+  updateTask,
+} from "features/taskBoard/taskBoardSlice";
 import { useConfirmDialog, useDispatch, useSelector } from "common/hooks";
 import { ConfirmDialog } from "common/components";
 import TaskPrioritySelect from "../TaskEditor/TaskPrioritySelect/TaskPrioritySelect";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
-import { TaskPriority } from "features/taskBoard/types";
+import { Label, TaskPriority } from "features/taskBoard/types";
+import TaskLabelSelect from "../TaskEditor/TaskLabelSelect/TaskLabelSelect";
+import { shallowEqual } from "react-redux";
 
 type TaskDetailsModalProps = {
   isShown: boolean;
@@ -38,10 +48,16 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
     const taskId = useSelector(
       (state) => state.taskBoard.extras.currentViewTaskId
     );
-
     const task = useSelector((state) =>
       taskSelector.selectById(state.taskBoard, taskId)
     );
+    const taskLabels = useSelector((state) => {
+      return task
+        ? task.labelIds.map(
+            (id) => labelSelector.selectEntities(state.taskBoard)[id]
+          )
+        : task;
+    }, shallowEqual) as Label[] | undefined;
     const [showConfirm, closeConfirm, dialogProps] = useConfirmDialog();
     const dispatch = useDispatch();
 
@@ -154,9 +170,16 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
                   <p>{task?.description}</p>
                 </div>
               </div>
+              <div className="label-wrapper">
+                {taskLabels?.map((label) => (
+                  <LabelComponent key={label.id} title={label?.name}>
+                    {label.name}
+                  </LabelComponent>
+                ))}
+              </div>
               <div className="task-actions">
                 <Button icon={faList} alternative="reverse" size="sx" />
-                <Button icon={faTag} alternative="reverse" size="sx" />
+                <TaskLabelSelect taskId={task?.id} mode="standalone" />
                 <TaskPrioritySelect
                   onSelect={onSelectPriority}
                   taskId={task?.id}

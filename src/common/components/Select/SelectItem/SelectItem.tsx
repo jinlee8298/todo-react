@@ -37,20 +37,16 @@ const Item: FC<SelectItemProps> = memo(
         onKeyDown={onKeyDown}
         tabIndex={0}
       >
-        {typeof value === "string" ? (
-          <span>{value}</span>
-        ) : (
-          <span>
-            {value.icon && (
-              <FontAwesomeIcon
-                icon={value.icon}
-                color={value.iconColor}
-                fixedWidth
-              />
-            )}
-            {value.label}
-          </span>
-        )}
+        <span>
+          {value.icon && (
+            <FontAwesomeIcon
+              icon={value.icon}
+              color={value.iconColor}
+              fixedWidth
+            />
+          )}
+          {value.label}
+        </span>
         {isSelected && <FontAwesomeIcon icon={faCheck} fixedWidth />}
       </StyledItem>
     );

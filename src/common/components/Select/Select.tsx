@@ -12,9 +12,14 @@ type SelecProps = {
   filterLabel?: string;
   selected?: SelectItem | SelectItem[];
   closeOnSelect?: boolean;
+  noResultContent?: ReactElement;
   onSelect?: (selectItem: SelectItem) => void;
   onDeselect?: (deselectItem: SelectItem) => void;
   onFilterChange?: (filterValue: string) => void;
+  onOpenFinished?: () => void;
+  onCloseFinished?: () => void;
+  onOpen?: () => void;
+  onClose?: () => void;
 };
 
 const Select: FC<SelecProps> = ({
@@ -24,6 +29,7 @@ const Select: FC<SelecProps> = ({
   filterLabel,
   selected,
   closeOnSelect,
+  noResultContent,
   onDeselect,
   ...props
 }) => {
@@ -101,6 +107,7 @@ const Select: FC<SelecProps> = ({
     childRefs.current.forEach((child) =>
       child.addEventListener("focus", childFocused)
     );
+    props.onOpenFinished?.();
   };
 
   const removeKeyboardListener = () => {
@@ -109,6 +116,7 @@ const Select: FC<SelecProps> = ({
       child.removeEventListener("focus", childFocused)
     );
     menuContainerRef.current?.removeEventListener("keydown", onKeypress);
+    props.onClose?.();
   };
 
   const checkSelected = (checkItem: SelectItem) => {
@@ -127,14 +135,14 @@ const Select: FC<SelecProps> = ({
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     onFilterChange(e);
-    props?.onFilterChange?.(e.target.value);
+    props.onFilterChange?.(e.target.value);
   };
 
   const onSelect = (value: SelectItem) => {
     if (closeSelectRef.current && closeOnSelect) {
       closeSelectRef.current();
     }
-    props?.onSelect?.(value);
+    props.onSelect?.(value);
   };
 
   const renderContent = ({ close }: { close: () => void }) => {
@@ -158,6 +166,7 @@ const Select: FC<SelecProps> = ({
               value={item}
             />
           ))}
+          {hasFilter && items.length === 0 && noResultContent}
         </StyledSelect>
       </>
     );
@@ -167,6 +176,8 @@ const Select: FC<SelecProps> = ({
     <Popover
       closeOnClickOutside
       onClose={removeKeyboardListener}
+      onCloseFinished={props.onCloseFinished}
+      onOpen={props.onOpen}
       onOpenFinished={setupKeyboardInteraction}
       content={renderContent}
     >

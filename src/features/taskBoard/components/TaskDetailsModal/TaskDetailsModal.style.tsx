@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { Modal } from "common/components";
 import { Checkbox, Button, Tabs } from "common/components/style";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor.style";
+import LabelStyle from "common/components/Label/Label.style";
 
 export default styled(Modal)`
   > section {
@@ -45,7 +46,7 @@ export default styled(Modal)`
     }
     ${Checkbox} {
       flex-shrink: 0;
-      height: 24px;
+      height: 1.5rem;
       margin-inline-end: 1rem;
     }
     .editable {
@@ -64,6 +65,7 @@ export default styled(Modal)`
       }
     }
   }
+
   .task-actions {
     display: flex;
     justify-content: flex-end;
@@ -91,6 +93,19 @@ export default styled(Modal)`
   .edit-task {
     ${TaskEditor} {
       padding: 0;
+    }
+    > .label-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      margin-block-start: 0.5rem;
+      margin-inline-start: 2.25rem;
+      ${LabelStyle} {
+        flex-shrink: 0;
+        margin-block-end: 0.5em;
+        &:not(:last-child) {
+          margin-inline-end: 0.5em;
+        }
+      }
     }
   }
 `;

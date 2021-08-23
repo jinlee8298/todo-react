@@ -1,21 +1,32 @@
 import {
   ComponentPropsWithoutRef,
   KeyboardEventHandler,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import TaskEditorContainer from "./TaskEditor.style";
-import { Button } from "common/components";
-import { faTag } from "@fortawesome/free-solid-svg-icons";
+import { Button, Label as LabelComponent } from "common/components";
 import { EntityId } from "@reduxjs/toolkit";
-import { Task, TaskPriority } from "features/taskBoard/types";
-import { useDispatch, useInput } from "common/hooks";
-import { addSubTask, addTask, updateTask } from "../../taskBoardSlice";
+import { Label, Task, TaskPriority } from "features/taskBoard/types";
+import { useDispatch, useInput, useSelector } from "common/hooks";
+import {
+  addSubTask,
+  addTask,
+  labelSelector,
+  updateTask,
+} from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 import TaskPrioritySelect, {
   TaskPrioritySelectRef,
 } from "./TaskPrioritySelect/TaskPrioritySelect";
+import TaskLabelSelect, {
+  TaskLabelSelectRef,
+} from "./TaskLabelSelect/TaskLabelSelect";
+import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
+import { shallowEqual } from "react-redux";
 
 type TaskEditorProps = {
   mode: "add" | "edit" | "add-subtask";
@@ -52,7 +63,18 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   const titleLineHeight = useRef<number | null>(null);
   const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
   const descriptionLineHeight = useRef<number | null>(null);
-  const taskPriority = useRef<TaskPrioritySelectRef>(null);
+  const taskPriorityRef = useRef<TaskPrioritySelectRef>(null);
+  const taskLabelRef = useRef<TaskLabelSelectRef>(null);
+  const [selectedLabels, setSelectedLabels] = useState<SelectItem[]>([]);
+  const taskLabels = useSelector(
+    (state) =>
+      task
+        ? task.labelIds.map(
+            (id) => labelSelector.selectEntities(state.taskBoard)[id]
+          )
+        : [],
+    shallowEqual
+  ) as Label[] | undefined;
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -72,6 +94,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       );
     }
   }, [title]);
+
   useLayoutEffect(() => {
     if (descriptionInputRef.current) {
       if (!descriptionLineHeight.current) {
@@ -91,6 +114,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       );
     }
   }, [description]);
+
   useLayoutEffect(() => {
     // Focus then put cursor to the end of line
     // Normally when you focus to input, cursor will stay at the beginning of line
@@ -102,6 +126,17 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       titleInputRef.current.value = value;
     }
   }, []);
+
+  useEffect(() => {
+    if (taskLabels && taskLabels.length > 0) {
+      setSelectedLabels(
+        taskLabels.map((label) => ({
+          value: label.id as string,
+          label: label.name,
+        }))
+      );
+    }
+  }, [taskLabels]);
 
   const onEnter: KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.key === "Enter") {
@@ -122,13 +157,16 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     if (task.description !== description.trim()) {
       changes.description = description;
     }
-    if (task.priority !== taskPriority?.current?.selected) {
-      changes.priority = taskPriority?.current?.selected;
+    if (task.priority !== taskPriorityRef.current?.selected) {
+      changes.priority = taskPriorityRef.current?.selected;
     }
+    taskLabelRef.current?.patchTaskLabel();
 
     dispatch(updateTask({ id: task.id, changes }));
     onCancel?.();
-    taskPriority?.current?.reset();
+    taskPriorityRef.current?.reset();
+    taskLabelRef.current?.reset();
+    clearLabelList();
   };
 
   const onAddTask = () => {
@@ -137,19 +175,15 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     }
 
     const selectedPriority =
-      taskPriority?.current?.selected || TaskPriority.Low;
+      taskPriorityRef?.current?.selected || TaskPriority.Low;
     const newTask: Omit<
       Task,
-      | "id"
-      | "createdAt"
-      | "updatedAt"
-      | "commentIds"
-      | "labelIds"
-      | "subTaskIds"
+      "id" | "createdAt" | "updatedAt" | "commentIds" | "subTaskIds"
     > = {
       title: title.trim(),
       description: description.trim(),
       priority: selectedPriority,
+      labelIds: selectedLabels.map((item) => item.value) || [],
     };
     if (mode === "add-subtask") {
       dispatch(addSubTask(parentTaskId, newTask));
@@ -158,7 +192,9 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     }
     resetTitle();
     resetDescription();
-    taskPriority?.current?.reset();
+    taskPriorityRef.current?.reset();
+    taskLabelRef.current?.reset();
+    clearLabelList();
   };
 
   const checkError = useMemo(() => {
@@ -176,8 +212,29 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     }
   };
 
+  const onSelectLabel = (selectItem: SelectItem) => {
+    setSelectedLabels((labelList) => [...labelList, selectItem]);
+  };
+
+  const onDeselectLabel = (deselectItem: SelectItem) => {
+    setSelectedLabels((labelList) =>
+      labelList.filter((labelItem) => labelItem.value !== deselectItem.value)
+    );
+  };
+
+  const clearLabelList = () => {
+    setSelectedLabels([]);
+  };
+
   return (
     <TaskEditorContainer {...props} onKeyDown={onKeyDown}>
+      <div className="label-wrapper">
+        {selectedLabels.map((labelItem) => (
+          <LabelComponent key={labelItem.value} title={labelItem.label}>
+            {labelItem.label}
+          </LabelComponent>
+        ))}
+      </div>
       <div className="input-wrapper">
         <textarea
           onChange={onTitleChange}
@@ -205,13 +262,14 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
         </p>
       </div>
       <div className="task-options">
-        <Button
-          size="sx"
-          icon={faTag}
-          title="Add label(s)"
-          alternative="reverse"
+        <TaskLabelSelect
+          mode={mode === "edit" ? "edit" : "add"}
+          onSelect={onSelectLabel}
+          onDeselect={onDeselectLabel}
+          ref={taskLabelRef}
+          taskId={task?.id}
         />
-        <TaskPrioritySelect taskId={task?.id} ref={taskPriority} />
+        <TaskPrioritySelect taskId={task?.id} ref={taskPriorityRef} />
       </div>
       <div className="button-group">
         <Button

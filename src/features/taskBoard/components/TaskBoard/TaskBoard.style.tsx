@@ -3,6 +3,7 @@ import { Button } from "common/components/style";
 import TaskList from "../TaskSection/TaskSection.style";
 import Placeholder from "../Placeholder/Placeholder.style";
 import AddSectionButton from "../AddSectionButton/AddSectionButton.style";
+import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor.style";
 
 export default styled.div`
   --list-width: 17rem;
@@ -21,7 +22,7 @@ export default styled.div`
     width: calc(var(--list-width) + 2rem);
     flex-shrink: 0;
   }
-  > ${Button} {
+  > ${Button}, > ${TaskSectionEditor} {
     flex-shrink: 0;
     width: calc(var(--list-width) + 2rem);
   }

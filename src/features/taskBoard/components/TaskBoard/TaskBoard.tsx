@@ -1,6 +1,6 @@
 import StyledTaskBoard from "./TaskBoard.style";
 import TaskSection from "../TaskSection/TaskSection";
-import { DragEventHandler, FC, Fragment } from "react";
+import { DragEventHandler, FC, Fragment, useState } from "react";
 import { Button } from "common/components";
 import { faPlusSquare } from "@fortawesome/free-regular-svg-icons";
 import { useDispatch, useSelector } from "common/hooks";
@@ -14,6 +14,7 @@ import {
 } from "../../taskBoardSlice";
 import Placeholder from "../Placeholder/Placeholder";
 import { RootState } from "app/store";
+import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 
 type TaskBoardProps = {};
 let cachedOrder = 0;
@@ -25,6 +26,7 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
   const draggingSectionInfo = useSelector(
     (state: RootState) => state.taskBoard.sections.draggingInfo
   );
+  const [addingSection, setAddingSection] = useState(false);
   const dispatch = useDispatch();
 
   const onDragEnter: DragEventHandler<HTMLDivElement> = (e) => {
@@ -57,6 +59,10 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
     }
   };
 
+  const toggleAddingSection = () => {
+    setAddingSection((v) => !v);
+  };
+
   return (
     <StyledTaskBoard
       onDrop={onSectionDrop}
@@ -84,19 +90,20 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
         </Fragment>
       ))}
 
-      <Button
-        alternative="reverse"
-        icon={faPlusSquare}
-        onClick={(e) =>
-          dispatch(
-            addSection("2021", {
-              name: "test" + cachedOrder++,
-            })
-          )
-        }
-      >
-        Add new section
-      </Button>
+      {addingSection ? (
+        <TaskSectionEditor
+          projectId="2021"
+          onCloseHandle={toggleAddingSection}
+        />
+      ) : (
+        <Button
+          onClick={toggleAddingSection}
+          alternative="reverse"
+          icon={faPlusSquare}
+        >
+          Add new section
+        </Button>
+      )}
     </StyledTaskBoard>
   );
 };

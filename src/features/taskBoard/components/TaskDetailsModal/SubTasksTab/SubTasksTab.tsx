@@ -30,7 +30,7 @@ const SubTasksTab: FC<SubTasksTabProps> = memo(({ parentTaskId }) => {
 
       {addTask ? (
         <TaskEditor
-          onCancel={toggleAddTask}
+          onCloseHandle={toggleAddTask}
           parentTaskId={parentTaskId}
           mode="add-subtask"
         />

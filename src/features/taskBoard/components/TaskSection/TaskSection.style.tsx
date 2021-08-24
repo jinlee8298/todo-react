@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { Button } from "common/components/style";
+import TaskSectionEditor from "./TaskSectionEditor/TaskSectionEditor.style";
 
 export default styled.section`
   --primary-10: ${(props) => `${props.theme.primary}0D`};
@@ -31,8 +32,11 @@ export default styled.section`
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: bold;
+      &:hover {
+        cursor: text;
+      }
     }
-    span {
+    > span {
       font-size: 0.8rem;
       margin-inline: 0.5em;
       font-weight: bold;
@@ -41,6 +45,9 @@ export default styled.section`
       background: var(--gray3);
       border-radius: 100rem;
       margin-inline-start: auto;
+    }
+    ${TaskSectionEditor} {
+      padding: 0.5em 0;
     }
   }
   footer {

@@ -1,4 +1,4 @@
-import { DragEventHandler, FC, useRef, memo } from "react";
+import { DragEventHandler, FC, useRef, memo, useState } from "react";
 import StyledTaskSection from "./TaskSection.style";
 import { EntityId } from "@reduxjs/toolkit";
 import {
@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "common/hooks";
 import TaskSectionFooter from "./TaskSectionFooter/TaskSectionFooter";
 import TaskSectionBody from "./TaskSectionBody/TaskSectionBody";
 import TaskSectionMenu from "./TaskSectionMenu/TaskSectionMenu";
+import TaskSecitonEditor from "./TaskSectionEditor/TaskSectionEditor";
 
 type TaskSectionProps = {
   sectionId: EntityId;
@@ -23,6 +24,7 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
     sectionSelector.selectById(state.taskBoard, props.sectionId)
   );
   const containerRef = useRef<HTMLElement>(null);
+  const [editing, setEditing] = useState(false);
   const dispatch = useDispatch();
 
   const onSectionDragOver: DragEventHandler<HTMLElement> = (e) => {
@@ -72,9 +74,13 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
       dispatch(removeTaskPlaceholder());
     }
   };
+
+  const toggleEditing = () => {
+    setEditing((v) => !v);
+  };
   return (
     <StyledTaskSection
-      draggable
+      draggable={!editing}
       ref={containerRef}
       onDragEnter={onDragEnterSection}
       onDragStart={onDragStartSection}
@@ -83,12 +89,26 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
       onDragLeave={onDragLeave}
     >
       <header>
-        <h3>{section?.name}</h3>
-        <span>
-          {section?.taskIds.filter((id) => id !== "placeholder").length}
-        </span>
-        {section && (
-          <TaskSectionMenu sectionId={section.id} projectId={props.projectId} />
+        {editing ? (
+          <TaskSecitonEditor
+            onCloseHandle={toggleEditing}
+            section={section}
+            projectId={props.projectId}
+          />
+        ) : (
+          <>
+            <h3 onClick={toggleEditing}>{section?.name}</h3>
+            <span>
+              {section?.taskIds.filter((id) => id !== "placeholder").length}
+            </span>
+            {section && (
+              <TaskSectionMenu
+                onEdit={toggleEditing}
+                sectionId={section.id}
+                projectId={props.projectId}
+              />
+            )}
+          </>
         )}
       </header>
       <TaskSectionBody

@@ -151,7 +151,7 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
             <TaskEditor
               task={task}
               mode="edit"
-              onCancel={toggleEdit}
+              onCloseHandle={toggleEdit}
             ></TaskEditor>
           ) : (
             <>

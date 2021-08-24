@@ -12,14 +12,19 @@ import {
   deleteSection,
   duplicateSection,
   sectionSelector,
-} from "../../../taskBoardSlice";
+} from "features/taskBoard/taskBoardSlice";
 
 type TaskMenuProps = {
   sectionId: EntityId;
   projectId: EntityId;
+  onEdit?: () => void;
 };
 
-const TaskSectionMenu: FC<TaskMenuProps> = ({ sectionId, projectId }) => {
+const TaskSectionMenu: FC<TaskMenuProps> = ({
+  sectionId,
+  projectId,
+  onEdit,
+}) => {
   const section = useSelector((state) =>
     sectionSelector.selectById(state.taskBoard, sectionId)
   );
@@ -68,6 +73,7 @@ const TaskSectionMenu: FC<TaskMenuProps> = ({ sectionId, projectId }) => {
             <Menu.Item
               icon={faPen}
               onTrigger={() => {
+                onEdit?.();
                 close();
               }}
             >

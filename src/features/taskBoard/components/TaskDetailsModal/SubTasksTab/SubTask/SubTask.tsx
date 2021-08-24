@@ -56,7 +56,7 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
       {editing ? (
         <TaskEditor
           onClick={onClickEditor}
-          onCancel={toggleEditing}
+          onCloseHandle={toggleEditing}
           task={task}
           mode="edit"
         ></TaskEditor>

@@ -25,7 +25,7 @@ const TaskSectionFooter: FC<TaskSectionFooterProps> = (props) => {
       {showTaskEditor ? (
         <TaskEditor
           mode="add"
-          onCancel={toggleTaskEditor}
+          onCloseHandle={toggleTaskEditor}
           sectionId={props.sectionId}
         />
       ) : (

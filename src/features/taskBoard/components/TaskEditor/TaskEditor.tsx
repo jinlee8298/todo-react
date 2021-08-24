@@ -30,7 +30,7 @@ import { shallowEqual } from "react-redux";
 
 type TaskEditorProps = {
   mode: "add" | "edit" | "add-subtask";
-  onCancel?: () => void;
+  onCloseHandle?: () => void;
   sectionId?: EntityId;
   task?: Task;
   parentTaskId?: EntityId;
@@ -41,7 +41,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   sectionId,
   task,
   parentTaskId,
-  onCancel,
+  onCloseHandle,
   ...props
 }) => {
   const [title, titleErrors, resetTitle, onTitleChange] =
@@ -163,7 +163,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     taskLabelRef.current?.patchTaskLabel();
 
     dispatch(updateTask({ id: task.id, changes }));
-    onCancel?.();
+    onCloseHandle?.();
     taskPriorityRef.current?.reset();
     taskLabelRef.current?.reset();
     clearLabelList();
@@ -208,7 +208,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   const onKeyDown: KeyboardEventHandler = (e) => {
     if (e.key === "Escape") {
       e.stopPropagation();
-      onCancel?.();
+      onCloseHandle?.();
     }
   };
 
@@ -279,7 +279,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
         >
           {mode === "edit" ? "Save" : "Add task"}
         </Button>
-        <Button size="sm" alternative="reverse" onClick={onCancel}>
+        <Button size="sm" alternative="reverse" onClick={onCloseHandle}>
           Cancel
         </Button>
       </div>

@@ -48,13 +48,7 @@ export const initialState = {
     entities: { "2021": { id: "2021", name: "Welcome", sectionIds: [] } },
   }),
   comments: commentAdapter.getInitialState(),
-  labels: labelAdapter.getInitialState({
-    ids: ["203325", "233664"],
-    entities: {
-      "203325": { id: "203325", name: "test", taskIds: [] },
-      "233664": { id: "233664", name: "tots", taskIds: [] },
-    },
-  }),
+  labels: labelAdapter.getInitialState(),
   extras: {
     currentViewTaskId: "0" as EntityId,
   },

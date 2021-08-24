@@ -80,8 +80,10 @@ const TaskLabelSelect: ForwardRefRenderFunction<
 
   const createNewLabel: MouseEventHandler = (e) => {
     e.stopPropagation();
-    dispatch(addLabel({ name: filterValue }));
-    newLabelName.current = filterValue;
+    if (filterValue.trim()) {
+      dispatch(addLabel({ name: filterValue }));
+      newLabelName.current = filterValue;
+    }
   };
 
   const onSelectLabel = (labelItem: SelectItem) => {
@@ -159,15 +161,17 @@ const TaskLabelSelect: ForwardRefRenderFunction<
   const noResultContent = (
     <StyledTaskLabelSelect>
       <p>Label not found</p>
-      <p className="add-label" onClick={createNewLabel}>
-        <Button
-          onClick={createNewLabel}
-          size="sx"
-          alternative="reverse"
-          icon={faPlus}
-        ></Button>
-        Create "{filterValue}"
-      </p>
+      {filterValue.trim() && (
+        <p className="add-label" onClick={createNewLabel}>
+          <Button
+            onClick={createNewLabel}
+            size="sx"
+            alternative="reverse"
+            icon={faPlus}
+          ></Button>
+          Create "{filterValue}"
+        </p>
+      )}
     </StyledTaskLabelSelect>
   );
 
@@ -188,7 +192,7 @@ const TaskLabelSelect: ForwardRefRenderFunction<
       <Button
         size="sx"
         icon={faTag}
-        title="Set priorities"
+        title="Set label(s)"
         alternative="reverse"
       />
     </Select>

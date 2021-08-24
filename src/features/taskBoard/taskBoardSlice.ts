@@ -184,19 +184,21 @@ export const taskBoardSlice = createSlice({
       updTask(state, action.payload);
     },
     duplicateTask: {
-      prepare: (sectionId, taskId, duplicateComments = false) => ({
-        payload: { sectionId, taskId, duplicateComments },
+      prepare: (sectionId, parentId, taskId, duplicateComments = false) => ({
+        payload: { sectionId, parentId, taskId, duplicateComments },
       }),
       reducer: (
         state,
         action: PayloadAction<{
           sectionId: EntityId | null;
+          parentId: EntityId | null;
           taskId: EntityId;
           duplicateComments: boolean;
         }>
       ) => {
-        const { sectionId, taskId, duplicateComments } = action.payload;
-        dupTask(state, sectionId, taskId, duplicateComments);
+        const { sectionId, parentId, taskId, duplicateComments } =
+          action.payload;
+        dupTask(state, sectionId, parentId, taskId, duplicateComments);
       },
     },
     deleteTask: {
@@ -421,6 +423,41 @@ export const taskBoardSlice = createSlice({
       action: PayloadAction<Update<Omit<TaskSection, "id">>>
     ) => {
       sectionAdapter.updateOne(state.sections, action.payload);
+    },
+    duplicateSection: {
+      prepare: (projectId, sectionId) => ({
+        payload: { projectId, sectionId },
+      }),
+      reducer: (
+        state,
+        action: PayloadAction<{ projectId: EntityId; sectionId: EntityId }>
+      ) => {
+        const { projectId, sectionId } = action.payload;
+        const originSection = sectionSelector.selectById(state, sectionId);
+        const project = projectSelector.selectById(state, projectId);
+
+        if (!originSection || !project) {
+          return;
+        }
+
+        const newSection: TaskSection = {
+          name: originSection.name,
+          taskIds: [],
+          id: generateTaskId(),
+        };
+        originSection.taskIds.forEach((taskId) => {
+          const duplicatedTaskId = dupTask(state, null, null, taskId, false);
+          newSection.taskIds.push(duplicatedTaskId);
+        });
+        sectionAdapter.addOne(state.sections, newSection);
+        console.log(project.sectionIds);
+        projectAdapter.updateOne(state.projects, {
+          id: projectId,
+          changes: {
+            sectionIds: [...project.sectionIds, newSection.id],
+          },
+        });
+      },
     },
     deleteSection: {
       prepare: (projectId, sectionId) => ({
@@ -717,6 +754,7 @@ export const {
   setDraggingTaskData,
   addSection,
   updateSection,
+  duplicateSection,
   deleteSection,
   repositionSection,
   setDraggingSectionData,

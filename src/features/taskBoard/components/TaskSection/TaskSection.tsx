@@ -1,6 +1,5 @@
 import { DragEventHandler, FC, useRef, memo } from "react";
 import StyledTaskSection from "./TaskSection.style";
-import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import {
   sectionSelector,
@@ -9,10 +8,10 @@ import {
   removeSectionPlaceholder,
   setDraggingSectionData,
 } from "../../taskBoardSlice";
-import { Button } from "common/components";
 import { useDispatch, useSelector } from "common/hooks";
 import TaskSectionFooter from "./TaskSectionFooter/TaskSectionFooter";
 import TaskSectionBody from "./TaskSectionBody/TaskSectionBody";
+import TaskSectionMenu from "./TaskSectionMenu/TaskSectionMenu";
 
 type TaskSectionProps = {
   sectionId: EntityId;
@@ -88,7 +87,9 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
         <span>
           {section?.taskIds.filter((id) => id !== "placeholder").length}
         </span>
-        <Button icon={faEllipsisH} size="sx" rounded alternative="reverse" />
+        {section && (
+          <TaskSectionMenu sectionId={section.id} projectId={props.projectId} />
+        )}
       </header>
       <TaskSectionBody
         sectionId={props.sectionId}

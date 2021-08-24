@@ -82,6 +82,7 @@ export const deleteTask = (
 export const duplicateTask = (
   state: typeof initialState,
   sectionId: EntityId | null,
+  parentId: EntityId | null,
   taskId: EntityId,
   duplicateComments: boolean
 ): EntityId => {
@@ -97,6 +98,10 @@ export const duplicateTask = (
     updatedAt: createdAt,
     createdAt,
   };
+
+  if (parentId) {
+    duplicatedTask.parentTaskId = parentId;
+  }
 
   if (sectionId) {
     const section = sectionSelector.selectById(state, sectionId);
@@ -132,12 +137,15 @@ export const duplicateTask = (
       const newSubTaskId = duplicateTask(
         state,
         null,
+        duplicatedTask.id,
         subTaskId,
         duplicateComments
       );
       duplicatedTask.subTaskIds.push(newSubTaskId);
     });
   }
+
+  taskAdapter.addOne(state.tasks, duplicatedTask);
 
   if (originTask.labelIds.length > 0) {
     originTask.labelIds.forEach((labelId) => {
@@ -153,8 +161,11 @@ export const duplicateTask = (
     });
   }
 
-  if (originTask.parentTaskId) {
-    const parentTask = taskSelector.selectById(state, originTask.parentTaskId);
+  if (duplicatedTask.parentTaskId) {
+    const parentTask = taskSelector.selectById(
+      state,
+      duplicatedTask.parentTaskId
+    );
     if (parentTask) {
       taskAdapter.updateOne(state.tasks, {
         id: parentTask.id,
@@ -163,13 +174,12 @@ export const duplicateTask = (
     }
   }
 
-  taskAdapter.addOne(state.tasks, duplicatedTask);
   return duplicatedTask.id;
 };
 
 export const updateTask = (
   state: typeof initialState,
-  update: Update<Omit<Task, "id" | "updatedAt">>
+  update: Update<Omit<Task, "id" | "updatedAt" | "createdAt">>
 ) => {
   const updateObj = update as Update<Omit<Task, "id">>;
   updateObj.changes.updatedAt = new Date().toJSON();
@@ -178,7 +188,7 @@ export const updateTask = (
 
 export const updateComment = (
   state: typeof initialState,
-  update: Update<Omit<Comment, "id" | "updatedAt">>
+  update: Update<Omit<Comment, "id" | "updatedAt" | "createdAt">>
 ) => {
   const updateObj = update as Update<Omit<Comment, "id">>;
   updateObj.changes.updatedAt = new Date().toJSON();

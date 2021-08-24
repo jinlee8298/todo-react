@@ -28,7 +28,14 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
       showConfirm({
         backdropClick: closeConfirm,
         onReject: () => {
-          dispatch(duplicateTask(props.sectionId, props.task.id, false));
+          dispatch(
+            duplicateTask(
+              props.sectionId,
+              props.task.parentTaskId,
+              props.task.id,
+              false
+            )
+          );
           closeConfirm();
         },
         onEsc: closeConfirm,
@@ -42,7 +49,9 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
         rejectButtonLabel: "Exclude comments",
       });
     } else {
-      dispatch(duplicateTask(props.sectionId, props.task.id));
+      dispatch(
+        duplicateTask(props.sectionId, props.task.parentTaskId, props.task.id)
+      );
     }
   };
 
@@ -57,7 +66,7 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
       title: "Delete task?",
       message: (
         <span>
-          Are you sure you want to delete task:
+          Are you sure you want to delete task:{" "}
           <strong>"{props.task.title}"</strong>?
         </span>
       ),

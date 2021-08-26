@@ -44,4 +44,5 @@ export interface Project {
   id: EntityId;
   sectionIds: EntityId[];
   name: string;
+  color: string;
 }

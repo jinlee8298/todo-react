@@ -11,6 +11,7 @@ import {
   duplicateTask as dupTask,
   updateTask as updTask,
   updateComment as updComment,
+  duplicateSection as dupSection,
 } from "./store/storeHelper";
 import { Task, TaskSection, Comment, Project, Label } from "./types";
 
@@ -433,30 +434,7 @@ export const taskBoardSlice = createSlice({
         action: PayloadAction<{ projectId: EntityId; sectionId: EntityId }>
       ) => {
         const { projectId, sectionId } = action.payload;
-        const originSection = sectionSelector.selectById(state, sectionId);
-        const project = projectSelector.selectById(state, projectId);
-
-        if (!originSection || !project) {
-          return;
-        }
-
-        const newSection: TaskSection = {
-          name: originSection.name,
-          taskIds: [],
-          id: generateTaskId(),
-        };
-        originSection.taskIds.forEach((taskId) => {
-          const duplicatedTaskId = dupTask(state, null, null, taskId, false);
-          newSection.taskIds.push(duplicatedTaskId);
-        });
-        sectionAdapter.addOne(state.sections, newSection);
-        console.log(project.sectionIds);
-        projectAdapter.updateOne(state.projects, {
-          id: projectId,
-          changes: {
-            sectionIds: [...project.sectionIds, newSection.id],
-          },
-        });
+        dupSection(state, projectId, sectionId);
       },
     },
     deleteSection: {
@@ -739,6 +717,47 @@ export const taskBoardSlice = createSlice({
     setCurrentViewTaskId: (state, action: PayloadAction<EntityId>) => {
       state.extras.currentViewTaskId = action.payload;
     },
+    addProject: (
+      state,
+      action: PayloadAction<Omit<Project, "id" | "sectionIds">>
+    ) => {
+      const newProject = {
+        ...action.payload,
+        id: generateTaskId(),
+        sectionIds: [],
+      };
+      projectAdapter.addOne(state.projects, newProject);
+    },
+    deleteProject: (state, action: PayloadAction<EntityId>) => {
+      projectAdapter.removeOne(state.projects, action.payload);
+    },
+    updateProject: (
+      state,
+      action: PayloadAction<Update<Omit<Project, "id">>>
+    ) => {
+      projectAdapter.updateOne(state.projects, action.payload);
+    },
+    duplicateProject: (state, action: PayloadAction<EntityId>) => {
+      const originProject = projectSelector.selectById(state, action.payload);
+      if (!originProject) {
+        return;
+      }
+
+      const newProject = {
+        ...originProject,
+        name: `Copy of ${originProject.name}`,
+        sectionIds: [],
+        id: generateTaskId(),
+      };
+
+      projectAdapter.addOne(state.projects, newProject);
+
+      if (originProject.sectionIds.length > 0) {
+        originProject.sectionIds.forEach((sectionId) => {
+          dupSection(state, newProject.id, sectionId);
+        });
+      }
+    },
   },
 });
 
@@ -768,6 +787,10 @@ export const {
   addLabelToTask,
   removeLabelFromTask,
   setCurrentViewTaskId,
+  addProject,
+  deleteProject,
+  updateProject,
+  duplicateProject,
 } = taskBoardSlice.actions;
 
 export default taskBoardSlice.reducer;

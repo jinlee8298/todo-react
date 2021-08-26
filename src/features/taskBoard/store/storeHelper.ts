@@ -5,12 +5,14 @@ import {
   initialState,
   labelAdapter,
   labelSelector,
+  projectAdapter,
+  projectSelector,
   sectionAdapter,
   sectionSelector,
   taskAdapter,
   taskSelector,
 } from "../taskBoardSlice";
-import { Task, Comment } from "../types";
+import { Task, Comment, TaskSection } from "../types";
 
 export const generateTaskId = (): EntityId => {
   return Date.now().toString() + Math.round(Math.random() * 10000);
@@ -175,6 +177,36 @@ export const duplicateTask = (
   }
 
   return duplicatedTask.id;
+};
+
+export const duplicateSection = (
+  state: typeof initialState,
+  projectId: EntityId,
+  sectionId: EntityId
+) => {
+  const originSection = sectionSelector.selectById(state, sectionId);
+  const project = projectSelector.selectById(state, projectId);
+
+  if (!originSection || !project) {
+    return;
+  }
+
+  const newSection: TaskSection = {
+    name: originSection.name,
+    taskIds: [],
+    id: generateTaskId(),
+  };
+  originSection.taskIds.forEach((taskId) => {
+    const duplicatedTaskId = duplicateTask(state, null, null, taskId, false);
+    newSection.taskIds.push(duplicatedTaskId);
+  });
+  sectionAdapter.addOne(state.sections, newSection);
+  projectAdapter.updateOne(state.projects, {
+    id: projectId,
+    changes: {
+      sectionIds: [...project.sectionIds, newSection.id],
+    },
+  });
 };
 
 export const updateTask = (

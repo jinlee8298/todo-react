@@ -3,6 +3,10 @@ import { createGlobalStyle } from "styled-components";
 import { ThemeProvider } from "styled-components";
 import LightTheme from "common/styles/themes/LightTheme";
 import TaskBoard from "features/taskBoard/components/TaskBoard/TaskBoard";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Header, NavBar } from "common/components";
+import TaskBoardStyle from "features/taskBoard/components/TaskBoard/TaskBoard.style";
+import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -18,18 +22,34 @@ const GlobalStyle = createGlobalStyle`
     --text: ${(props) => props.theme.text};
     --backdrop: #0000007f;
   }
+  main {
+    height: 100%;
+    position: relative;
+    ${TaskBoardStyle} {
+      margin-inline-start: 17.5rem;
+    }
+  }
 `;
 
 function App() {
   return (
     <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
-      <div className="App">
-        <TaskBoard></TaskBoard>
-
-        <div id="modal-container"></div>
-        <div id="popover-container"></div>
-      </div>
+      <Router>
+        <div className="App">
+          <Header />
+          <main>
+            <NavBar>
+              <ProjectNav></ProjectNav>
+            </NavBar>
+            <Switch>
+              <Route path={["/", "/:id"]} children={<TaskBoard />} />
+            </Switch>
+          </main>
+          <div id="modal-container"></div>
+          <div id="popover-container"></div>
+        </div>
+      </Router>
     </ThemeProvider>
   );
 }

@@ -3,7 +3,7 @@ import { TextInput, Button } from "common/components";
 import { useDispatch, useInput } from "common/hooks";
 import { addSection, updateSection } from "features/taskBoard/taskBoardSlice";
 import { TaskSection } from "features/taskBoard/types";
-import { FC } from "react";
+import { FC, KeyboardEventHandler } from "react";
 import StyledEditor from "./TaskSectionEditor.style";
 
 type TaskSectionEditorProps = {
@@ -16,7 +16,7 @@ const TaskSecitonEditor: FC<TaskSectionEditorProps> = ({
   onCloseHandle,
   projectId,
 }) => {
-  const [sectionName, errors, resetName, onNameChange] = useInput(
+  const [sectionName, errors, , onNameChange] = useInput(
     section ? section.name : "",
     { maxLength: { value: 500 } }
   );
@@ -36,8 +36,18 @@ const TaskSecitonEditor: FC<TaskSectionEditorProps> = ({
     onCloseHandle?.();
   };
 
+  const onKeyDown: KeyboardEventHandler = (e) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onCloseHandle?.();
+    }
+    if (["Enter", "NumpadEnter"].includes(e.key)) {
+      section ? saveChange() : addNewSection();
+    }
+  };
+
   return (
-    <StyledEditor>
+    <StyledEditor onKeyDown={onKeyDown}>
       <TextInput
         autoFocus
         label="Name"

@@ -1,32 +1,27 @@
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
-import { Button, ColorPicker } from "common/components";
-import { TextInput } from "common/components";
+import { Button, ColorPicker, TextInput } from "common/components";
 import { COLOR_LIST } from "common/constants";
-import { useInput } from "common/hooks";
+import { useDispatch, useInput } from "common/hooks";
 import { Color } from "common/types";
-import { addProject, updateProject } from "features/taskBoard/taskBoardSlice";
-import { Project } from "features/taskBoard/types";
+import { addLabel, updateLabel } from "features/taskBoard/taskBoardSlice";
+import { Label } from "features/taskBoard/types";
 import { FC, KeyboardEventHandler, useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
-import StyledModal from "./ProjectEditModal.style";
+import StyledModal from "./LabelEditModal.style";
 
-type AddProjectModalProps = {
+type LabelEditModalProps = {
+  label: Label | null;
   isShown: boolean;
-  project: Project | null;
   onCloseHandle?: () => void;
 };
 
-const AddProjectModal: FC<AddProjectModalProps> = ({
+const LabelEditModal: FC<LabelEditModalProps> = ({
+  label,
   isShown,
-  project,
   ...props
 }) => {
-  const [projectName, errors, resetName, onChange, setProjectName] = useInput(
-    "",
-    {
-      maxLength: { value: 120 },
-    }
-  );
+  const [labelName, errors, resetName, onChange, setLabelName] = useInput("", {
+    maxLength: { value: 120 },
+  });
   const [color, setColor] = useState<Color>(COLOR_LIST[0]);
   const isError = useMemo(() => {
     return Object.values(errors).filter((v) => v).length > 0;
@@ -34,38 +29,38 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (project) {
-      setProjectName(project.name);
+    if (label) {
+      setLabelName(label.name);
       setColor(
-        COLOR_LIST.find(({ color }) => color === project.color) || COLOR_LIST[0]
+        COLOR_LIST.find(({ color }) => color === label.color) || COLOR_LIST[0]
       );
     }
-  }, [project, setProjectName]);
+  }, [label, setLabelName]);
 
   const onCloseHandle = () => {
     resetName();
     props.onCloseHandle?.();
   };
 
-  const addNewProject = () => {
-    const trimmedName = projectName.trim();
+  const addNewLabel = () => {
+    const trimmedName = labelName.trim();
     if (trimmedName && !isError) {
-      dispatch(addProject({ name: trimmedName, color: color.color }));
+      dispatch(addLabel({ name: trimmedName, color: color.color }));
       onCloseHandle();
     }
   };
 
-  const updateProjectHandler = () => {
-    const trimmedName = projectName.trim();
-    if (trimmedName && !isError && project) {
-      const projectChangeObj: Partial<Project> = {};
-      if (project.name !== trimmedName) {
-        projectChangeObj.name = trimmedName;
+  const updateLabelHandler = () => {
+    const trimmedName = labelName.trim();
+    if (trimmedName && !isError && label) {
+      const labelChangeObj: Partial<Label> = {};
+      if (label.name !== trimmedName) {
+        labelChangeObj.name = trimmedName;
       }
-      if (project.color !== color.color) {
-        projectChangeObj.color = color.color;
+      if (label.color !== color.color) {
+        labelChangeObj.color = color.color;
       }
-      dispatch(updateProject({ id: project.id, changes: projectChangeObj }));
+      dispatch(updateLabel({ id: label.id, changes: labelChangeObj }));
       onCloseHandle();
     }
   };
@@ -76,17 +71,16 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
     }
     if (
       ["Enter", "NumpadEnter"].includes(e.code) &&
-      projectName.trim() &&
+      labelName.trim() &&
       !isError
     ) {
-      project ? updateProjectHandler() : addNewProject();
+      label ? updateLabelHandler() : addNewLabel();
     }
   };
 
   const onColorPick = (color: Color) => {
     setColor(color);
   };
-
   return (
     <StyledModal
       onKeyDown={onEsc}
@@ -94,7 +88,7 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
       isShown={isShown}
     >
       <div className="header">
-        <h2>Add project</h2>
+        <h2>{label ? "Edit" : "Add"} label</h2>
         <Button
           onClick={onCloseHandle}
           icon={faTimes}
@@ -105,7 +99,7 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
       </div>
       <TextInput
         autoFocus
-        value={projectName}
+        value={labelName}
         label="Name"
         onChange={onChange}
         errors={errors}
@@ -120,15 +114,15 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
           Cancel
         </Button>
         <Button
-          disabled={!projectName.trim() || isError}
-          onClick={project ? updateProjectHandler : addNewProject}
+          disabled={!labelName.trim() || isError}
+          onClick={label ? updateLabelHandler : addNewLabel}
           size="sm"
         >
-          {project ? "Update" : "Add"}
+          {label ? "Update" : "Add"}
         </Button>
       </div>
     </StyledModal>
   );
 };
 
-export default AddProjectModal;
+export default LabelEditModal;

@@ -9,7 +9,7 @@ export enum TaskPriority {
 export interface Label {
   id: EntityId;
   name: string;
-  labelColor?: string;
+  color: string;
   taskIds: EntityId[];
 }
 

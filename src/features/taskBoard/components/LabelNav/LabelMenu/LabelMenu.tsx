@@ -1,5 +1,4 @@
 import {
-  faCopy,
   faEllipsisH,
   faPen,
   faTrashAlt,
@@ -7,40 +6,33 @@ import {
 import { ConfirmDialog, Menu, Popover } from "common/components";
 import { Button } from "common/components";
 import { useConfirmDialog, useDispatch } from "common/hooks";
-import {
-  deleteProject,
-  deleteSection,
-  duplicateProject,
-} from "features/taskBoard/taskBoardSlice";
-import { Project } from "features/taskBoard/types";
+import { deleteLabel } from "features/taskBoard/taskBoardSlice";
+import { Label } from "features/taskBoard/types";
 import { FC, useRef } from "react";
 
-type ProjectMenuProps = {
-  project: Project;
+type LabelMenuProps = {
+  label: Label;
   onEdit: () => void;
 };
 
-const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
+const LabelMenu: FC<LabelMenuProps> = ({ label, onEdit }) => {
   const [showConfirm, closeConfirm, confirmDialogProps] = useConfirmDialog();
   const triggerButtonRef = useRef<HTMLElement | null>(null);
   const dispatch = useDispatch();
 
-  const deleteProjectHandler = () => {
+  const deleteLabelHandler = () => {
     showConfirm({
       backdropClick: closeConfirm,
       onReject: closeConfirm,
       onEsc: closeConfirm,
       onConfirm: () => {
-        project.sectionIds.forEach((sectionId) => {
-          dispatch(deleteSection(project.id, sectionId));
-        });
-        dispatch(deleteProject(project.id));
+        dispatch(deleteLabel(label.id));
       },
-      title: "Delete project?",
+      title: "Delete label?",
       message: (
         <span>
-          Are you sure you want to delete project:{" "}
-          <strong>"{project.name}"</strong>?
+          Are you sure you want to delete label: <strong>"{label.name}"</strong>
+          ?
         </span>
       ),
       acceptButtonLabel: "Delete",
@@ -49,12 +41,7 @@ const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
     });
   };
 
-  const duplicateProjectHandler = () => {
-    dispatch(duplicateProject(project.id));
-    closeConfirm();
-  };
-
-  const editProjectHandler = () => {
+  const editLabelHandler = () => {
     closeConfirm();
     onEdit();
   };
@@ -78,30 +65,21 @@ const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
       <Menu.Item
         icon={faPen}
         onTrigger={() => {
-          editProjectHandler();
+          editLabelHandler();
           action.close();
         }}
       >
         Edit
       </Menu.Item>
       <Menu.Item
-        icon={faCopy}
-        onTrigger={() => {
-          duplicateProjectHandler();
-          action.close();
-        }}
-      >
-        Duplicate
-      </Menu.Item>
-      <Menu.Item
         variant="danger"
         icon={faTrashAlt}
         onTrigger={() => {
-          deleteProjectHandler();
+          deleteLabelHandler();
           action.close();
         }}
       >
-        Delete project
+        Delete label
       </Menu.Item>
     </Menu>
   );
@@ -127,4 +105,4 @@ const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
   );
 };
 
-export default ProjectMenu;
+export default LabelMenu;

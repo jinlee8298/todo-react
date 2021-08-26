@@ -23,6 +23,7 @@ import {
 import { EntityId } from "@reduxjs/toolkit";
 import { shallowEqual } from "react-redux";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
+import { COLOR_LIST } from "common/constants";
 
 type TaskLabelSelectProps = {
   taskId?: EntityId;
@@ -81,7 +82,7 @@ const TaskLabelSelect: ForwardRefRenderFunction<
   const createNewLabel: MouseEventHandler = (e) => {
     e.stopPropagation();
     if (filterValue.trim()) {
-      dispatch(addLabel({ name: filterValue }));
+      dispatch(addLabel({ name: filterValue, color: COLOR_LIST[0].color }));
       newLabelName.current = filterValue;
     }
   };

@@ -172,7 +172,11 @@ const TaskDetailsModal: FC<TaskDetailsModalProps> = memo(
               </div>
               <div className="label-wrapper">
                 {taskLabels?.map((label) => (
-                  <LabelComponent key={label.id} title={label?.name}>
+                  <LabelComponent
+                    color={label.color}
+                    key={label.id}
+                    title={label.name}
+                  >
                     {label.name}
                   </LabelComponent>
                 ))}

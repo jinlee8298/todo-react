@@ -714,6 +714,28 @@ export const taskBoardSlice = createSlice({
         });
       },
     },
+    updateLabel: (state, action: PayloadAction<Update<Label>>) => {
+      labelAdapter.updateOne(state.labels, action.payload);
+    },
+    deleteLabel: (state, action: PayloadAction<EntityId>) => {
+      const label = labelSelector.selectById(state, action.payload);
+
+      if (label) {
+        label.taskIds.forEach((taskId) => {
+          const task = taskSelector.selectById(state, taskId);
+          if (task) {
+            const labelIds = [...task?.labelIds];
+            taskAdapter.updateOne(state.tasks, {
+              id: taskId,
+              changes: {
+                labelIds: labelIds.filter((id) => id !== action.payload),
+              },
+            });
+          }
+        });
+        labelAdapter.removeOne(state.labels, action.payload);
+      }
+    },
     setCurrentViewTaskId: (state, action: PayloadAction<EntityId>) => {
       state.extras.currentViewTaskId = action.payload;
     },
@@ -786,6 +808,8 @@ export const {
   addLabelThenAssignToTask,
   addLabelToTask,
   removeLabelFromTask,
+  updateLabel,
+  deleteLabel,
   setCurrentViewTaskId,
   addProject,
   deleteProject,

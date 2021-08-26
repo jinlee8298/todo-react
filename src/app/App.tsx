@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Header, NavBar } from "common/components";
 import TaskBoardStyle from "features/taskBoard/components/TaskBoard/TaskBoard.style";
 import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
+import LabelNav from "features/taskBoard/components/LabelNav/LabelNav";
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -41,6 +42,7 @@ function App() {
           <main>
             <NavBar>
               <ProjectNav></ProjectNav>
+              <LabelNav></LabelNav>
             </NavBar>
             <Switch>
               <Route path={["/", "/:id"]} children={<TaskBoard />} />

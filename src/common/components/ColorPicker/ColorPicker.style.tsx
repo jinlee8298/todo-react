@@ -1,8 +1,8 @@
-import { shadow, transtionTiming } from "common/styles/common";
+import { shadow, transitionTiming } from "common/styles/common";
 import styled from "styled-components";
 
 export const ColorButton = styled.button`
-  ${transtionTiming}
+  ${transitionTiming}
   display: flex;
   background: var(--gray2);
   border: none;

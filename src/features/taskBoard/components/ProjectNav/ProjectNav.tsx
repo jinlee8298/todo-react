@@ -6,7 +6,7 @@ import { NavBar } from "common/components";
 import { useSelector } from "common/hooks";
 import { projectSelector } from "features/taskBoard/taskBoardSlice";
 import { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import ProjectEditModal from "../ProjectEditModal/ProjectEditModal";
 import ProjectMenu from "./ProjectMenu/ProjectMenu";
 import { Project } from "features/taskBoard/types";
@@ -17,6 +17,7 @@ const ProjectNav = () => {
   );
   const [isShownProjectModal, setIsShownProjectModal] = useState(false);
   const [selectledProject, setSelectedProject] = useState<Project | null>(null);
+  const match = useRouteMatch<{ id: string }>("/project/:id");
   const history = useHistory();
 
   const onSelectProject = (projectId: EntityId) => {
@@ -46,6 +47,7 @@ const ProjectNav = () => {
     >
       {projects.map((project) => (
         <NavBar.NavItem
+          active={project.id === match?.params.id}
           className={"nav-item"}
           onTrigger={onSelectProject.bind(null, project.id)}
           key={project.id}

@@ -10,7 +10,8 @@ export default styled.li`
   white-space: nowrap;
   text-overflow: ellipsis;
   &:hover,
-  &:focus {
+  &:focus,
+  &.active {
     color: var(--primary);
     background: var(--primary-10);
     cursor: pointer;

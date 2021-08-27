@@ -78,44 +78,47 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
       onDragOver={onDragSectionOver}
       onDragEnter={onDragEnter}
     >
-      {projectId && (
+      {project && (
         <>
-          <div className="dropzone-padding"></div>
-          {project?.sectionIds.map((id, index) => (
-            <Fragment key={id}>
-              {id === "placeholder" ? (
-                <Placeholder
-                  height={draggingSectionInfo?.placeholderHeight ?? "100%"}
-                />
-              ) : (
-                <TaskSection key={id} sectionId={id} projectId={projectId} />
-              )}
+          <h1>{project.name}</h1>
+          <div role="listbox">
+            <div className="dropzone-padding"></div>
+            {project?.sectionIds.map((id, index) => (
+              <Fragment key={id}>
+                {id === "placeholder" ? (
+                  <Placeholder
+                    height={draggingSectionInfo?.placeholderHeight ?? "100%"}
+                  />
+                ) : (
+                  <TaskSection key={id} sectionId={id} projectId={projectId} />
+                )}
 
-              {index !== project?.sectionIds.length - 1 && (
-                <AddSectionTrigger
-                  onClick={(e) => {
-                    dispatch(
-                      addSection(projectId, { name: "test2" }, index + 1)
-                    );
-                  }}
-                />
-              )}
-            </Fragment>
-          ))}
-          {addingSection ? (
-            <TaskSectionEditor
-              projectId={projectId}
-              onCloseHandle={toggleAddingSection}
-            />
-          ) : (
-            <Button
-              onClick={toggleAddingSection}
-              alternative="reverse"
-              icon={faPlusSquare}
-            >
-              Add new section
-            </Button>
-          )}
+                {index !== project?.sectionIds.length - 1 && (
+                  <AddSectionTrigger
+                    onClick={(e) => {
+                      dispatch(
+                        addSection(projectId, { name: "test2" }, index + 1)
+                      );
+                    }}
+                  />
+                )}
+              </Fragment>
+            ))}
+            {addingSection ? (
+              <TaskSectionEditor
+                projectId={projectId}
+                onCloseHandle={toggleAddingSection}
+              />
+            ) : (
+              <Button
+                onClick={toggleAddingSection}
+                alternative="reverse"
+                icon={faPlusSquare}
+              >
+                Add new section
+              </Button>
+            )}
+          </div>
         </>
       )}
     </StyledTaskBoard>

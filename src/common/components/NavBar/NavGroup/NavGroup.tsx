@@ -28,19 +28,25 @@ const NavGroup: FC<NavGroupProps> = ({
   ...rest
 }) => {
   const [expand, setExpand] = useState(expandByDefault);
+  const [hideIcon, setHideIcon] = useState<boolean>(false);
   const ulRef = useRef<HTMLUListElement>(null);
 
   useLayoutEffect(() => {
     if (!ulRef.current) {
       return;
     }
-    if (expand) {
-      const navItems = ulRef.current.querySelectorAll("li");
-      if (navItems.length > 0) {
-        const itemCount = navItems.length;
-        const itemHeight = navItems[0].offsetHeight;
-        ulRef.current.style.height = `${itemHeight * itemCount}px`;
-      }
+
+    if (ulRef.current.childElementCount === 0) {
+      setHideIcon(true);
+    } else {
+      setHideIcon(false);
+    }
+
+    const navItems = ulRef.current.querySelectorAll("li");
+    if (expand && navItems.length > 0) {
+      const itemCount = navItems.length;
+      const itemHeight = navItems[0].offsetHeight;
+      ulRef.current.style.height = `${itemHeight * itemCount}px`;
     } else {
       ulRef.current.style.height = "0";
     }
@@ -75,8 +81,8 @@ const NavGroup: FC<NavGroupProps> = ({
         onKeyDown={onPressEnter}
         tabIndex={0}
       >
-        <span>
-          <FontAwesomeIcon fixedWidth icon={faChevronRight} />
+        <span className={hideIcon ? "hide-icon" : ""}>
+          <FontAwesomeIcon display="none" fixedWidth icon={faChevronRight} />
           {name}
         </span>
         {addButtonVisible && (

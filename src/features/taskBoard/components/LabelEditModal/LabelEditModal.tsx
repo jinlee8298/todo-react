@@ -38,8 +38,9 @@ const LabelEditModal: FC<LabelEditModalProps> = ({
   }, [label, setLabelName]);
 
   const onCloseHandle = () => {
-    resetName();
     props.onCloseHandle?.();
+    setColor(COLOR_LIST[0]);
+    resetName();
   };
 
   const addNewLabel = () => {
@@ -69,11 +70,15 @@ const LabelEditModal: FC<LabelEditModalProps> = ({
     if (e.code === "Escape") {
       onCloseHandle();
     }
+  };
+
+  const onKeyDown: KeyboardEventHandler = (e) => {
     if (
       ["Enter", "NumpadEnter"].includes(e.code) &&
       labelName.trim() &&
       !isError
     ) {
+      e.stopPropagation();
       label ? updateLabelHandler() : addNewLabel();
     }
   };
@@ -102,6 +107,7 @@ const LabelEditModal: FC<LabelEditModalProps> = ({
         value={labelName}
         label="Name"
         onChange={onChange}
+        onKeyDown={onKeyDown}
         errors={errors}
       />
       <ColorPicker

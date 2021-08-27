@@ -56,6 +56,8 @@ const TaskLabelSelect: ForwardRefRenderFunction<
     return labels.map((label) => ({
       value: label.id as string,
       label: label.name,
+      icon: faTag,
+      iconColor: label.color,
     }));
   }, [labels]);
   const [selected, setSelected] = useState<SelectItem[]>(

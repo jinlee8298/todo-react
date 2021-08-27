@@ -43,8 +43,9 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
   }, [project, setProjectName]);
 
   const onCloseHandle = () => {
-    resetName();
     props.onCloseHandle?.();
+    setColor(COLOR_LIST[0]);
+    resetName();
   };
 
   const addNewProject = () => {
@@ -74,11 +75,15 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
     if (e.code === "Escape") {
       onCloseHandle();
     }
+  };
+
+  const onKeyDown: KeyboardEventHandler = (e) => {
     if (
       ["Enter", "NumpadEnter"].includes(e.code) &&
       projectName.trim() &&
       !isError
     ) {
+      e.stopPropagation();
       project ? updateProjectHandler() : addNewProject();
     }
   };
@@ -104,6 +109,7 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
         />
       </div>
       <TextInput
+        onKeyDown={onKeyDown}
         autoFocus
         value={projectName}
         label="Name"

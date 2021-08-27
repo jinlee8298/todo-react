@@ -1,5 +1,5 @@
 const lightTheme = {
-  primary: "#0365F4",
+  primary: "#443DF6",
   success: "#27AE60",
   danger: "#EB5757",
   warning: "#E2B93B",

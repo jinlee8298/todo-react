@@ -1,4 +1,4 @@
-import { transtionTiming } from "common/styles/common";
+import { transitionTiming } from "common/styles/common";
 import styled from "styled-components";
 
 export default styled.div`
@@ -8,7 +8,7 @@ export default styled.div`
 
   transition: transform 0.2s, opacity 0.2s;
   transform-origin: var(--origin-x) var(--origin-y);
-  ${transtionTiming};
+  ${transitionTiming};
   transform: scale(0.9);
   opacity: 0;
 

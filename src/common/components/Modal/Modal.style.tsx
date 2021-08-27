@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { transtionTiming, shadow } from "common/styles/common";
+import { transitionTiming, shadow } from "common/styles/common";
 
 export default styled.div`
   width: 100%;
@@ -15,7 +15,7 @@ export default styled.div`
   height: 100%;
   padding-block: 2em;
   transition: opacity 0.2s;
-  ${transtionTiming};
+  ${transitionTiming};
 
   &.showing {
     > section,

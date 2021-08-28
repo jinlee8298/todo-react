@@ -29,7 +29,7 @@ export default styled.div`
     display: flex;
     align-items: flex-start;
     overflow: auto;
-    > ${TaskList}, > ${Placeholder} {
+    > ${TaskList}, > ${Placeholder}, > ${TaskSectionEditor} {
       margin-inline-end: 1.5rem;
     }
     > ${Placeholder} {

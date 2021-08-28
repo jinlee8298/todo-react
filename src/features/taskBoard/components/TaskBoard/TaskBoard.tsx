@@ -29,6 +29,7 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
     (state: RootState) => state.taskBoard.sections.draggingInfo
   );
   const [addingSection, setAddingSection] = useState(false);
+  const [addSectionIndex, setAddSectionIndex] = useState(-1);
   const match = useRouteMatch<{ id: string }>("/project/:id");
   const dispatch = useDispatch();
 
@@ -73,6 +74,14 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
     setAddingSection((v) => !v);
   };
 
+  const cancelAddSectionInBetween = () => {
+    setAddSectionIndex(-1);
+  };
+
+  const addSectionInBetween = (addIndex: number) => {
+    setAddSectionIndex(addIndex);
+  };
+
   return (
     <StyledTaskBoard
       onDrop={onSectionDrop}
@@ -94,13 +103,16 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
                   <TaskSection key={id} sectionId={id} projectId={projectId} />
                 )}
 
-                {index !== project?.sectionIds.length - 1 && (
+                {index !== project?.sectionIds.length - 1 &&
+                addSectionIndex === index ? (
+                  <TaskSectionEditor
+                    insertIndex={index + 1}
+                    projectId={projectId}
+                    onCloseHandle={cancelAddSectionInBetween}
+                  />
+                ) : (
                   <AddSectionTrigger
-                    onClick={(e) => {
-                      dispatch(
-                        addSection(projectId, { name: "test2" }, index + 1)
-                      );
-                    }}
+                    onClick={addSectionInBetween.bind(null, index)}
                   />
                 )}
               </Fragment>

@@ -9,12 +9,14 @@ import StyledEditor from "./TaskSectionEditor.style";
 type TaskSectionEditorProps = {
   projectId: EntityId;
   section?: TaskSection;
+  insertIndex?: number;
   onCloseHandle?: () => void;
 };
 const TaskSecitonEditor: FC<TaskSectionEditorProps> = ({
   section,
-  onCloseHandle,
+  insertIndex,
   projectId,
+  onCloseHandle,
 }) => {
   const [sectionName, errors, , onNameChange] = useInput(
     section ? section.name : "",
@@ -31,7 +33,9 @@ const TaskSecitonEditor: FC<TaskSectionEditorProps> = ({
   };
   const addNewSection = () => {
     if (sectionName.trim()) {
-      dispatch(addSection(projectId, { name: sectionName.trim() }));
+      dispatch(
+        addSection(projectId, { name: sectionName.trim() }, insertIndex)
+      );
     }
     onCloseHandle?.();
   };

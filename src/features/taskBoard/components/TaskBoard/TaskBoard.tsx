@@ -6,7 +6,6 @@ import { faPlusSquare } from "@fortawesome/free-regular-svg-icons";
 import { useDispatch, useSelector } from "common/hooks";
 import AddSectionTrigger from "../AddSectionButton/AddSectionButton";
 import {
-  addSection,
   insertSectionPlaceholder,
   projectSelector,
   removeTaskPlaceholder,

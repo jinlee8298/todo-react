@@ -1,9 +1,7 @@
-import { shadow } from "common/styles/common";
 import styled from "styled-components";
 
 export default styled.nav`
-  ${shadow};
-
+  background: var(--gray4);
   font-size: 0.875rem;
   position: absolute;
   top: 0;

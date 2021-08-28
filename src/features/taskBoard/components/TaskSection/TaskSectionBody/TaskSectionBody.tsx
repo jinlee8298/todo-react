@@ -75,6 +75,11 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
     [history, projectId]
   );
 
+  const onDragLeave: DragEventHandler<HTMLElement> = (e) => {
+    if (e.currentTarget === e.target) {
+      dispatch(removeTaskPlaceholder());
+    }
+  };
   return (
     <StyledTaskSectionBody
       className="task-list"
@@ -83,6 +88,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
       onDragStart={preventDrag}
       onDragOver={onDragOverTaskList}
       onDragEnter={onDragEnterTaskList}
+      onDragLeave={onDragLeave}
     >
       {taskIds.map((taskId) =>
         taskId === "placeholder" ? (

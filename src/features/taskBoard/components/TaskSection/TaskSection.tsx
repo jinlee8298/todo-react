@@ -69,12 +69,6 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
     }
   };
 
-  const onDragLeave: DragEventHandler<HTMLElement> = (e) => {
-    if (e.currentTarget === e.target) {
-      dispatch(removeTaskPlaceholder());
-    }
-  };
-
   const toggleEditing = () => {
     setEditing((v) => !v);
   };
@@ -86,7 +80,6 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
       onDragStart={onDragStartSection}
       onDragEnd={onDragEndSection}
       onDragOver={onSectionDragOver}
-      onDragLeave={onDragLeave}
     >
       <header>
         {editing ? (

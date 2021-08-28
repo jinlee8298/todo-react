@@ -12,7 +12,7 @@ import {
   labelSelector,
 } from "features/taskBoard/taskBoardSlice";
 import TaskMenu from "./TaskItemMenu/TaskMenu";
-import { faCommentAlt, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { Label } from "features/taskBoard/types";
 import { shallowEqual } from "react-redux";
 
@@ -26,6 +26,18 @@ const Task: FC<TaskProps> = memo((props) => {
   const task = useSelector((state) =>
     taskSelector.selectById(state.taskBoard, props.taskId)
   );
+  const subTaskProgress = useSelector((state) => {
+    let finishedCount = 0;
+    if (task) {
+      task.subTaskIds.forEach((subTaskId) => {
+        const subTask = taskSelector.selectById(state.taskBoard, subTaskId);
+        if (subTask?.finished) {
+          finishedCount++;
+        }
+      });
+    }
+    return finishedCount;
+  });
   const taskLabels = useSelector((state) => {
     const labels: Label[] = [];
     task?.labelIds.forEach((labelId) => {
@@ -90,21 +102,24 @@ const Task: FC<TaskProps> = memo((props) => {
       onDragEnd={onDragEnd}
       onDragEnter={onDragEnter}
       onClick={openTaskDetailsModal}
-      className={task.priority !== "low" ? task.priority : ""}
+      className={[
+        task.priority !== "low" ? task.priority : "",
+        task.finished ? "finished" : "",
+      ].join(" ")}
       ref={containerRef}
     >
       <h3>
-        <Checkbox checked={task?.finished ?? false} onChange={onTickCheckbox} />
-        <span>{task?.title}</span>
+        <Checkbox checked={task.finished ?? false} onChange={onTickCheckbox} />
+        <span>{task.title}</span>
       </h3>
-      {task?.description && <p>{task?.description}</p>}
+      {task.description && <p>{task.description}</p>}
       <div className="task-details">
         {task.subTaskIds.length > 0 && (
           <LabelComponent
             title={`${task.subTaskIds.length} sub-task(s)`}
-            icon={faLink}
+            icon={faCodeBranch}
           >
-            {task.subTaskIds.length}
+            {subTaskProgress} / {task.subTaskIds.length}
           </LabelComponent>
         )}
         {task.commentIds.length > 0 && (

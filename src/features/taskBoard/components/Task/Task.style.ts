@@ -38,6 +38,21 @@ export default styled.div`
   &.urgent::before {
     background: var(--danger);
   }
+  &.finished {
+    h3 {
+      text-decoration: line-through;
+      color: var(--gray1);
+    }
+  }
+  &:hover {
+    cursor: pointer;
+  }
+  &:focus-within,
+  &:hover {
+    ${Button} {
+      display: inline-flex;
+    }
+  }
 
   ${Checkbox} {
     margin-inline-end: 0.5em;
@@ -76,15 +91,5 @@ export default styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--gray1);
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
-  &:focus-within,
-  &:hover {
-    ${Button} {
-      display: inline-flex;
-    }
   }
 `;

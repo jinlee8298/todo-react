@@ -1,12 +1,16 @@
-import { faCommentAlt, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Checkbox, Label as LabelComponent } from "common/components";
-import { useSelector } from "common/hooks";
+import { useDispatch, useSelector } from "common/hooks";
 import TaskMenu from "features/taskBoard/components/Task/TaskItemMenu/TaskMenu";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
-import { labelSelector, taskSelector } from "features/taskBoard/taskBoardSlice";
+import {
+  labelSelector,
+  taskSelector,
+  updateTask,
+} from "features/taskBoard/taskBoardSlice";
 import { Label } from "features/taskBoard/types";
-import { FC, useState, memo, MouseEventHandler } from "react";
+import { FC, useState, memo, MouseEventHandler, FormEventHandler } from "react";
 import { shallowEqual } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import StyledSubTask from "./SubTask.style";
@@ -19,6 +23,18 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
   const task = useSelector((state) =>
     taskSelector.selectById(state.taskBoard, taskId)
   );
+  const subTaskProgress = useSelector((state) => {
+    let finishedCount = 0;
+    if (task) {
+      task.subTaskIds.forEach((subTaskId) => {
+        const subTask = taskSelector.selectById(state.taskBoard, subTaskId);
+        if (subTask?.finished) {
+          finishedCount++;
+        }
+      });
+    }
+    return finishedCount;
+  });
   const [editing, setEditing] = useState(false);
   const taskLabels = useSelector((state) => {
     const labels: Label[] = [];
@@ -33,6 +49,7 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
   const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
   const history = useHistory();
   const projectId = match?.params.projectId;
+  const dispatch = useDispatch();
 
   const toggleEditing = () => {
     setEditing((v) => !v);
@@ -47,10 +64,21 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
     e.stopPropagation();
   };
 
+  const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
+    if (task) {
+      dispatch(
+        updateTask({ id: task.id, changes: { finished: !task.finished } })
+      );
+    }
+  };
+
   return task ? (
     <StyledSubTask
       onClick={onClickTask}
-      className={task.priority !== "low" ? task.priority : ""}
+      className={[
+        task.priority !== "low" ? task.priority : "",
+        task.finished ? "finished" : "",
+      ].join(" ")}
     >
       {editing ? (
         <TaskEditor
@@ -62,7 +90,10 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
       ) : (
         <>
           <h3>
-            <Checkbox />
+            <Checkbox
+              checked={task.finished ?? false}
+              onChange={onTickCheckbox}
+            />
             <span>{task.title}</span>
           </h3>
           {task.description && <p>{task.description}</p>}
@@ -70,9 +101,9 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
             {task.subTaskIds.length > 0 && (
               <LabelComponent
                 title={`${task.subTaskIds.length} sub-task(s)`}
-                icon={faLink}
+                icon={faCodeBranch}
               >
-                {task.subTaskIds.length}
+                {subTaskProgress} / {task.subTaskIds.length}
               </LabelComponent>
             )}
             {task.commentIds.length > 0 && (

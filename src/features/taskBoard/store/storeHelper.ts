@@ -209,12 +209,53 @@ export const duplicateSection = (
   });
 };
 
+const markTaskFinished = (state: typeof initialState, taskId: EntityId) => {
+  const task = taskSelector.selectById(state, taskId);
+  if (!task) {
+    return;
+  }
+
+  if (task.subTaskIds.length > 0) {
+    task.subTaskIds.forEach((subTaskId) => markTaskFinished(state, subTaskId));
+  }
+
+  taskAdapter.updateOne(state.tasks, {
+    id: taskId,
+    changes: { finished: true },
+  });
+};
+
+const markTaskUnfinished = (state: typeof initialState, taskId: EntityId) => {
+  const task = taskSelector.selectById(state, taskId);
+  if (!task) {
+    return;
+  }
+
+  if (task.parentTaskId) {
+    markTaskUnfinished(state, task.parentTaskId);
+  }
+
+  taskAdapter.updateOne(state.tasks, {
+    id: taskId,
+    changes: { finished: false },
+  });
+};
+
 export const updateTask = (
   state: typeof initialState,
   update: Update<Omit<Task, "id" | "updatedAt" | "createdAt">>
 ) => {
   const updateObj = update as Update<Omit<Task, "id">>;
   updateObj.changes.updatedAt = new Date().toJSON();
+
+  if (typeof updateObj.changes.finished === "boolean") {
+    if (updateObj.changes.finished) {
+      markTaskFinished(state, updateObj.id);
+    } else {
+      markTaskUnfinished(state, updateObj.id);
+    }
+  }
+
   taskAdapter.updateOne(state.tasks, updateObj);
 };
 

@@ -7,6 +7,12 @@ export default styled(Task)`
   border-radius: 0;
   border: none;
   padding: 1em 2rem;
+  &.finished {
+    h3 {
+      text-decoration: line-through;
+      color: var(--gray1);
+    }
+  }
   &:hover,
   &:focus-within {
     background: var(--gray4);

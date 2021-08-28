@@ -5,6 +5,7 @@ import {
   Update,
   EntityId,
 } from "@reduxjs/toolkit";
+import { COLOR_LIST } from "common/constants";
 import {
   generateTaskId,
   deleteTask as delTask,
@@ -27,7 +28,11 @@ export const commentAdapter = createEntityAdapter<Comment>({
   sortComparer: (a, b) => a.createdAt.localeCompare(b.createdAt),
 });
 
-export const initialState = {
+const peristedState = JSON.parse(
+  localStorage.getItem("store") || "{}"
+)?.taskBoard;
+
+export const initialState = peristedState || {
   tasks: taskAdapter.getInitialState<{
     draggingInfo: {
       draggingTaskId: EntityId;
@@ -46,13 +51,17 @@ export const initialState = {
   }>({ draggingInfo: null }),
   projects: projectAdapter.getInitialState({
     ids: ["2021"],
-    entities: { "2021": { id: "2021", name: "Welcome", sectionIds: [] } },
+    entities: {
+      "2021": {
+        id: "2021",
+        name: "Welcome",
+        color: COLOR_LIST[0],
+        sectionIds: [],
+      },
+    },
   }),
   comments: commentAdapter.getInitialState(),
   labels: labelAdapter.getInitialState(),
-  extras: {
-    currentViewTaskId: "0" as EntityId,
-  },
 };
 
 export const taskSelector = taskAdapter.getSelectors(
@@ -736,9 +745,6 @@ export const taskBoardSlice = createSlice({
         labelAdapter.removeOne(state.labels, action.payload);
       }
     },
-    setCurrentViewTaskId: (state, action: PayloadAction<EntityId>) => {
-      state.extras.currentViewTaskId = action.payload;
-    },
     addProject: (
       state,
       action: PayloadAction<Omit<Project, "id" | "sectionIds">>
@@ -810,7 +816,6 @@ export const {
   removeLabelFromTask,
   updateLabel,
   deleteLabel,
-  setCurrentViewTaskId,
   addProject,
   deleteProject,
   updateProject,

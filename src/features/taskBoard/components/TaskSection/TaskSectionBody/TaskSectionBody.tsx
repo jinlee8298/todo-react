@@ -4,13 +4,12 @@ import {
   insertTaskPlaceholder,
   removeTaskPlaceholder,
   repositionTask,
-  setCurrentViewTaskId,
 } from "features/taskBoard/taskBoardSlice";
-import { FC, DragEventHandler, DragEvent, useState, useCallback } from "react";
+import { FC, DragEventHandler, DragEvent, useCallback } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
 import Placeholder from "../../Placeholder/Placeholder";
 import Task from "../../Task/Task";
-import TaskDetailsModal from "../../TaskDetailsModal/TaskDetailsModal";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 type TaskSectionBodyProps = {
   sectionId: EntityId;
@@ -21,7 +20,9 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
   const draggingInfo = useSelector(
     (state) => state.taskBoard.tasks.draggingInfo
   );
-  const [showTaskDetails, setShowTaskDetails] = useState<boolean>(false);
+  const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
+  const history = useHistory();
+  const projectId = match?.params.projectId;
   const dispatch = useDispatch();
 
   const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
@@ -69,15 +70,10 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
 
   const openTaskDetailsModal = useCallback(
     (taskId: EntityId) => {
-      dispatch(setCurrentViewTaskId(taskId));
-      setShowTaskDetails((v) => !v);
+      history.push(`/project/${projectId}/task/${taskId}`);
     },
-    [dispatch]
+    [history, projectId]
   );
-
-  const toggleTaskDetailsModal = useCallback(() => {
-    setShowTaskDetails((v) => !v);
-  }, []);
 
   return (
     <StyledTaskSectionBody
@@ -104,10 +100,6 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
         )
       )}
       <div className="dropzone-padding"></div>
-      <TaskDetailsModal
-        isShown={showTaskDetails}
-        handleClose={toggleTaskDetailsModal}
-      />
     </StyledTaskSectionBody>
   );
 };

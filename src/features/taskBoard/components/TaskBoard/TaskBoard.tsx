@@ -16,6 +16,7 @@ import Placeholder from "../Placeholder/Placeholder";
 import { RootState } from "app/store";
 import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 import { useRouteMatch } from "react-router-dom";
+import TaskDetailsModal from "../TaskDetailsModal/TaskDetailsModal";
 
 type TaskBoardProps = {};
 
@@ -121,6 +122,7 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
           </div>
         </>
       )}
+      <TaskDetailsModal />
     </StyledTaskBoard>
   );
 };

@@ -32,7 +32,6 @@ export default styled(Modal)`
       svg {
         flex-shrink: 0;
         width: 20px;
-        font-size: 0.5rem;
         margin-inline-end: 1rem;
       }
     }

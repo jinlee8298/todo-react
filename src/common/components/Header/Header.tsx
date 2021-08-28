@@ -1,4 +1,4 @@
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC } from "react";
 import StyledHeader from "./Header.style";
@@ -10,9 +10,14 @@ type HeaderProps = {
 const Header: FC<HeaderProps> = ({ onToggleNavBar }) => {
   return (
     <StyledHeader>
-      <button onClick={onToggleNavBar} className="toggle-nav">
-        <FontAwesomeIcon icon={faBars} fixedWidth />
-      </button>
+      <div className="left-group">
+        <button onClick={onToggleNavBar} className="toggle-nav">
+          <FontAwesomeIcon icon={faBars} fixedWidth />
+        </button>
+        <button className="toggle-nav">
+          <FontAwesomeIcon icon={faHome} fixedWidth />
+        </button>
+      </div>
     </StyledHeader>
   );
 };

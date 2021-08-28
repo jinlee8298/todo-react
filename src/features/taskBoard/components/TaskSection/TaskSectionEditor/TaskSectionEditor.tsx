@@ -31,7 +31,7 @@ const TaskSecitonEditor: FC<TaskSectionEditorProps> = ({
   };
   const addNewSection = () => {
     if (sectionName.trim()) {
-      dispatch(addSection(projectId, { name: sectionName }));
+      dispatch(addSection(projectId, { name: sectionName.trim() }));
     }
     onCloseHandle?.();
   };

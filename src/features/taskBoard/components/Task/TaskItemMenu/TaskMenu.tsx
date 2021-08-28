@@ -40,7 +40,14 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
         },
         onEsc: closeConfirm,
         onConfirm: () => {
-          dispatch(duplicateTask(props.sectionId, props.task.id, true));
+          dispatch(
+            duplicateTask(
+              props.sectionId,
+              props.task.parentTaskId,
+              props.task.id,
+              true
+            )
+          );
           closeConfirm();
         },
         title: "Duplicate comments?",

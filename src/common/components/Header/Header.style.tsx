@@ -5,6 +5,11 @@ export default styled.header`
   display: flex;
   align-items: center;
   padding-inline: 1rem;
+  .left-group {
+    > * {
+      margin-inline-end: 0.5rem;
+    }
+  }
   .toggle-nav {
     color: #fff;
     background: transparent;

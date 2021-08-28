@@ -1,17 +1,14 @@
 import { faCommentAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Checkbox, Label as LabelComponent } from "common/components";
-import { useDispatch, useSelector } from "common/hooks";
+import { useSelector } from "common/hooks";
 import TaskMenu from "features/taskBoard/components/Task/TaskItemMenu/TaskMenu";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
-import {
-  labelSelector,
-  setCurrentViewTaskId,
-  taskSelector,
-} from "features/taskBoard/taskBoardSlice";
+import { labelSelector, taskSelector } from "features/taskBoard/taskBoardSlice";
 import { Label } from "features/taskBoard/types";
 import { FC, useState, memo, MouseEventHandler } from "react";
 import { shallowEqual } from "react-redux";
+import { useHistory, useRouteMatch } from "react-router-dom";
 import StyledSubTask from "./SubTask.style";
 
 type SubTaskProps = {
@@ -33,7 +30,9 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
     });
     return labels;
   }, shallowEqual);
-  const dispatch = useDispatch();
+  const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
+  const history = useHistory();
+  const projectId = match?.params.projectId;
 
   const toggleEditing = () => {
     setEditing((v) => !v);
@@ -41,7 +40,7 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
 
   const onClickTask: MouseEventHandler = (e) => {
     e.stopPropagation();
-    dispatch(setCurrentViewTaskId(taskId));
+    history.push(`/project/${projectId}/task/${taskId}`);
   };
 
   const onClickEditor: MouseEventHandler = (e) => {

@@ -19,6 +19,7 @@ export default styled.div`
       ${transitionTiming};
       left: -17.5rem;
       transition: all 0.2s;
+      visibility: hidden;
     }
     ${TaskBoard} {
       ${transitionTiming};
@@ -30,6 +31,7 @@ export default styled.div`
       }
       ${NavBar} {
         left: 0;
+        visibility: visible;
       }
     }
   }

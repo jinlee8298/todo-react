@@ -16,9 +16,11 @@ export default styled.div`
   overflow: hidden;
 
   h1 {
+    font-size: 1.5rem;
     margin-block-end: 0.5em;
     flex-shrink: 0;
-    padding: 2rem;
+    padding-inline: 2rem;
+    margin-block: 1rem;
   }
 
   [role="listbox"] {

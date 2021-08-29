@@ -81,61 +81,56 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
     setAddSectionIndex(addIndex);
   };
 
-  return (
+  return project ? (
     <StyledTaskBoard
       onDrop={onSectionDrop}
       onDragOver={onDragSectionOver}
       onDragEnter={onDragEnter}
     >
-      {project && (
-        <>
-          <h1>{project.name}</h1>
-          <div role="listbox">
-            <div className="dropzone-padding"></div>
-            {project?.sectionIds.map((id, index) => (
-              <Fragment key={id}>
-                {id === "placeholder" ? (
-                  <Placeholder
-                    height={draggingSectionInfo?.placeholderHeight ?? "100%"}
-                  />
-                ) : (
-                  <TaskSection key={id} sectionId={id} projectId={projectId} />
-                )}
-
-                {index !== project?.sectionIds.length - 1 &&
-                addSectionIndex === index ? (
-                  <TaskSectionEditor
-                    insertIndex={index + 1}
-                    projectId={projectId}
-                    onCloseHandle={cancelAddSectionInBetween}
-                  />
-                ) : (
-                  <AddSectionTrigger
-                    onClick={addSectionInBetween.bind(null, index)}
-                  />
-                )}
-              </Fragment>
-            ))}
-            {addingSection ? (
-              <TaskSectionEditor
-                projectId={projectId}
-                onCloseHandle={toggleAddingSection}
+      <h1>{project.name}</h1>
+      <div role="listbox">
+        <div className="dropzone-padding"></div>
+        {project.sectionIds.map((id, index) => (
+          <Fragment key={id}>
+            {id === "placeholder" ? (
+              <Placeholder
+                height={draggingSectionInfo?.placeholderHeight ?? "100%"}
               />
             ) : (
-              <Button
-                onClick={toggleAddingSection}
-                alternative="reverse"
-                icon={faPlusSquare}
-              >
-                Add new section
-              </Button>
+              <TaskSection key={id} sectionId={id} projectId={projectId} />
             )}
-          </div>
-        </>
-      )}
+            {index !== project.sectionIds.length - 1 &&
+              (addSectionIndex === index ? (
+                <TaskSectionEditor
+                  insertIndex={index + 1}
+                  projectId={projectId}
+                  onCloseHandle={cancelAddSectionInBetween}
+                />
+              ) : (
+                <AddSectionTrigger
+                  onClick={addSectionInBetween.bind(null, index)}
+                />
+              ))}
+          </Fragment>
+        ))}
+        {addingSection ? (
+          <TaskSectionEditor
+            projectId={projectId}
+            onCloseHandle={toggleAddingSection}
+          />
+        ) : (
+          <Button
+            onClick={toggleAddingSection}
+            alternative="reverse"
+            icon={faPlusSquare}
+          >
+            Add new section
+          </Button>
+        )}
+      </div>
       <TaskDetailsModal />
     </StyledTaskBoard>
-  );
+  ) : null;
 };
 
 export default TaskBoard;

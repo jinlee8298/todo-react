@@ -48,6 +48,12 @@ export default styled(Modal)`
       height: 1.5rem;
       margin-inline-end: 1rem;
     }
+    &.finished {
+      h4 {
+        color: var(--gray1);
+        text-decoration: line-through;
+      }
+    }
     .editable {
       flex: 1;
       max-height: 10rem;

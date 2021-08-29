@@ -3,7 +3,6 @@ import StyledTaskSection from "./TaskSection.style";
 import { EntityId } from "@reduxjs/toolkit";
 import {
   sectionSelector,
-  removeTaskPlaceholder,
   insertSectionPlaceholder,
   removeSectionPlaceholder,
   setDraggingSectionData,

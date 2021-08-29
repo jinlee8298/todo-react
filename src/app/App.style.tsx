@@ -18,19 +18,20 @@ export default styled.div`
     ${NavBar} {
       ${transitionTiming};
       left: -17.5rem;
-      transition: all 0.2s;
+      transition: left 0.2s, visibility 0.2s step-end;
       visibility: hidden;
     }
     ${TaskBoard} {
       ${transitionTiming};
-      transition: all 0.2s;
+      transition: padding 0.2s;
     }
     &.show-nav {
       ${TaskBoard} {
-        margin-inline-start: 17.5rem;
+        padding-inline-start: 17.5rem;
       }
       ${NavBar} {
         left: 0;
+        transition: left 0.2s, visibility 0.2s step-start;
         visibility: visible;
       }
     }

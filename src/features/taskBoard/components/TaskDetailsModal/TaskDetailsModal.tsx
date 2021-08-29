@@ -195,7 +195,12 @@ const TaskDetailsModal: FC = memo(() => {
           ></TaskEditor>
         ) : (
           <>
-            <div className="task-details">
+            <div
+              className={[
+                "task-details",
+                task?.finished ? "finished" : "",
+              ].join(" ")}
+            >
               <Checkbox
                 checked={task?.finished ?? false}
                 onChange={onTickCheckbox}

@@ -8,8 +8,8 @@ import {
   setDraggingTaskData,
   removeTaskPlaceholder,
   insertTaskPlaceholder,
-  updateTask,
   labelSelector,
+  toggleTask,
 } from "features/taskBoard/taskBoardSlice";
 import TaskMenu from "./TaskItemMenu/TaskMenu";
 import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
@@ -85,9 +85,7 @@ const Task: FC<TaskProps> = memo((props) => {
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      dispatch(
-        updateTask({ id: task.id, changes: { finished: !task.finished } })
-      );
+      dispatch(toggleTask(props.sectionId, props.taskId));
     }
   };
 
@@ -97,10 +95,10 @@ const Task: FC<TaskProps> = memo((props) => {
 
   return task ? (
     <StyledTask
-      draggable
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragEnter={onDragEnter}
+      draggable={!task.finished}
+      onDragStart={task.finished ? undefined : onDragStart}
+      onDragEnd={task.finished ? undefined : onDragEnd}
+      onDragEnter={task.finished ? undefined : onDragEnter}
       onClick={openTaskDetailsModal}
       className={[
         task.priority !== "low" ? task.priority : "",

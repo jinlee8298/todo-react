@@ -71,6 +71,7 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
   const toggleEditing = () => {
     setEditing((v) => !v);
   };
+
   return (
     <StyledTaskSection
       draggable={!editing}
@@ -106,6 +107,7 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
       <TaskSectionBody
         sectionId={props.sectionId}
         taskIds={section?.taskIds ?? []}
+        finishedTaskIds={section?.finishedTaskIds ?? []}
       />
       <TaskSectionFooter sectionId={props.sectionId} />
     </StyledTaskSection>

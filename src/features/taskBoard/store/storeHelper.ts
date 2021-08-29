@@ -194,11 +194,16 @@ export const duplicateSection = (
   const newSection: TaskSection = {
     name: originSection.name,
     taskIds: [],
+    finishedTaskIds: [],
     id: generateTaskId(),
   };
   originSection.taskIds.forEach((taskId) => {
     const duplicatedTaskId = duplicateTask(state, null, null, taskId, false);
     newSection.taskIds.push(duplicatedTaskId);
+  });
+  originSection.finishedTaskIds.forEach((taskId) => {
+    const duplicatedTaskId = duplicateTask(state, null, null, taskId, false);
+    newSection.finishedTaskIds.push(duplicatedTaskId);
   });
   sectionAdapter.addOne(state.sections, newSection);
   projectAdapter.updateOne(state.projects, {
@@ -209,7 +214,10 @@ export const duplicateSection = (
   });
 };
 
-const markTaskFinished = (state: typeof initialState, taskId: EntityId) => {
+export const markTaskFinished = (
+  state: typeof initialState,
+  taskId: EntityId
+) => {
   const task = taskSelector.selectById(state, taskId);
   if (!task) {
     return;
@@ -225,7 +233,10 @@ const markTaskFinished = (state: typeof initialState, taskId: EntityId) => {
   });
 };
 
-const markTaskUnfinished = (state: typeof initialState, taskId: EntityId) => {
+export const markTaskUnfinished = (
+  state: typeof initialState,
+  taskId: EntityId
+) => {
   const task = taskSelector.selectById(state, taskId);
   if (!task) {
     return;
@@ -247,14 +258,6 @@ export const updateTask = (
 ) => {
   const updateObj = update as Update<Omit<Task, "id">>;
   updateObj.changes.updatedAt = new Date().toJSON();
-
-  if (typeof updateObj.changes.finished === "boolean") {
-    if (updateObj.changes.finished) {
-      markTaskFinished(state, updateObj.id);
-    } else {
-      markTaskUnfinished(state, updateObj.id);
-    }
-  }
 
   taskAdapter.updateOne(state.tasks, updateObj);
 };

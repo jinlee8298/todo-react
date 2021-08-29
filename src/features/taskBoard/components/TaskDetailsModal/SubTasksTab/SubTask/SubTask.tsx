@@ -1,5 +1,4 @@
 import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
-import { EntityId } from "@reduxjs/toolkit";
 import { Checkbox, Label as LabelComponent } from "common/components";
 import { useDispatch, useSelector } from "common/hooks";
 import TaskMenu from "features/taskBoard/components/Task/TaskItemMenu/TaskMenu";
@@ -7,22 +6,19 @@ import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
 import {
   labelSelector,
   taskSelector,
-  updateTask,
+  toggleTask,
 } from "features/taskBoard/taskBoardSlice";
-import { Label } from "features/taskBoard/types";
+import { Label, Task } from "features/taskBoard/types";
 import { FC, useState, memo, MouseEventHandler, FormEventHandler } from "react";
 import { shallowEqual } from "react-redux";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import StyledSubTask from "./SubTask.style";
 
 type SubTaskProps = {
-  taskId: EntityId;
+  task: Task;
 };
 
-const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
-  const task = useSelector((state) =>
-    taskSelector.selectById(state.taskBoard, taskId)
-  );
+const SubTask: FC<SubTaskProps> = memo(({ task }) => {
   const subTaskProgress = useSelector((state) => {
     let finishedCount = 0;
     if (task) {
@@ -57,7 +53,7 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
 
   const onClickTask: MouseEventHandler = (e) => {
     e.stopPropagation();
-    history.push(`/project/${projectId}/task/${taskId}`);
+    history.push(`/project/${projectId}/task/${task.id}`);
   };
 
   const onClickEditor: MouseEventHandler = (e) => {
@@ -66,9 +62,7 @@ const SubTask: FC<SubTaskProps> = memo(({ taskId }) => {
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      dispatch(
-        updateTask({ id: task.id, changes: { finished: !task.finished } })
-      );
+      dispatch(toggleTask(null, task.id));
     }
   };
 

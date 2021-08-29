@@ -29,6 +29,7 @@ import {
   labelSelector,
   projectSelector,
   taskSelector,
+  toggleTask,
   updateTask,
 } from "features/taskBoard/taskBoardSlice";
 import { useConfirmDialog, useDispatch, useSelector } from "common/hooks";
@@ -50,6 +51,7 @@ const TaskDetailsModal: FC = memo(() => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const taskId = match?.params.taskId;
   const projectId = match?.params.projectId;
+  const sectionId = sessionStorage.getItem("currentSectionId");
   const task = useSelector((state) => {
     if (taskId) {
       return taskSelector.selectById(state.taskBoard, taskId);
@@ -99,12 +101,7 @@ const TaskDetailsModal: FC = memo(() => {
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      dispatch(
-        updateTask({
-          id: task.id,
-          changes: { finished: !task.finished },
-        })
-      );
+      dispatch(toggleTask(sectionId, taskId));
     }
   };
   const onCloseModal = useCallback(() => {

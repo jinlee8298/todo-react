@@ -25,5 +25,13 @@ export default styled.div`
   .dropzone-padding {
     height: 1em;
     margin-block-end: -1em;
+    &:not(:empty) {
+      height: auto;
+      margin-block-start: 0.5rem;
+      padding-block-end: 1em;
+      &:only-child {
+        margin-block-start: 0;
+      }
+    }
   }
 `;

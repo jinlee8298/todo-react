@@ -38,6 +38,7 @@ export interface TaskSection {
   id: EntityId;
   name: string;
   taskIds: EntityId[];
+  finishedTaskIds: EntityId[];
 }
 
 export interface Project {

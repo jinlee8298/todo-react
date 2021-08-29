@@ -81,6 +81,12 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
     setAddSectionIndex(addIndex);
   };
 
+  const onDragEnterListbox: DragEventHandler<HTMLDivElement> = (e) => {
+    if (e.currentTarget === e.target) {
+      dispatch(removeTaskPlaceholder());
+    }
+  };
+
   return project ? (
     <StyledTaskBoard
       onDrop={onSectionDrop}
@@ -88,7 +94,7 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
       onDragEnter={onDragEnter}
     >
       <h1>{project.name}</h1>
-      <div role="listbox">
+      <div role="listbox" onDragEnter={onDragEnterListbox}>
         <div className="dropzone-padding"></div>
         {project.sectionIds.map((id, index) => (
           <Fragment key={id}>

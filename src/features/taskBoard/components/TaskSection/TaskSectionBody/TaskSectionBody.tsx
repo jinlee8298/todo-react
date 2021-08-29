@@ -14,9 +14,14 @@ import { useHistory, useRouteMatch } from "react-router-dom";
 type TaskSectionBodyProps = {
   sectionId: EntityId;
   taskIds: EntityId[];
+  finishedTaskIds: EntityId[];
 };
 
-const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
+const TaskSectionBody: FC<TaskSectionBodyProps> = ({
+  sectionId,
+  taskIds,
+  finishedTaskIds,
+}) => {
   const draggingInfo = useSelector(
     (state) => state.taskBoard.tasks.draggingInfo
   );
@@ -70,16 +75,12 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
 
   const openTaskDetailsModal = useCallback(
     (taskId: EntityId) => {
+      sessionStorage.setItem("currentSectionId", sectionId.toString());
       history.push(`/project/${projectId}/task/${taskId}`);
     },
-    [history, projectId]
+    [history, projectId, sectionId]
   );
 
-  const onDragLeave: DragEventHandler<HTMLElement> = (e) => {
-    if (e.currentTarget === e.target) {
-      dispatch(removeTaskPlaceholder());
-    }
-  };
   return (
     <StyledTaskSectionBody
       className="task-list"
@@ -88,7 +89,6 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
       onDragStart={preventDrag}
       onDragOver={onDragOverTaskList}
       onDragEnter={onDragEnterTaskList}
-      onDragLeave={onDragLeave}
     >
       {taskIds.map((taskId) =>
         taskId === "placeholder" ? (
@@ -105,7 +105,17 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({ sectionId, taskIds }) => {
           />
         )
       )}
-      <div className="dropzone-padding"></div>
+
+      <div className="dropzone-padding">
+        {finishedTaskIds.map((taskId) => (
+          <Task
+            key={taskId}
+            onClick={openTaskDetailsModal}
+            taskId={taskId}
+            sectionId={sectionId}
+          />
+        ))}
+      </div>
     </StyledTaskSectionBody>
   );
 };

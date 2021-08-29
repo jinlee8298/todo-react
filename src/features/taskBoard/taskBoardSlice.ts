@@ -13,6 +13,8 @@ import {
   updateTask as updTask,
   updateComment as updComment,
   duplicateSection as dupSection,
+  markTaskUnfinished,
+  markTaskFinished,
 } from "./store/storeHelper";
 import { Task, TaskSection, Comment, Project, Label } from "./types";
 
@@ -187,9 +189,45 @@ export const taskBoardSlice = createSlice({
         });
       },
     },
+    toggleTask: {
+      prepare: (sectionId, taskId) => ({ payload: { sectionId, taskId } }),
+      reducer: (
+        state,
+        action: PayloadAction<{ sectionId: EntityId | null; taskId: EntityId }>
+      ) => {
+        const { sectionId, taskId } = action.payload;
+        const task = taskSelector.selectById(state, taskId);
+        if (!task) {
+          return;
+        }
+
+        if (task.finished) {
+          markTaskUnfinished(state, taskId);
+        } else {
+          markTaskFinished(state, taskId);
+        }
+
+        if (sectionId) {
+          const section = sectionSelector.selectById(state, sectionId);
+          if (section) {
+            sectionAdapter.updateOne(state.sections, {
+              id: sectionId,
+              changes: {
+                taskIds: task.finished
+                  ? [...section.taskIds, taskId]
+                  : section.taskIds.filter((id) => id !== taskId),
+                finishedTaskIds: task.finished
+                  ? section.finishedTaskIds.filter((id) => id !== taskId)
+                  : [...section.finishedTaskIds, taskId],
+              },
+            });
+          }
+        }
+      },
+    },
     updateTask: (
       state,
-      action: PayloadAction<Update<Omit<Task, "id" | "updatedAt">>>
+      action: PayloadAction<Update<Omit<Task, "id" | "updatedAt" | "finished">>>
     ) => {
       updTask(state, action.payload);
     },
@@ -396,7 +434,7 @@ export const taskBoardSlice = createSlice({
         state,
         action: PayloadAction<{
           projectId: EntityId;
-          section: Omit<TaskSection, "id" | "taskIds">;
+          section: Omit<TaskSection, "id" | "taskIds" | "finishedTaskIds">;
           index: number;
         }>
       ) => {
@@ -413,6 +451,7 @@ export const taskBoardSlice = createSlice({
           ...section,
           id: generateTaskId(),
           taskIds: [],
+          finishedTaskIds: [],
         };
         const sectionIds = [...project.sectionIds];
         sectionIds.splice(
@@ -792,6 +831,7 @@ export const taskBoardSlice = createSlice({
 export const {
   addTask,
   addSubTask,
+  toggleTask,
   updateTask,
   duplicateTask,
   deleteTask,

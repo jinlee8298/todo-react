@@ -10,7 +10,7 @@ export default styled.ul`
   margin: 0;
   max-height: 20rem;
   padding: 0.5rem 0;
-  width: 11.5rem;
+  min-width: 11.5rem;
   overflow: hidden;
   &:hover,
   &:focus-within {

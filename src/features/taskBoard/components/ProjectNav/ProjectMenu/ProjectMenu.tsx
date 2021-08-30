@@ -13,7 +13,7 @@ import {
   duplicateProject,
 } from "features/taskBoard/taskBoardSlice";
 import { Project } from "features/taskBoard/types";
-import { FC, ReactElement, useRef } from "react";
+import { FC, ReactElement, useCallback, useRef } from "react";
 
 type ProjectMenuProps = {
   additionOptions?: (action: {
@@ -74,12 +74,12 @@ const ProjectMenu: FC<ProjectMenuProps> = ({
     triggerButtonRef.current = targetRef;
   };
 
-  const onMenuOpened = () => {
+  const onMenuOpened = useCallback(() => {
     triggerButtonRef.current?.classList.add("showing");
-  };
-  const onMenuClosed = () => {
+  }, []);
+  const onMenuClosed = useCallback(() => {
     triggerButtonRef.current?.classList.remove("showing");
-  };
+  }, []);
 
   const popoverContent = (action: { close: () => void; open: () => void }) => (
     <Menu>

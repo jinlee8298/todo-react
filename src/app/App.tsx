@@ -2,38 +2,32 @@ import "./App.css";
 import { ThemeProvider } from "styled-components";
 import LightTheme from "common/styles/themes/LightTheme";
 import Project from "features/taskBoard/components/Project/Project";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Header, NavBar } from "common/components";
-import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
-import LabelNav from "features/taskBoard/components/LabelNav/LabelNav";
-import { useState } from "react";
+import { Route, Switch } from "react-router-dom";
+import { Header } from "common/components";
 import { GlobalStyle } from "common/styles/common";
 import StyledApp from "./App.style";
+import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
+import LabelNav from "features/taskBoard/components/LabelNav/LabelNav";
 
 function App() {
-  const [showNavBar, setShowNavBar] = useState(false);
-  const onToggleNavBar = () => {
-    setShowNavBar((v) => !v);
-  };
+  const navContent = (
+    <>
+      <ProjectNav /> <LabelNav />
+    </>
+  );
   return (
     <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
-      <Router>
-        <StyledApp className="App">
-          <Header onToggleNavBar={onToggleNavBar} />
-          <main className={showNavBar ? "show-nav" : ""}>
-            <NavBar>
-              <ProjectNav></ProjectNav>
-              <LabelNav></LabelNav>
-            </NavBar>
-            <Switch>
-              <Route path={["/", "/:id"]} children={<Project />} />
-            </Switch>
-          </main>
-          <div id="modal-container"></div>
-          <div id="popover-container"></div>
-        </StyledApp>
-      </Router>
+      <StyledApp className="App">
+        <Header navContent={navContent} />
+        <main>
+          <Switch>
+            <Route path={["/", "/:id"]} children={<Project />} />
+          </Switch>
+        </main>
+        <div id="modal-container"></div>
+        <div id="popover-container"></div>
+      </StyledApp>
     </ThemeProvider>
   );
 }

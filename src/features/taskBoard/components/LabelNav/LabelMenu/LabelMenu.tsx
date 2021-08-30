@@ -8,7 +8,7 @@ import { Button } from "common/components";
 import { useConfirmDialog, useDispatch } from "common/hooks";
 import { deleteLabel } from "features/taskBoard/taskBoardSlice";
 import { Label } from "features/taskBoard/types";
-import { FC, useRef } from "react";
+import { FC, useCallback, useRef } from "react";
 
 type LabelMenuProps = {
   label: Label;
@@ -53,12 +53,12 @@ const LabelMenu: FC<LabelMenuProps> = ({ label, onEdit }) => {
     triggerButtonRef.current = targetRef;
   };
 
-  const onMenuOpened = () => {
+  const onMenuOpened = useCallback(() => {
     triggerButtonRef.current?.classList.add("showing");
-  };
-  const onMenuClosed = () => {
+  }, []);
+  const onMenuClosed = useCallback(() => {
     triggerButtonRef.current?.classList.remove("showing");
-  };
+  }, []);
 
   const popoverContent = (action: { close: () => void }) => (
     <Menu>

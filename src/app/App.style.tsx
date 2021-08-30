@@ -1,6 +1,3 @@
-import { NavBar } from "common/components/style";
-import { transitionTiming } from "common/styles/common";
-import Project from "features/taskBoard/components/Project/Project.style";
 import styled from "styled-components";
 
 export default styled.div`
@@ -15,25 +12,5 @@ export default styled.div`
     flex: 1;
     flex-basis: 0px;
     overflow: hidden;
-    ${NavBar} {
-      ${transitionTiming};
-      left: -17.5rem;
-      transition: left 0.2s, visibility 0.2s step-end;
-      visibility: hidden;
-    }
-    ${Project} {
-      ${transitionTiming};
-      transition: padding 0.2s;
-    }
-    &.show-nav {
-      ${Project} {
-        padding-inline-start: 17.5rem;
-      }
-      ${NavBar} {
-        left: 0;
-        transition: left 0.2s, visibility 0.2s step-start;
-        visibility: visible;
-      }
-    }
   }
 `;

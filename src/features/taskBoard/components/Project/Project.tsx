@@ -1,6 +1,13 @@
 import StyledTaskBoard from "./Project.style";
 import TaskSection from "../TaskSection/TaskSection";
-import { DragEventHandler, FC, Fragment, useEffect, useState } from "react";
+import {
+  DragEventHandler,
+  FC,
+  Fragment,
+  memo,
+  useEffect,
+  useState,
+} from "react";
 import { Button } from "common/components";
 import { faPlusSquare } from "@fortawesome/free-regular-svg-icons";
 import { useDispatch, useSelector } from "common/hooks";
@@ -20,7 +27,7 @@ import ProjectHeader from "./ProjectHeader/ProjectHeader";
 
 type ProjectProps = {};
 
-const Project: FC<ProjectProps> = (props) => {
+const Project: FC<ProjectProps> = memo(() => {
   const [projectId, setProjectId] = useState("");
   const project = useSelector((state) =>
     projectSelector.selectById(state.taskBoard, projectId)
@@ -34,6 +41,7 @@ const Project: FC<ProjectProps> = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.trace("run");
     if (match) {
       const { params } = match;
       setProjectId(params.id);
@@ -138,6 +146,6 @@ const Project: FC<ProjectProps> = (props) => {
       <TaskDetailsModal />
     </StyledTaskBoard>
   ) : null;
-};
+});
 
 export default Project;

@@ -1,7 +1,7 @@
 import "./App.css";
 import { ThemeProvider } from "styled-components";
 import LightTheme from "common/styles/themes/LightTheme";
-import TaskBoard from "features/taskBoard/components/TaskBoard/TaskBoard";
+import Project from "features/taskBoard/components/Project/Project";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Header, NavBar } from "common/components";
 import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
@@ -27,7 +27,7 @@ function App() {
               <LabelNav></LabelNav>
             </NavBar>
             <Switch>
-              <Route path={["/", "/:id"]} children={<TaskBoard />} />
+              <Route path={["/", "/:id"]} children={<Project />} />
             </Switch>
           </main>
           <div id="modal-container"></div>

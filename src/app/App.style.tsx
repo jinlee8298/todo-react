@@ -1,6 +1,6 @@
 import { NavBar } from "common/components/style";
 import { transitionTiming } from "common/styles/common";
-import TaskBoard from "features/taskBoard/components/TaskBoard/TaskBoard.style";
+import Project from "features/taskBoard/components/Project/Project.style";
 import styled from "styled-components";
 
 export default styled.div`
@@ -21,12 +21,12 @@ export default styled.div`
       transition: left 0.2s, visibility 0.2s step-end;
       visibility: hidden;
     }
-    ${TaskBoard} {
+    ${Project} {
       ${transitionTiming};
       transition: padding 0.2s;
     }
     &.show-nav {
-      ${TaskBoard} {
+      ${Project} {
         padding-inline-start: 17.5rem;
       }
       ${NavBar} {

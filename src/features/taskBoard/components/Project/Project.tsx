@@ -1,4 +1,4 @@
-import StyledTaskBoard from "./TaskBoard.style";
+import StyledTaskBoard from "./Project.style";
 import TaskSection from "../TaskSection/TaskSection";
 import { DragEventHandler, FC, Fragment, useEffect, useState } from "react";
 import { Button } from "common/components";
@@ -16,10 +16,11 @@ import { RootState } from "app/store";
 import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 import { useRouteMatch } from "react-router-dom";
 import TaskDetailsModal from "../TaskDetailsModal/TaskDetailsModal";
+import ProjectHeader from "./ProjectHeader/ProjectHeader";
 
-type TaskBoardProps = {};
+type ProjectProps = {};
 
-const TaskBoard: FC<TaskBoardProps> = (props) => {
+const Project: FC<ProjectProps> = (props) => {
   const [projectId, setProjectId] = useState("");
   const project = useSelector((state) =>
     projectSelector.selectById(state.taskBoard, projectId)
@@ -93,7 +94,7 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
       onDragOver={onDragSectionOver}
       onDragEnter={onDragEnter}
     >
-      <h1>{project.name}</h1>
+      <ProjectHeader project={project} />
       <div role="listbox" onDragEnter={onDragEnterListbox}>
         <div className="dropzone-padding"></div>
         {project.sectionIds.map((id, index) => (
@@ -139,4 +140,4 @@ const TaskBoard: FC<TaskBoardProps> = (props) => {
   ) : null;
 };
 
-export default TaskBoard;
+export default Project;

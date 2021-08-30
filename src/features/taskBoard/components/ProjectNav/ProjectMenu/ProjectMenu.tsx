@@ -13,14 +13,22 @@ import {
   duplicateProject,
 } from "features/taskBoard/taskBoardSlice";
 import { Project } from "features/taskBoard/types";
-import { FC, useRef } from "react";
+import { FC, ReactElement, useRef } from "react";
 
 type ProjectMenuProps = {
+  additionOptions?: (action: {
+    close: () => void;
+    open: () => void;
+  }) => ReactElement;
   project: Project;
   onEdit: () => void;
 };
 
-const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
+const ProjectMenu: FC<ProjectMenuProps> = ({
+  additionOptions,
+  project,
+  onEdit,
+}) => {
   const [showConfirm, closeConfirm, confirmDialogProps] = useConfirmDialog();
   const triggerButtonRef = useRef<HTMLElement | null>(null);
   const dispatch = useDispatch();
@@ -73,7 +81,7 @@ const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
     triggerButtonRef.current?.classList.remove("showing");
   };
 
-  const popoverContent = (action: { close: () => void }) => (
+  const popoverContent = (action: { close: () => void; open: () => void }) => (
     <Menu>
       <Menu.Item
         icon={faPen}
@@ -93,6 +101,7 @@ const ProjectMenu: FC<ProjectMenuProps> = ({ project, onEdit }) => {
       >
         Duplicate
       </Menu.Item>
+      {additionOptions?.(action)}
       <Menu.Item
         variant="danger"
         icon={faTrashAlt}

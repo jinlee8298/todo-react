@@ -15,14 +15,6 @@ export default styled.div`
   width: 100%;
   overflow: hidden;
 
-  h1 {
-    font-size: 1.5rem;
-    margin-block-end: 0.5em;
-    flex-shrink: 0;
-    padding-inline: 2rem;
-    margin-block: 1rem;
-  }
-
   [role="listbox"] {
     flex: 1;
     flex-basis: 0px;

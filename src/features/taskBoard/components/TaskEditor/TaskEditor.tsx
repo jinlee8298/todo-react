@@ -178,7 +178,12 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       taskPriorityRef?.current?.selected || TaskPriority.Low;
     const newTask: Omit<
       Task,
-      "id" | "createdAt" | "updatedAt" | "commentIds" | "subTaskIds"
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "commentIds"
+      | "subTaskIds"
+      | "finished"
     > = {
       title: title.trim(),
       description: description.trim(),

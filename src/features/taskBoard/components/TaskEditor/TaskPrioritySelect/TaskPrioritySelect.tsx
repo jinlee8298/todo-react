@@ -50,6 +50,7 @@ const PRIORITY_COLOR_MAPPING = {
 
 type TaskPrioritySelectProps = {
   taskId?: EntityId;
+  disabled?: boolean;
   onSelect?: (value: SelectItem) => void;
 };
 
@@ -61,7 +62,7 @@ export type TaskPrioritySelectRef = {
 const TaskPrioritySelect: ForwardRefRenderFunction<
   TaskPrioritySelectRef,
   TaskPrioritySelectProps
-> = ({ taskId = 0, ...props }, ref) => {
+> = ({ taskId = 0, disabled, ...props }, ref) => {
   const [selected, setSelected] = useState<SelectItem>(PRIORITY_ITEM[0]);
   const task = useSelector((state) =>
     taskSelector.selectById(state.taskBoard, taskId)
@@ -100,6 +101,7 @@ const TaskPrioritySelect: ForwardRefRenderFunction<
       closeOnSelect
     >
       <Button
+        disabled={disabled}
         size="sx"
         icon={faFlag}
         title="Set priorities"

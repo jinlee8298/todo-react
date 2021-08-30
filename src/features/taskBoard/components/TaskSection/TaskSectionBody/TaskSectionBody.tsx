@@ -2,6 +2,7 @@ import { EntityId } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "common/hooks";
 import {
   insertTaskPlaceholder,
+  projectSelector,
   removeTaskPlaceholder,
   repositionTask,
 } from "features/taskBoard/taskBoardSlice";
@@ -28,6 +29,11 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
   const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
   const history = useHistory();
   const projectId = match?.params.projectId;
+  const filterOptions = useSelector(
+    (state) =>
+      projectSelector.selectById(state.taskBoard, projectId || "")
+        ?.filterOptions
+  );
   const dispatch = useDispatch();
 
   const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
@@ -107,14 +113,15 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
       )}
 
       <div className="dropzone-padding">
-        {finishedTaskIds.map((taskId) => (
-          <Task
-            key={taskId}
-            onClick={openTaskDetailsModal}
-            taskId={taskId}
-            sectionId={sectionId}
-          />
-        ))}
+        {filterOptions?.showCompletedTask &&
+          finishedTaskIds.map((taskId) => (
+            <Task
+              key={taskId}
+              onClick={openTaskDetailsModal}
+              taskId={taskId}
+              sectionId={sectionId}
+            />
+          ))}
       </div>
     </StyledTaskSectionBody>
   );

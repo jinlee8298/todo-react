@@ -96,7 +96,9 @@ const TaskDetailsModal: FC = memo(() => {
   }, [isShown]);
 
   const toggleEdit = () => {
-    setIsEdit((v) => !v);
+    if (!task?.finished) {
+      setIsEdit((v) => !v);
+    }
   };
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
@@ -161,7 +163,7 @@ const TaskDetailsModal: FC = memo(() => {
     return `/project/${projectId}`;
   };
 
-  return (
+  return task ? (
     <StyledModal
       onKeyDown={onEscape}
       backdropClick={onCloseModal}
@@ -170,10 +172,10 @@ const TaskDetailsModal: FC = memo(() => {
       <div className="header">
         <Link to={redirectLink()}>
           <FontAwesomeIcon
-            icon={task?.parentTaskId ? faCodeBranch : faDotCircle}
+            icon={task.parentTaskId ? faCodeBranch : faDotCircle}
             fixedWidth
           />
-          {task?.parentTaskId ? parentTaskTitle : projectName}
+          <span>{task.parentTaskId ? parentTaskTitle : projectName}</span>
         </Link>
         <Button
           icon={faTimes}
@@ -193,13 +195,12 @@ const TaskDetailsModal: FC = memo(() => {
         ) : (
           <>
             <div
-              className={[
-                "task-details",
-                task?.finished ? "finished" : "",
-              ].join(" ")}
+              className={["task-details", task.finished ? "finished" : ""].join(
+                " "
+              )}
             >
               <Checkbox
-                checked={task?.finished ?? false}
+                checked={task.finished ?? false}
                 onChange={onTickCheckbox}
               />
               <div
@@ -208,8 +209,8 @@ const TaskDetailsModal: FC = memo(() => {
                 onKeyPress={onKeyPressEditable}
                 onClick={toggleEdit}
               >
-                <h4>{task?.title}</h4>
-                <p>{task?.description}</p>
+                <h4>{task.title}</h4>
+                <p>{task.description}</p>
               </div>
             </div>
             <div className="label-wrapper">
@@ -225,10 +226,15 @@ const TaskDetailsModal: FC = memo(() => {
             </div>
             <div className="task-actions">
               <Button icon={faList} alternative="reverse" size="sx" />
-              <TaskLabelSelect taskId={task?.id} mode="standalone" />
+              <TaskLabelSelect
+                disabled={task.finished}
+                taskId={task.id}
+                mode="standalone"
+              />
               <TaskPrioritySelect
+                disabled={task.finished}
                 onSelect={onSelectPriority}
-                taskId={task?.id}
+                taskId={task.id}
               />
               <Button icon={faEllipsisH} alternative="reverse" size="sx" />
             </div>
@@ -240,7 +246,12 @@ const TaskDetailsModal: FC = memo(() => {
           <Tabs.Tab
             id="Sub-tasks"
             title="Sub-tasks"
-            content={<SubTasksTab parentTaskId={taskId} />}
+            content={
+              <SubTasksTab
+                parentTaskFinished={!!task.finished}
+                parentTaskId={taskId}
+              />
+            }
           />
           <Tabs.Tab
             id="Comments"
@@ -251,7 +262,7 @@ const TaskDetailsModal: FC = memo(() => {
       )}
       <ConfirmDialog {...dialogProps} />
     </StyledModal>
-  );
+  ) : null;
 });
 
 export default TaskDetailsModal;

@@ -24,7 +24,7 @@ export interface Task {
   commentIds: EntityId[];
   createdAt: string;
   description?: string;
-  finished?: boolean;
+  finished: boolean;
   id: EntityId;
   labelIds: EntityId[];
   parentTaskId?: EntityId;
@@ -46,4 +46,5 @@ export interface Project {
   sectionIds: EntityId[];
   name: string;
   color: string;
+  filterOptions: { showCompletedTask: boolean };
 }

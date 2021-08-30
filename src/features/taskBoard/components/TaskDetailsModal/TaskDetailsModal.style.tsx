@@ -25,9 +25,23 @@ export default styled(Modal)`
       align-items: center;
       text-decoration: none;
       outline: none;
-      &:focus {
+      flex: 1;
+      overflow: hidden;
+      padding-inline-end: 0.5em;
+
+      &:focus,
+      &:hover {
         color: var(--primary);
         font-weight: bold;
+      }
+
+      span {
+        flex: 1;
+        display: block;
+        flex-basis: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       svg {
         flex-shrink: 0;

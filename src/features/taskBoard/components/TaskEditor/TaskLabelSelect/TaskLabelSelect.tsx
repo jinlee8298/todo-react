@@ -30,6 +30,7 @@ type TaskLabelSelectProps = {
   mode?: "add" | "edit" | "standalone";
   onSelect?: (value: SelectItem) => void;
   onDeselect?: (value: SelectItem) => void;
+  disabled?: boolean;
 };
 
 export type TaskLabelSelectRef = {
@@ -40,7 +41,7 @@ export type TaskLabelSelectRef = {
 const TaskLabelSelect: ForwardRefRenderFunction<
   TaskLabelSelectRef,
   TaskLabelSelectProps
-> = ({ taskId, mode, ...props }, ref) => {
+> = ({ taskId, mode, disabled, ...props }, ref) => {
   const labels = useSelector((state) =>
     labelSelector.selectAll(state.taskBoard)
   );
@@ -193,6 +194,7 @@ const TaskLabelSelect: ForwardRefRenderFunction<
       hasFilter
     >
       <Button
+        disabled={disabled}
         size="sx"
         icon={faTag}
         title="Set label(s)"

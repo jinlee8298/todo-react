@@ -96,7 +96,12 @@ export const taskBoardSlice = createSlice({
           sectionId: EntityId;
           task: Omit<
             Task,
-            "id" | "createdAt" | "updatedAt" | "commentIds" | "subTaskIds"
+            | "id"
+            | "createdAt"
+            | "updatedAt"
+            | "commentIds"
+            | "subTaskIds"
+            | "finished"
           >;
         }>
       ) => {
@@ -113,6 +118,7 @@ export const taskBoardSlice = createSlice({
           updatedAt: createdAt,
           commentIds: [],
           subTaskIds: [],
+          finished: false,
         };
 
         taskAdapter.addOne(state.tasks, newTask);
@@ -786,12 +792,15 @@ export const taskBoardSlice = createSlice({
     },
     addProject: (
       state,
-      action: PayloadAction<Omit<Project, "id" | "sectionIds">>
+      action: PayloadAction<
+        Omit<Project, "id" | "sectionIds" | "filterOptions">
+      >
     ) => {
       const newProject = {
         ...action.payload,
         id: generateTaskId(),
         sectionIds: [],
+        filterOptions: { showCompletedTask: false },
       };
       projectAdapter.addOne(state.projects, newProject);
     },

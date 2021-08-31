@@ -99,7 +99,7 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
       isShown={isShown}
     >
       <div className="header">
-        <h2>Add project</h2>
+        <h2>{project ? "Edit" : "Add"} project</h2>
         <Button
           onClick={onCloseHandle}
           icon={faTimes}

@@ -16,7 +16,18 @@ export default styled.div`
     text-overflow: ellipsis;
     padding-inline-end: 1rem;
     flex: 1;
+    display: flex;
+    align-items: center;
+    .color-indicator {
+      background: var(--project-color);
+      width: 0.5em;
+      height: 1.5em;
+      display: block;
+      border-radius: 2px;
+      margin-inline-end: 0.5em;
+    }
   }
+
   ${Button} {
     flex-shrink: 0;
   }

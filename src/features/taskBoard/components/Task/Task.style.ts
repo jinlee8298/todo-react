@@ -82,7 +82,6 @@ export default styled.div`
     flex: 1;
     font-size: 0.9rem;
     line-height: 1.5em;
-    word-break: break-all;
   }
   p {
     margin-block: 0.25em 0;

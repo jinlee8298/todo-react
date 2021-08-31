@@ -59,7 +59,13 @@ const ProjectViewHeader: FC<ProjectViewHeaderProps> = ({ project }) => {
   };
   return (
     <StyledHeader>
-      <h1>{project.name}</h1>
+      <h1>
+        <div
+          style={{ ["--project-color" as any]: project.color }}
+          className="color-indicator"
+        ></div>
+        <span>{project.name}</span>
+      </h1>
       <ProjectMenu
         additionOptions={additionMenu}
         project={project}

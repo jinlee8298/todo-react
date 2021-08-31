@@ -21,4 +21,8 @@ export default styled.span`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  a {
+    text-decoration: none;
+    color: var(--color);
+  }
 `;

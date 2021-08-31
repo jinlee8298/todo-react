@@ -36,7 +36,17 @@ const LabelView = memo(() => {
 
   return (
     <StyledView>
-      <h1>{label && label.name}</h1>
+      <h1>
+        {label && (
+          <>
+            <div
+              className="color-indicator"
+              style={{ ["--label-color" as any]: label?.color }}
+            ></div>
+            <span>{label.name}</span>{" "}
+          </>
+        )}
+      </h1>
       {tasks.map(
         (task) => task && <SubTask key={task.id} task={task}></SubTask>
       )}

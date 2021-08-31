@@ -65,7 +65,12 @@ const TaskInfo: FC<TaskInfoProps> = ({ task, onEdit }) => {
       </div>
       <div className="label-wrapper">
         {taskLabels.map((label) => (
-          <LabelComponent color={label.color} key={label.id} title={label.name}>
+          <LabelComponent
+            to={`/label/${label.id}`}
+            color={label.color}
+            key={label.id}
+            title={label.name}
+          >
             {label.name}
           </LabelComponent>
         ))}

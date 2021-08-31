@@ -129,7 +129,12 @@ const Task: FC<TaskProps> = memo((props) => {
           </LabelComponent>
         )}
         {taskLabels.map((label) => (
-          <LabelComponent color={label.color} key={label.id} title={label.name}>
+          <LabelComponent
+            to={`/label/${label.id}`}
+            color={label.color}
+            key={label.id}
+            title={label.name}
+          >
             {label.name}
           </LabelComponent>
         ))}

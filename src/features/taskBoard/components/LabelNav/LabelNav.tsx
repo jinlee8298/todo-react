@@ -43,6 +43,7 @@ const LabelNav = () => {
       name="Labels"
       onAddButtonClick={toggleLabelModal}
       addButtonVisible
+      expandByDefault
     >
       {labels.map((label) => (
         <NavBar.NavItem

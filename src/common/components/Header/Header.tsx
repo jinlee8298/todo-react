@@ -10,7 +10,7 @@ type HeaderProps = {
 };
 
 const Header: FC<HeaderProps> = ({ navContent }) => {
-  const [showNavBar, setShowNavBar] = useState(false);
+  const [showNavBar, setShowNavBar] = useState(true);
   const history = useHistory();
   const onToggleNavBar = () => {
     setShowNavBar((v) => !v);

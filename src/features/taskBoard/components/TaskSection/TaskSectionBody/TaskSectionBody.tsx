@@ -2,7 +2,6 @@ import { EntityId } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "common/hooks";
 import {
   insertTaskPlaceholder,
-  projectSelector,
   removeTaskPlaceholder,
   repositionTask,
 } from "features/taskBoard/taskBoardSlice";
@@ -11,6 +10,7 @@ import StyledTaskSectionBody from "./TaskSectionBody.style";
 import Placeholder from "../../Placeholder/Placeholder";
 import Task from "../../Task/Task";
 import { useHistory, useRouteMatch } from "react-router-dom";
+import { projectSelector } from "features/taskBoard/store/projectReducer";
 
 type TaskSectionBodyProps = {
   sectionId: EntityId;
@@ -48,8 +48,9 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     const taskId = draggingInfo?.draggingTaskId;
     const originSectionId = draggingInfo?.originSectionId;
     const taskIndex = taskIds.indexOf("placeholder");
-
-    dispatch(repositionTask(sectionId, originSectionId, taskId, taskIndex));
+    if (originSectionId && taskId) {
+      dispatch(repositionTask(sectionId, originSectionId, taskId, taskIndex));
+    }
 
     if (originSectionId !== draggingInfo?.currentPlaceholderSecionId) {
       dispatch(removeTaskPlaceholder());

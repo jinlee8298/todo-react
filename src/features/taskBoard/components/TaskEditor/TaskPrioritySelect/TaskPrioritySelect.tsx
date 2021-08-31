@@ -2,7 +2,6 @@ import { faFlag } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
 import { Button, Select } from "common/components";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
-import { taskSelector } from "features/taskBoard/taskBoardSlice";
 import { TaskPriority } from "features/taskBoard/types";
 import {
   forwardRef,
@@ -13,6 +12,7 @@ import {
   memo,
 } from "react";
 import { useSelector } from "common/hooks";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
 
 const PRIORITY_ITEM: SelectItem[] = [
   {

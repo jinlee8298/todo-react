@@ -25,13 +25,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TaskEditor from "../TaskEditor/TaskEditor";
 import SubTasksTab from "./SubTasksTab/SubTasksTab";
 import CommentsTab from "./CommentsTab/CommentsTab";
-import {
-  labelSelector,
-  projectSelector,
-  taskSelector,
-  toggleTask,
-  updateTask,
-} from "features/taskBoard/taskBoardSlice";
+import { toggleTask, updateTask } from "features/taskBoard/taskBoardSlice";
 import { useConfirmDialog, useDispatch, useSelector } from "common/hooks";
 import { ConfirmDialog } from "common/components";
 import TaskPrioritySelect from "../TaskEditor/TaskPrioritySelect/TaskPrioritySelect";
@@ -40,6 +34,9 @@ import { Label, TaskPriority } from "features/taskBoard/types";
 import TaskLabelSelect from "../TaskEditor/TaskLabelSelect/TaskLabelSelect";
 import { shallowEqual } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
+import { projectSelector } from "features/taskBoard/store/projectReducer";
 
 const TaskDetailsModal: FC = memo(() => {
   const match = useRouteMatch<{
@@ -110,7 +107,7 @@ const TaskDetailsModal: FC = memo(() => {
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      dispatch(toggleTask(sectionId, taskId));
+      dispatch(toggleTask(sectionId || undefined, task.id));
     }
   };
   const onCloseModal = useCallback(() => {

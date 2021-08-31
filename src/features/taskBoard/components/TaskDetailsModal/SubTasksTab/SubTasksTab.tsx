@@ -6,8 +6,8 @@ import { FC, useState, memo, useMemo } from "react";
 import SubTask from "./SubTask/SubTask";
 import { EntityId } from "@reduxjs/toolkit";
 import { useSelector } from "common/hooks";
-import { taskSelector } from "features/taskBoard/taskBoardSlice";
 import { shallowEqual } from "react-redux";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
 
 type SubTasksTabProps = {
   parentTaskId: EntityId;

@@ -4,12 +4,12 @@ import { EntityId } from "@reduxjs/toolkit";
 import StyledNavGroup from "./LabelNav.style";
 import { NavBar } from "common/components";
 import { useSelector } from "common/hooks";
-import { labelSelector } from "features/taskBoard/taskBoardSlice";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Label } from "features/taskBoard/types";
 import LabelEditModal from "../LabelEditModal/LabelEditModal";
 import LabelMenu from "./LabelMenu/LabelMenu";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 const LabelNav = () => {
   const labels = useSelector((state) =>

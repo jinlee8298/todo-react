@@ -4,17 +4,17 @@ import StyledTask from "./Task.style";
 import { useDispatch, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
 import {
-  taskSelector,
   setDraggingTaskData,
   removeTaskPlaceholder,
   insertTaskPlaceholder,
-  labelSelector,
   toggleTask,
 } from "features/taskBoard/taskBoardSlice";
 import TaskMenu from "./TaskItemMenu/TaskMenu";
 import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { Label } from "features/taskBoard/types";
 import { shallowEqual } from "react-redux";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 type TaskProps = {
   taskId: EntityId;

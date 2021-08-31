@@ -4,7 +4,8 @@ import { useDispatch, useInput, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
 import { FC, useMemo, memo } from "react";
 import TaskComment from "./TaskComment/TaskComment";
-import { addComment, taskSelector } from "features/taskBoard/taskBoardSlice";
+import { addComment } from "features/taskBoard/taskBoardSlice";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
 
 type CommentsTabProps = {
   taskId: EntityId;

@@ -11,8 +11,8 @@ import { FC } from "react";
 import {
   deleteSection,
   duplicateSection,
-  sectionSelector,
 } from "features/taskBoard/taskBoardSlice";
+import { sectionSelector } from "features/taskBoard/store/sectionReducer";
 
 type TaskMenuProps = {
   sectionId: EntityId;

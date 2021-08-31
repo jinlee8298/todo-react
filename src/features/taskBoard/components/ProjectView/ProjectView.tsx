@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from "common/hooks";
 import AddSectionTrigger from "../AddSectionButton/AddSectionButton";
 import {
   insertSectionPlaceholder,
-  projectSelector,
   removeTaskPlaceholder,
   repositionSection,
 } from "../../taskBoardSlice";
@@ -24,6 +23,7 @@ import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEdito
 import { useRouteMatch } from "react-router-dom";
 import TaskDetailsModal from "../TaskDetailsModal/TaskDetailsModal";
 import ProjectViewHeader from "./ProjectViewHeader/ProjectViewHeader";
+import { projectSelector } from "features/taskBoard/store/projectReducer";
 
 type ProjectProps = {};
 
@@ -66,8 +66,9 @@ const ProjectView: FC<ProjectProps> = memo(() => {
 
       const sectionId = draggingSectionInfo?.draggingSectionId;
       const sectionIndex = project?.sectionIds.indexOf("placeholder");
-
-      dispatch(repositionSection(projectId, sectionId, sectionIndex));
+      if (sectionId && sectionIndex) {
+        dispatch(repositionSection(projectId, sectionId, sectionIndex));
+      }
     }
   };
 

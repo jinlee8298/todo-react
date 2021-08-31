@@ -2,7 +2,6 @@ import { DragEventHandler, FC, useRef, memo, useState } from "react";
 import StyledTaskSection from "./TaskSection.style";
 import { EntityId } from "@reduxjs/toolkit";
 import {
-  sectionSelector,
   insertSectionPlaceholder,
   removeSectionPlaceholder,
   setDraggingSectionData,
@@ -12,6 +11,7 @@ import TaskSectionFooter from "./TaskSectionFooter/TaskSectionFooter";
 import TaskSectionBody from "./TaskSectionBody/TaskSectionBody";
 import TaskSectionMenu from "./TaskSectionMenu/TaskSectionMenu";
 import TaskSecitonEditor from "./TaskSectionEditor/TaskSectionEditor";
+import { sectionSelector } from "features/taskBoard/store/sectionReducer";
 
 type TaskSectionProps = {
   sectionId: EntityId;

@@ -5,9 +5,7 @@ import { useDispatch, useSelector } from "common/hooks";
 import {
   addLabel,
   addLabelToTask,
-  labelSelector,
   removeLabelFromTask,
-  taskSelector,
 } from "features/taskBoard/taskBoardSlice";
 import {
   forwardRef,
@@ -24,6 +22,8 @@ import { EntityId } from "@reduxjs/toolkit";
 import { shallowEqual } from "react-redux";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
 import { COLOR_LIST } from "common/constants";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 type TaskLabelSelectProps = {
   taskId?: EntityId;

@@ -4,12 +4,12 @@ import { EntityId } from "@reduxjs/toolkit";
 import StyledNavGroup from "./ProjectNav.style";
 import { NavBar } from "common/components";
 import { useSelector } from "common/hooks";
-import { projectSelector } from "features/taskBoard/taskBoardSlice";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ProjectEditModal from "../ProjectEditModal/ProjectEditModal";
 import ProjectMenu from "./ProjectMenu/ProjectMenu";
 import { Project } from "features/taskBoard/types";
+import { projectSelector } from "features/taskBoard/store/projectReducer";
 
 const ProjectNav = () => {
   const projects = useSelector((state) =>

@@ -3,11 +3,9 @@ import { Checkbox, Label as LabelComponent } from "common/components";
 import { useDispatch, useSelector } from "common/hooks";
 import TaskMenu from "features/taskBoard/components/Task/TaskItemMenu/TaskMenu";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
-import {
-  labelSelector,
-  taskSelector,
-  toggleTask,
-} from "features/taskBoard/taskBoardSlice";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
+import { toggleTask } from "features/taskBoard/taskBoardSlice";
 import { Label, Task } from "features/taskBoard/types";
 import { FC, useState, memo, MouseEventHandler, FormEventHandler } from "react";
 import { shallowEqual } from "react-redux";

@@ -13,8 +13,8 @@ import {
   useInput,
   useSelector,
 } from "common/hooks";
+import { commentSelector } from "features/taskBoard/store/commentReducer";
 import {
-  commentSelector,
   deleteComment,
   updateComment,
 } from "features/taskBoard/taskBoardSlice";

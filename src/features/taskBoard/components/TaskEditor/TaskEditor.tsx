@@ -12,12 +12,7 @@ import { Button, Label as LabelComponent } from "common/components";
 import { EntityId } from "@reduxjs/toolkit";
 import { Label, Task, TaskPriority } from "features/taskBoard/types";
 import { useDispatch, useInput, useSelector } from "common/hooks";
-import {
-  addSubTask,
-  addTask,
-  labelSelector,
-  updateTask,
-} from "../../taskBoardSlice";
+import { addSubTask, addTask, updateTask } from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 import TaskPrioritySelect, {
   TaskPrioritySelectRef,
@@ -27,6 +22,7 @@ import TaskLabelSelect, {
 } from "./TaskLabelSelect/TaskLabelSelect";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
 import { shallowEqual } from "react-redux";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 type TaskEditorProps = {
   mode: "add" | "edit" | "add-subtask";
@@ -190,9 +186,9 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       priority: selectedPriority,
       labelIds: selectedLabels.map((item) => item.value) || [],
     };
-    if (mode === "add-subtask") {
+    if (mode === "add-subtask" && parentTaskId) {
       dispatch(addSubTask(parentTaskId, newTask));
-    } else {
+    } else if (sectionId) {
       dispatch(addTask(sectionId, newTask));
     }
     resetTitle();

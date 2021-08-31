@@ -1,5 +1,6 @@
 import { useSelector } from "common/hooks";
-import { labelSelector, taskSelector } from "features/taskBoard/taskBoardSlice";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
+import { taskSelector } from "features/taskBoard/store/taskReducer";
 import { memo, useMemo } from "react";
 import { shallowEqual } from "react-redux";
 import { useRouteMatch } from "react-router-dom";

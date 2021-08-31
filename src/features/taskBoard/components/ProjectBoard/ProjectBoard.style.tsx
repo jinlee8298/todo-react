@@ -4,6 +4,7 @@ import styled from "styled-components";
 export default styled.div`
   padding: 2rem 1rem;
   max-width: 50rem;
+  min-width: 20rem;
   margin-inline: auto;
   h1 {
     margin-block-end: 1rem;

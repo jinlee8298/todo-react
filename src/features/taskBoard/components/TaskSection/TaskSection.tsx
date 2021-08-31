@@ -54,10 +54,11 @@ const TaskSection: FC<TaskSectionProps> = memo((props) => {
   };
 
   const onDragEndSection: DragEventHandler<HTMLDivElement> = (e) => {
-    containerRef.current?.classList.remove("dragging");
-
-    dispatch(removeSectionPlaceholder(props.projectId));
-    dispatch(setDraggingSectionData(null));
+    if (e.target === e.currentTarget) {
+      containerRef.current?.classList.remove("dragging");
+      dispatch(removeSectionPlaceholder(props.projectId));
+      dispatch(setDraggingSectionData(null));
+    }
   };
 
   const onDragEnterSection: DragEventHandler<HTMLElement> = (e) => {

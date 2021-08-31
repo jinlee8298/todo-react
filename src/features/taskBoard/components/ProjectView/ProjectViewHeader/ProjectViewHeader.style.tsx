@@ -18,7 +18,13 @@ export default styled.div`
     flex: 1;
     display: flex;
     align-items: center;
+    span {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .color-indicator {
+      flex-shrink: 0;
       background: var(--project-color);
       width: 0.5em;
       height: 1.5em;

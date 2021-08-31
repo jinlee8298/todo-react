@@ -3,6 +3,7 @@ import SubTask from "../TaskDetailsModal/SubTasksTab/SubTask/SubTask.style";
 
 export default styled.div`
   max-width: 50rem;
+  min-width: 20rem;
   margin-inline: auto;
   h1 {
     font-size: 1.5rem;

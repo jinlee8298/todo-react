@@ -129,6 +129,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
         taskLabels.map((label) => ({
           value: label.id as string,
           label: label.name,
+          iconColor: label.color,
         }))
       );
     }
@@ -231,7 +232,11 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     <TaskEditorContainer {...props} onKeyDown={onKeyDown}>
       <div className="label-wrapper">
         {selectedLabels.map((labelItem) => (
-          <LabelComponent key={labelItem.value} title={labelItem.label}>
+          <LabelComponent
+            color={labelItem.iconColor}
+            key={labelItem.value}
+            title={labelItem.label}
+          >
             {labelItem.label}
           </LabelComponent>
         ))}

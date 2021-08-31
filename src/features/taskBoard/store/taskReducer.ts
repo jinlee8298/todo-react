@@ -109,9 +109,12 @@ export const duplicateTaskHandler = (
   if (sectionId) {
     const section = sectionSelector.selectById(state, sectionId);
     if (section) {
+      const originIndex = section.taskIds.findIndex((id) => id === taskId);
+      const sectionTaskIds = [...section.taskIds];
+      sectionTaskIds.splice(originIndex + 1, 0, duplicatedTask.id);
       sectionAdapter.updateOne(state.sections, {
         id: sectionId,
-        changes: { taskIds: [...section.taskIds, duplicatedTask.id] },
+        changes: { taskIds: sectionTaskIds },
       });
     }
   }
@@ -170,9 +173,14 @@ export const duplicateTaskHandler = (
       duplicatedTask.parentTaskId
     );
     if (parentTask) {
+      const originIndex = parentTask.subTaskIds.findIndex(
+        (id) => id === taskId
+      );
+      const parentSubTaskIds = [...parentTask.subTaskIds];
+      parentSubTaskIds.splice(originIndex + 1, 0, duplicatedTask.id);
       taskAdapter.updateOne(state.tasks, {
         id: parentTask.id,
-        changes: { subTaskIds: [...parentTask.subTaskIds, duplicatedTask.id] },
+        changes: { subTaskIds: parentSubTaskIds },
       });
     }
   }

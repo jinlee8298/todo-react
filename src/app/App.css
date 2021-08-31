@@ -1,0 +1,43 @@
+@import-normalize;
+
+* {
+  font-family: "Open Sans", sans-serif;
+  scrollbar-width: thin;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+body,
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+  word-break: break-word;
+}
+
+body,
+html,
+#root,
+.App {
+  line-height: 1.5;
+  height: 100%;
+  overflow: hidden;
+}
+
+.svg-inline--fa.fa-fw {
+  width: 1em;
+}

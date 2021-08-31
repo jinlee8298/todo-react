@@ -8,45 +8,33 @@ import { FC, useRef } from "react";
 import { Button, Menu, ConfirmDialog, Popover } from "common/components";
 import { useDispatch, useConfirmDialog } from "common/hooks";
 import { Task } from "features/taskBoard/types";
-import { EntityId } from "@reduxjs/toolkit";
 import { deleteTask, duplicateTask } from "features/taskBoard/taskBoardSlice";
 
 type TaskMenuProps = {
   task: Task;
-  sectionId?: EntityId;
   onEdit: () => void;
 };
 
-const TaskMenu: FC<TaskMenuProps> = (props) => {
+const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
   const [showConfirm, closeConfirm, confirmDialogProps] = useConfirmDialog();
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerButtonRef = useRef<HTMLElement | null>(null);
   const dispatch = useDispatch();
 
   const duplicateTaskHandler = () => {
-    if (props.task.commentIds.length > 0) {
+    if (task.commentIds.length > 0) {
       showConfirm({
         backdropClick: closeConfirm,
         onReject: () => {
           dispatch(
-            duplicateTask(
-              props.sectionId,
-              props.task.parentTaskId,
-              props.task.id,
-              false
-            )
+            duplicateTask(task.sectionId, task.parentTaskId, task.id, false)
           );
           closeConfirm();
         },
         onEsc: closeConfirm,
         onConfirm: () => {
           dispatch(
-            duplicateTask(
-              props.sectionId,
-              props.task.parentTaskId,
-              props.task.id,
-              true
-            )
+            duplicateTask(task.sectionId, task.parentTaskId, task.id, true)
           );
           closeConfirm();
         },
@@ -56,9 +44,7 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
         rejectButtonLabel: "Exclude comments",
       });
     } else {
-      dispatch(
-        duplicateTask(props.sectionId, props.task.parentTaskId, props.task.id)
-      );
+      dispatch(duplicateTask(task.sectionId, task.parentTaskId, task.id));
     }
   };
 
@@ -68,13 +54,12 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
       onReject: closeConfirm,
       onEsc: closeConfirm,
       onConfirm: () => {
-        dispatch(deleteTask(props.sectionId, props.task.id));
+        dispatch(deleteTask(task.sectionId, task.id));
       },
       title: "Delete task?",
       message: (
         <span>
-          Are you sure you want to delete task:{" "}
-          <strong>"{props.task.title}"</strong>?
+          Are you sure you want to delete task: <strong>"{task.title}"</strong>?
         </span>
       ),
       acceptButtonLabel: "Delete",
@@ -85,7 +70,7 @@ const TaskMenu: FC<TaskMenuProps> = (props) => {
 
   const editTaskHandler = () => {
     closeConfirm();
-    props.onEdit();
+    onEdit();
   };
 
   const getPopoverRef = (

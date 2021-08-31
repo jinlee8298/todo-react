@@ -32,6 +32,7 @@ export interface Task {
   title: string;
   updatedAt: string;
   subTaskIds: EntityId[];
+  sectionId?: EntityId;
 }
 
 export interface TaskSection {

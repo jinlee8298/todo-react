@@ -134,11 +134,7 @@ const Task: FC<TaskProps> = memo((props) => {
           </LabelComponent>
         ))}
       </div>
-      <TaskMenu
-        onEdit={openTaskDetailsModal}
-        sectionId={props.sectionId}
-        task={task}
-      />
+      <TaskMenu onEdit={openTaskDetailsModal} task={task} />
     </StyledTask>
   ) : null;
 });

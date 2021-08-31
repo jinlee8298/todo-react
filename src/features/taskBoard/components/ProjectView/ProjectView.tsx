@@ -1,4 +1,4 @@
-import StyledTaskBoard from "./Project.style";
+import StyledTaskBoard from "./ProjectView.style";
 import TaskSection from "../TaskSection/TaskSection";
 import {
   DragEventHandler,
@@ -23,11 +23,11 @@ import { RootState } from "app/store";
 import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 import { useRouteMatch } from "react-router-dom";
 import TaskDetailsModal from "../TaskDetailsModal/TaskDetailsModal";
-import ProjectHeader from "./ProjectHeader/ProjectHeader";
+import ProjectViewHeader from "./ProjectViewHeader/ProjectViewHeader";
 
 type ProjectProps = {};
 
-const Project: FC<ProjectProps> = memo(() => {
+const ProjectView: FC<ProjectProps> = memo(() => {
   const [projectId, setProjectId] = useState("");
   const project = useSelector((state) =>
     projectSelector.selectById(state.taskBoard, projectId)
@@ -41,7 +41,6 @@ const Project: FC<ProjectProps> = memo(() => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.trace("run");
     if (match) {
       const { params } = match;
       setProjectId(params.id);
@@ -102,7 +101,7 @@ const Project: FC<ProjectProps> = memo(() => {
       onDragOver={onDragSectionOver}
       onDragEnter={onDragEnter}
     >
-      <ProjectHeader project={project} />
+      <ProjectViewHeader project={project} />
       <div role="listbox" onDragEnter={onDragEnterListbox}>
         <div className="dropzone-padding"></div>
         {project.sectionIds.map((id, index) => (
@@ -148,4 +147,4 @@ const Project: FC<ProjectProps> = memo(() => {
   ) : null;
 });
 
-export default Project;
+export default ProjectView;

@@ -42,9 +42,13 @@ const SubTask: FC<SubTaskProps> = memo(({ task }) => {
     });
     return labels;
   }, shallowEqual);
-  const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
+  const match = useRouteMatch<{ projectId: string; labelId: string }>([
+    "/project/:projectId",
+    "/label/:labelId",
+  ]);
   const history = useHistory();
   const projectId = match?.params.projectId;
+  const labelId = match?.params.labelId;
   const dispatch = useDispatch();
 
   const toggleEditing = () => {
@@ -53,7 +57,12 @@ const SubTask: FC<SubTaskProps> = memo(({ task }) => {
 
   const onClickTask: MouseEventHandler = (e) => {
     e.stopPropagation();
-    history.push(`/project/${projectId}/task/${task.id}`);
+    if (labelId) {
+      history.push(`/label/${labelId}/task/${task.id}`);
+    }
+    if (projectId) {
+      history.push(`/project/${projectId}/task/${task.id}`);
+    }
   };
 
   const onClickEditor: MouseEventHandler = (e) => {
@@ -62,7 +71,7 @@ const SubTask: FC<SubTaskProps> = memo(({ task }) => {
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      dispatch(toggleTask(null, task.id));
+      dispatch(toggleTask(task.sectionId, task.id));
     }
   };
 
@@ -109,7 +118,11 @@ const SubTask: FC<SubTaskProps> = memo(({ task }) => {
               </LabelComponent>
             )}
             {taskLabels.map((label) => (
-              <LabelComponent key={label.id} title={label.name}>
+              <LabelComponent
+                color={label.color}
+                key={label.id}
+                title={label.name}
+              >
                 {label.name}
               </LabelComponent>
             ))}

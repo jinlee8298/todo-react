@@ -42,7 +42,13 @@ import { shallowEqual } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 
 const TaskDetailsModal: FC = memo(() => {
-  const match = useRouteMatch<{ projectId: string; taskId: string }>([
+  const match = useRouteMatch<{
+    projectId: string;
+    taskId: string;
+    labelId: string;
+  }>([
+    "/label/:labelId/task/:taskId",
+    "/label/:labelId",
     "/project/:projectId/task/:taskId",
     "/project/:projectId",
   ]);
@@ -51,6 +57,7 @@ const TaskDetailsModal: FC = memo(() => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const taskId = match?.params.taskId;
   const projectId = match?.params.projectId;
+  const labelId = match?.params.labelId;
   const sectionId = sessionStorage.getItem("currentSectionId");
   const task = useSelector((state) => {
     if (taskId) {
@@ -108,7 +115,12 @@ const TaskDetailsModal: FC = memo(() => {
   };
   const onCloseModal = useCallback(() => {
     const handleClose = () => {
-      history.push(`/project/${projectId}`);
+      if (labelId) {
+        history.push(`/label/${labelId}`);
+      }
+      if (projectId) {
+        history.push(`/project/${projectId}`);
+      }
     };
 
     if (isEdit) {
@@ -128,7 +140,7 @@ const TaskDetailsModal: FC = memo(() => {
     } else {
       handleClose();
     }
-  }, [showConfirm, closeConfirm, history, projectId, isEdit]);
+  }, [showConfirm, closeConfirm, history, projectId, labelId, isEdit]);
 
   const onEscape: KeyboardEventHandler = useCallback(
     (e) => {
@@ -157,10 +169,13 @@ const TaskDetailsModal: FC = memo(() => {
   };
 
   const redirectLink = () => {
+    const linkFirstPart = labelId
+      ? `/label/${labelId}`
+      : `/project/${projectId}`;
     if (task?.parentTaskId) {
-      return `/project/${projectId}/task/${task.parentTaskId}`;
+      return `${linkFirstPart}/task/${task.parentTaskId}`;
     }
-    return `/project/${projectId}`;
+    return `${linkFirstPart}`;
   };
 
   return task ? (

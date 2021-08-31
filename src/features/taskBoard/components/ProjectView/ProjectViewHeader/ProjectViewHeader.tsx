@@ -6,13 +6,13 @@ import { Project } from "features/taskBoard/types";
 import { FC, useState } from "react";
 import ProjectEditModal from "../../ProjectEditModal/ProjectEditModal";
 import ProjectMenu from "../../ProjectNav/ProjectMenu/ProjectMenu";
-import StyledHeader from "./ProjectHeader.style";
+import StyledHeader from "./ProjectViewHeader.style";
 
-type ProjectHeaderProps = {
+type ProjectViewHeaderProps = {
   project: Project;
 };
 
-const ProjectHeader: FC<ProjectHeaderProps> = ({ project }) => {
+const ProjectViewHeader: FC<ProjectViewHeaderProps> = ({ project }) => {
   const dispatch = useDispatch();
   const [isShownProjectModal, setIsShownProjectModal] = useState(false);
   const [selectledProject, setSelectedProject] = useState<Project | null>(null);
@@ -74,4 +74,4 @@ const ProjectHeader: FC<ProjectHeaderProps> = ({ project }) => {
   );
 };
 
-export default ProjectHeader;
+export default ProjectViewHeader;

@@ -119,6 +119,7 @@ export const taskBoardSlice = createSlice({
           commentIds: [],
           subTaskIds: [],
           finished: false,
+          sectionId,
         };
 
         taskAdapter.addOne(state.tasks, newTask);
@@ -131,6 +132,7 @@ export const taskBoardSlice = createSlice({
             },
           });
         }
+
         if (newTask.labelIds.length > 0) {
           newTask.labelIds.forEach((labelId) => {
             const label = labelSelector.selectById(state, labelId);
@@ -303,6 +305,12 @@ export const taskBoardSlice = createSlice({
               state.tasks.draggingInfo.originSectionId = destinationSectionId;
             }
 
+            taskAdapter.updateOne(state.tasks, {
+              id: taskId,
+              changes: {
+                sectionId: destinationSectionId,
+              },
+            });
             sectionAdapter.updateMany(state.sections, [
               {
                 id: originSectionId,

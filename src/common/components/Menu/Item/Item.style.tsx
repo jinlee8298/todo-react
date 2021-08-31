@@ -30,4 +30,15 @@ export default styled.li`
     border: 1px solid var(--color);
     color: var(--color);
   }
+  &:not(:only-child) {
+    &:first-child {
+      border-radius: 4px 4px 0 0;
+    }
+    &:last-child {
+      border-radius: 0 0 4px 4px;
+    }
+  }
+  &:only-child {
+    border-radius: 4px;
+  }
 `;

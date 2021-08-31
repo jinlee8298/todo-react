@@ -9,7 +9,7 @@ export default styled.ul`
   list-style: none;
   margin: 0;
   max-height: 20rem;
-  padding: 0.5rem 0;
+  padding: 0;
   min-width: 11.5rem;
   overflow: hidden;
   &:hover,

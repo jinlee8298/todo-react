@@ -96,24 +96,28 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
         closeOnClickOutside={true}
         content={({ close }) => (
           <Menu>
-            <Menu.Item
-              icon={faPen}
-              onTrigger={() => {
-                editTaskHandler();
-                close();
-              }}
-            >
-              Edit
-            </Menu.Item>
-            <Menu.Item
-              icon={faCopy}
-              onTrigger={() => {
-                duplicateTaskHandler();
-                close();
-              }}
-            >
-              Duplicate
-            </Menu.Item>
+            {!task.finished && (
+              <>
+                <Menu.Item
+                  icon={faPen}
+                  onTrigger={() => {
+                    editTaskHandler();
+                    close();
+                  }}
+                >
+                  Edit
+                </Menu.Item>
+                <Menu.Item
+                  icon={faCopy}
+                  onTrigger={() => {
+                    duplicateTaskHandler();
+                    close();
+                  }}
+                >
+                  Duplicate
+                </Menu.Item>
+              </>
+            )}
             <Menu.Item
               variant="danger"
               icon={faTrashAlt}

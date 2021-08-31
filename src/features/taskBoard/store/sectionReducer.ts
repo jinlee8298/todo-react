@@ -4,14 +4,11 @@ import {
   PayloadAction,
   Update,
 } from "@reduxjs/toolkit";
+import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { TaskSection } from "../types";
 import { projectAdapter, projectSelector } from "./projectReducer";
-import {
-  deleteTaskHandler,
-  duplicateTaskHandler,
-  generateTaskId,
-} from "./taskReducer";
+import { deleteTaskHandler, duplicateTaskHandler } from "./taskReducer";
 
 export const sectionAdapter = createEntityAdapter<TaskSection>();
 export const sectionSelector = sectionAdapter.getSelectors(
@@ -34,7 +31,7 @@ export const duplicateSectionHandler = (
     name: originSection.name,
     taskIds: [],
     finishedTaskIds: [],
-    id: generateTaskId(),
+    id: generateUID(),
   };
   originSection.taskIds.forEach((taskId) => {
     const duplicatedTaskId = duplicateTaskHandler(
@@ -121,7 +118,7 @@ const addSection = {
 
     const newSection: TaskSection = {
       ...section,
-      id: generateTaskId(),
+      id: generateUID(),
       taskIds: [],
       finishedTaskIds: [],
     };

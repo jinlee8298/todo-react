@@ -4,14 +4,10 @@ import {
   PayloadAction,
   Update,
 } from "@reduxjs/toolkit";
+import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { Label } from "../types";
-import {
-  generateTaskId,
-  taskAdapter,
-  taskSelector,
-  updateTaskHandler,
-} from "./taskReducer";
+import { taskAdapter, taskSelector, updateTaskHandler } from "./taskReducer";
 
 export const labelAdapter = createEntityAdapter<Label>();
 export const labelSelector = labelAdapter.getSelectors(
@@ -26,7 +22,7 @@ const addLabel = (
 ) => {
   const newLabel = {
     ...action.payload,
-    id: generateTaskId(),
+    id: generateUID(),
     taskIds: [],
   };
   labelAdapter.addOne(state.labels, newLabel);
@@ -49,7 +45,7 @@ const addLabelThenAssignToTask = {
     if (task) {
       const newLabel = {
         ...label,
-        id: generateTaskId(),
+        id: generateUID(),
         taskIds: [taskId],
       };
 

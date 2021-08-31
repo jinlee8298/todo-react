@@ -4,13 +4,13 @@ import {
   PayloadAction,
   Update,
 } from "@reduxjs/toolkit";
+import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { Project } from "../types";
 import {
   deleteSectionHandler,
   duplicateSectionHandler,
 } from "./sectionReducer";
-import { generateTaskId } from "./taskReducer";
 
 export const projectAdapter = createEntityAdapter<Project>();
 export const projectSelector = projectAdapter.getSelectors(
@@ -23,7 +23,7 @@ const addProject = (
 ) => {
   const newProject = {
     ...action.payload,
-    id: generateTaskId(),
+    id: generateUID(),
     sectionIds: [],
     filterOptions: { showCompletedTask: false },
   };
@@ -64,7 +64,7 @@ const duplicateProject = (
     ...originProject,
     name: `Copy of ${originProject.name}`,
     sectionIds: [],
-    id: generateTaskId(),
+    id: generateUID(),
   };
 
   projectAdapter.addOne(state.projects, newProject);

@@ -4,6 +4,7 @@ import {
   PayloadAction,
   Update,
 } from "@reduxjs/toolkit";
+import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { Task } from "../types";
 import { commentAdapter, commentSelector } from "./commentReducer";
@@ -14,10 +15,6 @@ export const taskAdapter = createEntityAdapter<Task>();
 export const taskSelector = taskAdapter.getSelectors(
   (state: TaskBoardStore) => state.tasks
 );
-
-export const generateTaskId = (): EntityId => {
-  return Date.now().toString() + Math.round(Math.random() * 10000);
-};
 
 export const deleteTaskHandler = (
   state: TaskBoardStore,
@@ -97,7 +94,7 @@ export const duplicateTaskHandler = (
   const createdAt = new Date().toJSON();
   const duplicatedTask = {
     ...originTask,
-    id: generateTaskId(),
+    id: generateUID(),
     updatedAt: createdAt,
     createdAt,
   };
@@ -127,7 +124,7 @@ export const duplicateTaskHandler = (
         const createdAt = new Date().toJSON();
         const newComment = {
           ...comment,
-          id: generateTaskId(),
+          id: generateUID(),
           updatedAt: createdAt,
           createdAt,
         };
@@ -270,7 +267,7 @@ const addTask = {
     const createdAt = new Date().toJSON();
     const newTask: Task = {
       ...task,
-      id: generateTaskId(),
+      id: generateUID(),
       createdAt,
       updatedAt: createdAt,
       commentIds: [],
@@ -344,7 +341,7 @@ const addSubTask = {
     const createdAt = new Date().toJSON();
     const newTask: Task = {
       ...task,
-      id: generateTaskId(),
+      id: generateUID(),
       createdAt,
       updatedAt: createdAt,
       parentTaskId,

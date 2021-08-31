@@ -4,9 +4,10 @@ import {
   PayloadAction,
   Update,
 } from "@reduxjs/toolkit";
+import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { Comment } from "../types";
-import { generateTaskId, taskSelector, updateTaskHandler } from "./taskReducer";
+import { taskSelector, updateTaskHandler } from "./taskReducer";
 
 export const commentAdapter = createEntityAdapter<Comment>({
   sortComparer: (a, b) => a.createdAt.localeCompare(b.createdAt),
@@ -47,7 +48,7 @@ const addComment = {
     const createdAt = new Date().toJSON();
     const newComment: Comment = {
       ...comment,
-      id: generateTaskId(),
+      id: generateUID(),
       createdAt,
       updatedAt: createdAt,
     };

@@ -1,7 +1,7 @@
 import { useSelector } from "common/hooks";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
 import { taskSelector } from "features/taskBoard/store/taskReducer";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { shallowEqual } from "react-redux";
 import { useRouteMatch } from "react-router-dom";
 import SubTask from "../TaskDetailsModal/SubTasksTab/SubTask/SubTask";
@@ -27,6 +27,12 @@ const LabelView = memo(() => {
         .filter((task) => task && !task.finished),
     shallowEqual
   );
+
+  useEffect(() => {
+    if (label?.name) {
+      document.title = `Label: ${label.name}`;
+    }
+  }, [label?.name]);
 
   return (
     <StyledView>

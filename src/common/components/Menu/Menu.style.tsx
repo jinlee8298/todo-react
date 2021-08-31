@@ -12,6 +12,7 @@ export default styled.ul`
   padding: 0;
   min-width: 11.5rem;
   overflow: hidden;
+  font-size: 0.875rem;
   &:hover,
   &:focus-within {
     overflow: auto;

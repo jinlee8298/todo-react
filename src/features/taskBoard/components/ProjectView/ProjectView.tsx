@@ -1,29 +1,17 @@
 import StyledTaskBoard from "./ProjectView.style";
-import TaskSection from "../TaskSection/TaskSection";
-import {
-  DragEventHandler,
-  FC,
-  Fragment,
-  memo,
-  useEffect,
-  useState,
-} from "react";
-import { Button } from "common/components";
-import { faPlusSquare } from "@fortawesome/free-regular-svg-icons";
+import { DragEventHandler, FC, memo, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "common/hooks";
-import AddSectionTrigger from "../AddSectionButton/AddSectionButton";
 import {
   insertSectionPlaceholder,
   removeTaskPlaceholder,
   repositionSection,
 } from "../../taskBoardSlice";
-import Placeholder from "../Placeholder/Placeholder";
 import { RootState } from "app/store";
-import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 import { useRouteMatch } from "react-router-dom";
 import TaskDetailsModal from "../TaskDetailsModal/TaskDetailsModal";
 import ProjectViewHeader from "./ProjectViewHeader/ProjectViewHeader";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
+import ProjectViewBody from "./ProjectViewBody";
 
 type ProjectProps = {};
 
@@ -35,8 +23,6 @@ const ProjectView: FC<ProjectProps> = memo(() => {
   const draggingSectionInfo = useSelector(
     (state: RootState) => state.taskBoard.sections.draggingInfo
   );
-  const [addingSection, setAddingSection] = useState(false);
-  const [addSectionIndex, setAddSectionIndex] = useState(-1);
   const match = useRouteMatch<{ id: string }>("/project/:id");
   const dispatch = useDispatch();
 
@@ -46,6 +32,13 @@ const ProjectView: FC<ProjectProps> = memo(() => {
       setProjectId(params.id);
     }
   }, [match]);
+
+  useEffect(() => {
+    if (project?.name) {
+      console.log("ProjectView");
+      document.title = `Project: ${project?.name || ""}`;
+    }
+  }, [project?.name]);
 
   const onDragEnter: DragEventHandler<HTMLDivElement> = (e) => {
     if (e.target === e.currentTarget) {
@@ -78,24 +71,6 @@ const ProjectView: FC<ProjectProps> = memo(() => {
     }
   };
 
-  const toggleAddingSection = () => {
-    setAddingSection((v) => !v);
-  };
-
-  const cancelAddSectionInBetween = () => {
-    setAddSectionIndex(-1);
-  };
-
-  const addSectionInBetween = (addIndex: number) => {
-    setAddSectionIndex(addIndex);
-  };
-
-  const onDragEnterListbox: DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.currentTarget === e.target) {
-      dispatch(removeTaskPlaceholder());
-    }
-  };
-
   return project ? (
     <StyledTaskBoard
       onDrop={onSectionDrop}
@@ -103,46 +78,7 @@ const ProjectView: FC<ProjectProps> = memo(() => {
       onDragEnter={onDragEnter}
     >
       <ProjectViewHeader project={project} />
-      <div role="listbox" onDragEnter={onDragEnterListbox}>
-        <div className="dropzone-padding"></div>
-        {project.sectionIds.map((id, index) => (
-          <Fragment key={id}>
-            {id === "placeholder" ? (
-              <Placeholder
-                height={draggingSectionInfo?.placeholderHeight ?? "100%"}
-              />
-            ) : (
-              <TaskSection key={id} sectionId={id} projectId={projectId} />
-            )}
-            {index !== project.sectionIds.length - 1 &&
-              (addSectionIndex === index ? (
-                <TaskSectionEditor
-                  insertIndex={index + 1}
-                  projectId={projectId}
-                  onCloseHandle={cancelAddSectionInBetween}
-                />
-              ) : (
-                <AddSectionTrigger
-                  onClick={addSectionInBetween.bind(null, index)}
-                />
-              ))}
-          </Fragment>
-        ))}
-        {addingSection ? (
-          <TaskSectionEditor
-            projectId={projectId}
-            onCloseHandle={toggleAddingSection}
-          />
-        ) : (
-          <Button
-            onClick={toggleAddingSection}
-            alternative="reverse"
-            icon={faPlusSquare}
-          >
-            Add new section
-          </Button>
-        )}
-      </div>
+      <ProjectViewBody project={project} />
       <TaskDetailsModal />
     </StyledTaskBoard>
   ) : null;

@@ -23,6 +23,7 @@ import TaskLabelSelect, {
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
 import { shallowEqual } from "react-redux";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
+import { useRouteMatch } from "react-router-dom";
 
 type TaskEditorProps = {
   mode: "add" | "edit" | "add-subtask";
@@ -72,6 +73,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
     shallowEqual
   ) as Label[] | undefined;
   const dispatch = useDispatch();
+  const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
 
   useLayoutEffect(() => {
     if (titleInputRef.current) {
@@ -186,6 +188,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       description: description.trim(),
       priority: selectedPriority,
       labelIds: selectedLabels.map((item) => item.value) || [],
+      projectId: match?.params.projectId,
     };
     if (mode === "add-subtask" && parentTaskId) {
       dispatch(addSubTask(parentTaskId, newTask));
@@ -227,7 +230,6 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   const clearLabelList = () => {
     setSelectedLabels([]);
   };
-  console.log(selectedLabels);
 
   return (
     <TaskEditorContainer {...props} onKeyDown={onKeyDown}>

@@ -1,42 +1,29 @@
 import StyledModal from "./TaskDetailsModal.style";
-import {
-  Button,
-  Checkbox,
-  Label as LabelComponent,
-  Tabs,
-} from "common/components";
+import { Button, Tabs } from "common/components";
 import {
   FC,
   useState,
   memo,
   useEffect,
-  FormEventHandler,
   KeyboardEventHandler,
   useCallback,
 } from "react";
 import {
   faCodeBranch,
   faDotCircle,
-  faEllipsisH,
-  faList,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import TaskEditor from "../TaskEditor/TaskEditor";
 import SubTasksTab from "./SubTasksTab/SubTasksTab";
 import CommentsTab from "./CommentsTab/CommentsTab";
-import { toggleTask, updateTask } from "features/taskBoard/taskBoardSlice";
-import { useConfirmDialog, useDispatch, useSelector } from "common/hooks";
+import { useConfirmDialog, useSelector } from "common/hooks";
 import { ConfirmDialog } from "common/components";
-import TaskPrioritySelect from "../TaskEditor/TaskPrioritySelect/TaskPrioritySelect";
-import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
-import { Label, TaskPriority } from "features/taskBoard/types";
-import TaskLabelSelect from "../TaskEditor/TaskLabelSelect/TaskLabelSelect";
-import { shallowEqual } from "react-redux";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { taskSelector } from "features/taskBoard/store/taskReducer";
-import { labelSelector } from "features/taskBoard/store/labelReducer";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
+import TaskInfo from "./TaskInfo/TaskInfo";
+import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 const TaskDetailsModal: FC = memo(() => {
   const match = useRouteMatch<{
@@ -50,15 +37,19 @@ const TaskDetailsModal: FC = memo(() => {
     "/project/:projectId",
   ]);
   const history = useHistory();
-  const dispatch = useDispatch();
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const taskId = match?.params.taskId;
-  const projectId = match?.params.projectId;
-  const labelId = match?.params.labelId;
-  const sectionId = sessionStorage.getItem("currentSectionId");
   const task = useSelector((state) => {
     if (taskId) {
       return taskSelector.selectById(state.taskBoard, taskId);
+    }
+  });
+  const projectId = match?.params.projectId || task?.projectId;
+  const labelId = match?.params.labelId;
+  const labelName = useSelector((state) => {
+    if (labelId) {
+      const label = labelSelector.selectById(state.taskBoard, labelId);
+      return label?.name;
     }
   });
   const projectName = useSelector((state) => {
@@ -80,24 +71,7 @@ const TaskDetailsModal: FC = memo(() => {
     }
   });
   const isShown = !!task ?? false;
-  const taskLabels = useSelector((state) => {
-    return task
-      ? task.labelIds.map(
-          (id) => labelSelector.selectEntities(state.taskBoard)[id]
-        )
-      : task;
-  }, shallowEqual) as Label[] | undefined;
   const [showConfirm, closeConfirm, dialogProps] = useConfirmDialog();
-
-  useEffect(() => {
-    setIsEdit(false);
-  }, [taskId]);
-
-  useEffect(() => {
-    if (!isShown) {
-      setIsEdit(false);
-    }
-  }, [isShown]);
 
   const toggleEdit = () => {
     if (!task?.finished) {
@@ -105,17 +79,11 @@ const TaskDetailsModal: FC = memo(() => {
     }
   };
 
-  const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
-    if (task) {
-      dispatch(toggleTask(sectionId || undefined, task.id));
-    }
-  };
   const onCloseModal = useCallback(() => {
     const handleClose = () => {
       if (labelId) {
         history.push(`/label/${labelId}`);
-      }
-      if (projectId) {
+      } else {
         history.push(`/project/${projectId}`);
       }
     };
@@ -148,32 +116,36 @@ const TaskDetailsModal: FC = memo(() => {
     [onCloseModal]
   );
 
-  const onKeyPressEditable: KeyboardEventHandler = (e) => {
-    if (e.key === "Space" || e.key === "Enter" || e.key === "NumpadEnter") {
-      toggleEdit();
-    }
-  };
-
-  const onSelectPriority = (e: SelectItem) => {
-    if (task) {
-      dispatch(
-        updateTask({
-          id: task.id,
-          changes: { priority: e.value as TaskPriority },
-        })
-      );
-    }
-  };
-
   const redirectLink = () => {
-    const linkFirstPart = labelId
-      ? `/label/${labelId}`
-      : `/project/${projectId}`;
     if (task?.parentTaskId) {
+      const linkFirstPart = labelId
+        ? `/label/${labelId}`
+        : `/project/${projectId}`;
       return `${linkFirstPart}/task/${task.parentTaskId}`;
     }
-    return `${linkFirstPart}`;
+    return `/project/${projectId}`;
   };
+
+  useEffect(() => {
+    setIsEdit(false);
+  }, [taskId]);
+
+  useEffect(() => {
+    if (!isShown) {
+      setIsEdit(false);
+    }
+    setTimeout(() => {
+      if (isShown) {
+        document.title = `Task: ${task?.title}`;
+      } else {
+        if (labelName) {
+          document.title = `Label: ${labelName}`;
+        } else {
+          document.title = `Project: ${projectName}`;
+        }
+      }
+    });
+  }, [isShown, labelName, projectName, task?.title]);
 
   return task ? (
     <StyledModal
@@ -205,52 +177,7 @@ const TaskDetailsModal: FC = memo(() => {
             onCloseHandle={toggleEdit}
           ></TaskEditor>
         ) : (
-          <>
-            <div
-              className={["task-details", task.finished ? "finished" : ""].join(
-                " "
-              )}
-            >
-              <Checkbox
-                checked={task.finished ?? false}
-                onChange={onTickCheckbox}
-              />
-              <div
-                className="editable"
-                tabIndex={0}
-                onKeyPress={onKeyPressEditable}
-                onClick={toggleEdit}
-              >
-                <h4>{task.title}</h4>
-                <p>{task.description}</p>
-              </div>
-            </div>
-            <div className="label-wrapper">
-              {taskLabels?.map((label) => (
-                <LabelComponent
-                  color={label.color}
-                  key={label.id}
-                  title={label.name}
-                >
-                  {label.name}
-                </LabelComponent>
-              ))}
-            </div>
-            <div className="task-actions">
-              <Button icon={faList} alternative="reverse" size="sx" />
-              <TaskLabelSelect
-                disabled={task.finished}
-                taskId={task.id}
-                mode="standalone"
-              />
-              <TaskPrioritySelect
-                disabled={task.finished}
-                onSelect={onSelectPriority}
-                taskId={task.id}
-              />
-              <Button icon={faEllipsisH} alternative="reverse" size="sx" />
-            </div>
-          </>
+          <TaskInfo task={task} onEdit={toggleEdit} />
         )}
       </div>
       {taskId && (

@@ -1,6 +1,6 @@
 import { useSelector } from "common/hooks";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ProjectEditModal from "../ProjectEditModal/ProjectEditModal";
 import StyledBoard from "./ProjectBoard.style";
@@ -14,6 +14,11 @@ const ProjectBoard = () => {
   const toggleProjectModal = () => {
     setIsShownProjectModal((v) => !v);
   };
+
+  useEffect(() => {
+    document.title = "Project Board";
+  }, []);
+
   return (
     <StyledBoard>
       <h1>Your project(s)</h1>

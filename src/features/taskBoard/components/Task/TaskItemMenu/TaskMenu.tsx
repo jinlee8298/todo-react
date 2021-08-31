@@ -3,12 +3,14 @@ import {
   faCopy,
   faTrashAlt,
   faPen,
+  faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FC, useRef } from "react";
 import { Button, Menu, ConfirmDialog, Popover } from "common/components";
 import { useDispatch, useConfirmDialog } from "common/hooks";
 import { Task } from "features/taskBoard/types";
 import { deleteTask, duplicateTask } from "features/taskBoard/taskBoardSlice";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 type TaskMenuProps = {
   task: Task;
@@ -19,6 +21,15 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
   const [showConfirm, closeConfirm, confirmDialogProps] = useConfirmDialog();
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerButtonRef = useRef<HTMLElement | null>(null);
+  const history = useHistory();
+  const match = useRouteMatch<{
+    projectId: string;
+    taskId: string;
+    labelId: string;
+  }>(["/project/:projectId/task/:taskId", "/label/:labelId/task/:taskId"]);
+  const projectId = match?.params.projectId;
+  const labelId = match?.params.labelId;
+  const isOnModal = !!match?.params.taskId;
   const dispatch = useDispatch();
 
   const duplicateTaskHandler = () => {
@@ -54,6 +65,15 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
       onReject: closeConfirm,
       onEsc: closeConfirm,
       onConfirm: () => {
+        if (isOnModal) {
+          if (labelId) {
+            history.push(`/label/${labelId}`);
+          }
+          if (projectId) {
+            history.push(`/project/${projectId}`);
+          }
+        }
+
         dispatch(deleteTask(task.sectionId, task.id));
       },
       title: "Delete task?",
@@ -71,6 +91,12 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
   const editTaskHandler = () => {
     closeConfirm();
     onEdit();
+  };
+
+  const copyLinkHandler = () => {
+    navigator.clipboard.writeText(
+      `${window.location.origin}/project/${task.projectId}/task/${task.id}`
+    );
   };
 
   const getPopoverRef = (
@@ -119,6 +145,15 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
               </>
             )}
             <Menu.Item
+              icon={faLink}
+              onTrigger={() => {
+                copyLinkHandler();
+                close();
+              }}
+            >
+              Copy link to task
+            </Menu.Item>
+            <Menu.Item
               variant="danger"
               icon={faTrashAlt}
               onTrigger={() => {
@@ -136,7 +171,7 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
           size="sx"
           icon={faEllipsisH}
           alternative="reverse"
-          rounded
+          rounded={!isOnModal}
         />
       </Popover>
 

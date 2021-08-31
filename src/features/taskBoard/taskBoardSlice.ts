@@ -29,7 +29,7 @@ const defaultState = {
       "2021": {
         id: "2021",
         name: "Welcome",
-        color: COLOR_LIST[0],
+        color: COLOR_LIST[0].color,
         sectionIds: [],
         filterOptions: { showCompletedTask: false },
       },

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StyledHeader from "./Header.style";
 import { FC, ReactElement, useState } from "react";
 import NavBar from "../NavBar/NavBar";
+import { useHistory } from "react-router-dom";
 
 type HeaderProps = {
   navContent?: ReactElement;
@@ -10,8 +11,12 @@ type HeaderProps = {
 
 const Header: FC<HeaderProps> = ({ navContent }) => {
   const [showNavBar, setShowNavBar] = useState(false);
+  const history = useHistory();
   const onToggleNavBar = () => {
     setShowNavBar((v) => !v);
+  };
+  const onToHomePage = () => {
+    history.push("/");
   };
 
   return (
@@ -21,7 +26,7 @@ const Header: FC<HeaderProps> = ({ navContent }) => {
         <button onClick={onToggleNavBar} className="toggle-nav">
           <FontAwesomeIcon icon={faBars} fixedWidth />
         </button>
-        <button className="toggle-nav">
+        <button onClick={onToHomePage} className="toggle-nav">
           <FontAwesomeIcon icon={faHome} fixedWidth />
         </button>
       </div>

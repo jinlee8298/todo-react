@@ -148,6 +148,7 @@ const TaskLabelSelect: ForwardRefRenderFunction<
         const labelItem = {
           value: addedLabel.id as string,
           label: addedLabel.name,
+          iconColor: addedLabel.color,
         };
         setSelected((items) => [...items, labelItem]);
         props?.onSelect?.(labelItem);

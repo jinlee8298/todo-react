@@ -227,6 +227,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   const clearLabelList = () => {
     setSelectedLabels([]);
   };
+  console.log(selectedLabels);
 
   return (
     <TaskEditorContainer {...props} onKeyDown={onKeyDown}>

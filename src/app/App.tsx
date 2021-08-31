@@ -9,6 +9,7 @@ import StyledApp from "./App.style";
 import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
 import LabelNav from "features/taskBoard/components/LabelNav/LabelNav";
 import LabelView from "features/taskBoard/components/LabelView/LabelView";
+import ProjectBoard from "features/taskBoard/components/ProjectBoard/ProjectBoard";
 
 function App() {
   const navContent = (
@@ -25,6 +26,7 @@ function App() {
           <Switch>
             <Route path={["/label/:id"]} children={<LabelView />} />
             <Route path={["/project/:id"]} children={<ProjectView />} />
+            <Route path={["/"]} children={<ProjectBoard />} />
           </Switch>
         </main>
         <div id="modal-container"></div>

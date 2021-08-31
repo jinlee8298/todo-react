@@ -6,7 +6,10 @@ import {
 } from "@reduxjs/toolkit";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { Project } from "../types";
-import { duplicateSectionHandler } from "./sectionReducer";
+import {
+  deleteSectionHandler,
+  duplicateSectionHandler,
+} from "./sectionReducer";
 import { generateTaskId } from "./taskReducer";
 
 export const projectAdapter = createEntityAdapter<Project>();
@@ -31,7 +34,14 @@ const deleteProject = (
   state: TaskBoardStore,
   action: PayloadAction<EntityId>
 ) => {
-  projectAdapter.removeOne(state.projects, action.payload);
+  const projectToDelete = projectSelector.selectById(state, action.payload);
+  if (projectToDelete) {
+    projectToDelete.sectionIds.forEach((sectionId) =>
+      deleteSectionHandler(state, action.payload, sectionId)
+    );
+
+    projectAdapter.removeOne(state.projects, action.payload);
+  }
 };
 
 const updateProject = (

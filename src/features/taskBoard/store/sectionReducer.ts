@@ -65,6 +65,33 @@ export const duplicateSectionHandler = (
   });
 };
 
+export const deleteSectionHandler = (
+  state: TaskBoardStore,
+  projectId: EntityId,
+  sectionId: EntityId
+) => {
+  const project = projectSelector.selectById(state, projectId);
+  const deleteSection = sectionSelector.selectById(state, sectionId);
+
+  projectAdapter.updateOne(state.projects, {
+    id: projectId,
+    changes: {
+      sectionIds: project?.sectionIds.filter((id) => id !== sectionId),
+    },
+  });
+
+  sectionAdapter.removeOne(state.sections, sectionId);
+
+  if (deleteSection) {
+    deleteSection.taskIds.forEach((taskId) => {
+      deleteTaskHandler(state, sectionId, taskId);
+    });
+    deleteSection.finishedTaskIds.forEach((taskId) => {
+      deleteTaskHandler(state, sectionId, taskId);
+    });
+  }
+};
+
 // Reducer
 
 const addSection = {
@@ -142,23 +169,7 @@ const deleteSection = {
     action: PayloadAction<{ projectId: EntityId; sectionId: EntityId }>
   ) => {
     const { projectId, sectionId } = action.payload;
-    const project = projectSelector.selectById(state, projectId);
-    const deleteSection = sectionSelector.selectById(state, sectionId);
-
-    projectAdapter.updateOne(state.projects, {
-      id: projectId,
-      changes: {
-        sectionIds: project?.sectionIds.filter((id) => id !== sectionId),
-      },
-    });
-
-    sectionAdapter.removeOne(state.sections, sectionId);
-
-    if (deleteSection) {
-      deleteSection.taskIds.forEach((taskId) => {
-        deleteTaskHandler(state, sectionId, taskId);
-      });
-    }
+    deleteSectionHandler(state, projectId, sectionId);
   },
 };
 

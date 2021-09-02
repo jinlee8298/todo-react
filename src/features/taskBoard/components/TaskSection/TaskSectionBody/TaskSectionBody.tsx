@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "common/hooks";
 import { repositionTask } from "features/taskBoard/taskBoardSlice";
 import { FC, useCallback, MouseEventHandler } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
-import Placeholder from "../../Placeholder/Placeholder";
 import Task from "../../Task/Task";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { projectSelector } from "features/taskBoard/store/projectReducer";

@@ -1,8 +1,7 @@
-import { useDispatch, useSelector } from "common/hooks";
+import { useDispatch } from "common/hooks";
 import { repositionSection } from "features/taskBoard/taskBoardSlice";
 import { Project } from "features/taskBoard/types";
 import { FC, Fragment, useState } from "react";
-import Placeholder from "../Placeholder/Placeholder";
 import TaskSection from "../TaskSection/TaskSection";
 import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 import AddSectionTrigger from "../AddSectionButton/AddSectionButton";

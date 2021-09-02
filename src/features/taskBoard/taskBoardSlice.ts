@@ -1,4 +1,4 @@
-import { createSlice, EntityId } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import taskReducer, { taskAdapter } from "./store/taskReducer";
 import sectionReducer, { sectionAdapter } from "./store/sectionReducer";
 import labelReducer, { labelAdapter } from "./store/labelReducer";
@@ -7,22 +7,8 @@ import commentReducer, { commentAdapter } from "./store/commentReducer";
 import defaultState from "./store/defaultStore";
 
 const defaultStateTemplate = {
-  tasks: taskAdapter.getInitialState<{
-    draggingInfo: {
-      draggingTaskId: EntityId;
-      originSectionId: EntityId;
-      placeholderHeight: string;
-      currentPlaceholderSecionId: EntityId | null;
-    } | null;
-  }>({
-    draggingInfo: null,
-  }),
-  sections: sectionAdapter.getInitialState<{
-    draggingInfo: {
-      draggingSectionId: EntityId;
-      placeholderHeight: string;
-    } | null;
-  }>({ draggingInfo: null }),
+  tasks: taskAdapter.getInitialState(),
+  sections: sectionAdapter.getInitialState(),
   projects: projectAdapter.getInitialState(),
   comments: commentAdapter.getInitialState(),
   labels: labelAdapter.getInitialState(),
@@ -55,17 +41,11 @@ export const {
   duplicateTask,
   deleteTask,
   repositionTask,
-  insertTaskPlaceholder,
-  removeTaskPlaceholder,
-  setDraggingTaskData,
   addSection,
   updateSection,
   duplicateSection,
   deleteSection,
   repositionSection,
-  setDraggingSectionData,
-  insertSectionPlaceholder,
-  removeSectionPlaceholder,
   addComment,
   updateComment,
   deleteComment,

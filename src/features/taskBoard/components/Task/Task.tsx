@@ -1,14 +1,9 @@
-import { FC, useRef, DragEventHandler, FormEventHandler, memo } from "react";
+import { FC, FormEventHandler, memo, MouseEventHandler } from "react";
 import { Checkbox, Label as LabelComponent } from "common/components";
 import StyledTask from "./Task.style";
-import { useDispatch, useSelector } from "common/hooks";
+import { useDispatch, useDrag, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
-import {
-  setDraggingTaskData,
-  removeTaskPlaceholder,
-  insertTaskPlaceholder,
-  toggleTask,
-} from "features/taskBoard/taskBoardSlice";
+import { toggleTask } from "features/taskBoard/taskBoardSlice";
 import TaskMenu from "./TaskItemMenu/TaskMenu";
 import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { Label } from "features/taskBoard/types";
@@ -19,12 +14,18 @@ import { labelSelector } from "features/taskBoard/store/labelReducer";
 type TaskProps = {
   taskId: EntityId;
   sectionId: EntityId;
+  onMouseEnter?: (
+    e: React.MouseEvent<Element, MouseEvent>,
+    taskId: EntityId
+  ) => void;
+  onDragStart?: (dragEle: HTMLElement, taskId: EntityId) => void;
+  onDragEnd?: (dragEle: HTMLElement, taskId: EntityId) => void;
   onClick?: (taskId: EntityId) => void;
 };
 
-const Task: FC<TaskProps> = memo((props) => {
+const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
   const task = useSelector((state) =>
-    taskSelector.selectById(state.taskBoard, props.taskId)
+    taskSelector.selectById(state.taskBoard, taskId)
   );
   const subTaskProgress = useSelector((state) => {
     let finishedCount = 0;
@@ -48,63 +49,41 @@ const Task: FC<TaskProps> = memo((props) => {
     });
     return labels;
   }, shallowEqual);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [, containerRef, containerProps] = useDrag<HTMLDivElement>({
+    preventDrag: task?.finished,
+    onDragStart: (dragEle) => {
+      props.onDragStart?.(dragEle, taskId);
+    },
+    onDragEnd: (dragEle) => {
+      props.onDragEnd?.(dragEle, taskId);
+    },
+  });
   const dispatch = useDispatch();
-
-  const onDragStart: DragEventHandler<HTMLDivElement> = (e) => {
-    if (task) {
-      e.dataTransfer.setData("task", props.taskId.toString());
-      e.dataTransfer.setData("text/plain", task.title);
-      dispatch(
-        setDraggingTaskData({
-          draggingTaskId: task.id,
-          originSectionId: props.sectionId,
-          placeholderHeight: `${containerRef.current?.offsetHeight}px`,
-        })
-      );
-
-      setTimeout(() => {
-        dispatch(insertTaskPlaceholder(props.sectionId, props.taskId, null));
-        containerRef.current?.classList.add("dragging");
-      });
-    }
-  };
-
-  const onDragEnd: DragEventHandler<HTMLDivElement> = (e) => {
-    containerRef.current?.classList.remove("dragging");
-
-    dispatch(removeTaskPlaceholder());
-    dispatch(setDraggingTaskData(null));
-  };
-
-  const onDragEnter: DragEventHandler<HTMLElement> = (e) => {
-    if (e.dataTransfer.types.includes("task")) {
-      dispatch(insertTaskPlaceholder(props.sectionId, props.taskId, null));
-    }
-  };
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {
-      dispatch(toggleTask(props.sectionId, props.taskId));
+      dispatch(toggleTask(sectionId, taskId));
     }
   };
 
   const openTaskDetailsModal = () => {
-    props?.onClick?.(props.taskId);
+    props.onClick?.(taskId);
+  };
+
+  const onMouseEnter: MouseEventHandler = (e) => {
+    props.onMouseEnter?.(e, taskId);
   };
 
   return task ? (
     <StyledTask
-      draggable={!task.finished}
-      onDragStart={task.finished ? undefined : onDragStart}
-      onDragEnd={task.finished ? undefined : onDragEnd}
-      onDragEnter={task.finished ? undefined : onDragEnter}
       onClick={openTaskDetailsModal}
+      onMouseEnter={onMouseEnter}
       className={[
         task.priority !== "low" ? task.priority : "",
         task.finished ? "finished" : "",
       ].join(" ")}
       ref={containerRef}
+      {...containerProps}
     >
       <h3>
         <Checkbox checked={task.finished ?? false} onChange={onTickCheckbox} />

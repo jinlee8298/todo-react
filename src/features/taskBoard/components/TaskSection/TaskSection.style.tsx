@@ -14,11 +14,8 @@ export default styled.section`
   width: calc(var(--list-width) + 2rem);
   flex-shrink: 0;
 
-  &.dragging {
-    display: none;
-  }
-
   header {
+    user-select: none;
     border-radius: 8px 8px 0 0;
     padding: 0.5em 1em;
     border-bottom: 1px solid var(--gray2);
@@ -45,6 +42,7 @@ export default styled.section`
       background: var(--gray3);
       border-radius: 100rem;
       margin-inline-start: auto;
+      word-break: normal;
     }
     ${TaskSectionEditor} {
       padding: 0.5em 0;

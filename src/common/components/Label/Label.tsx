@@ -1,7 +1,7 @@
 import StyledLabel from "./Label.style";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { FC } from "react";
+import { FC, MouseEventHandler } from "react";
 import { Link } from "react-router-dom";
 
 type LabelProps = {
@@ -12,9 +12,12 @@ type LabelProps = {
 };
 
 const Label: FC<LabelProps> = (props) => {
+  const stopPropagation: MouseEventHandler = (e) => {
+    e.stopPropagation();
+  };
   return props.to ? (
     <StyledLabel title={props.title} color={props.color}>
-      <Link onClick={(e) => e.stopPropagation()} to={props.to}>
+      <Link onClick={stopPropagation} to={props.to}>
         {props.icon && <FontAwesomeIcon icon={props.icon}></FontAwesomeIcon>}
         {props.children}
       </Link>

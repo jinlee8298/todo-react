@@ -1,11 +1,7 @@
 import { EntityId } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "common/hooks";
-import {
-  insertTaskPlaceholder,
-  removeTaskPlaceholder,
-  repositionTask,
-} from "features/taskBoard/taskBoardSlice";
-import { FC, DragEventHandler, DragEvent, useCallback } from "react";
+import { repositionTask } from "features/taskBoard/taskBoardSlice";
+import { FC, useCallback, MouseEventHandler } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
 import Placeholder from "../../Placeholder/Placeholder";
 import Task from "../../Task/Task";
@@ -18,14 +14,16 @@ type TaskSectionBodyProps = {
   finishedTaskIds: EntityId[];
 };
 
+let draggingTask = false;
+
+const taskPlaceholderNode: HTMLElement = document.createElement("div");
+taskPlaceholderNode.classList.add("placeholder");
+
 const TaskSectionBody: FC<TaskSectionBodyProps> = ({
   sectionId,
   taskIds,
   finishedTaskIds,
 }) => {
-  const draggingInfo = useSelector(
-    (state) => state.taskBoard.tasks.draggingInfo
-  );
   const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
   const history = useHistory();
   const projectId = match?.params.projectId;
@@ -36,50 +34,6 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
   );
   const dispatch = useDispatch();
 
-  const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      e.preventDefault();
-    }
-  };
-
-  const onTaskDrop: DragEventHandler<HTMLElement> = (e) => {
-    e.preventDefault();
-
-    const taskId = draggingInfo?.draggingTaskId;
-    const originSectionId = draggingInfo?.originSectionId;
-    const taskIndex = taskIds.indexOf("placeholder");
-    if (originSectionId && taskId) {
-      dispatch(repositionTask(sectionId, originSectionId, taskId, taskIndex));
-    }
-
-    if (originSectionId !== draggingInfo?.currentPlaceholderSecionId) {
-      dispatch(removeTaskPlaceholder());
-    }
-  };
-
-  const onDragEnterTaskList: DragEventHandler<HTMLElement> = (e) => {
-    if (e.dataTransfer.types.includes("task")) {
-      e.preventDefault();
-
-      const nonDraggingTaskIds = taskIds.filter(
-        (id) => id !== draggingInfo?.draggingTaskId
-      );
-      if (nonDraggingTaskIds?.length === 0) {
-        dispatch(insertTaskPlaceholder(sectionId, null, 0));
-        return;
-      }
-
-      const targetEl = e.target as HTMLDivElement;
-      if (targetEl.classList.contains("dropzone-padding")) {
-        dispatch(insertTaskPlaceholder(sectionId, null, taskIds.length));
-      }
-    }
-  };
-
-  const onDragOverTaskList = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault();
-  };
-
   const openTaskDetailsModal = useCallback(
     (taskId: EntityId) => {
       sessionStorage.setItem("currentSectionId", sectionId.toString());
@@ -88,32 +42,78 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     [history, projectId, sectionId]
   );
 
-  return (
-    <StyledTaskSectionBody
-      className="task-list"
-      draggable
-      onDrop={onTaskDrop}
-      onDragStart={preventDrag}
-      onDragOver={onDragOverTaskList}
-      onDragEnter={onDragEnterTaskList}
-    >
-      {taskIds.map((taskId) =>
-        taskId === "placeholder" ? (
-          <Placeholder
-            key="placeholder"
-            height={draggingInfo ? draggingInfo.placeholderHeight : "0px"}
-          />
-        ) : (
-          <Task
-            key={taskId}
-            onClick={openTaskDetailsModal}
-            taskId={taskId}
-            sectionId={sectionId}
-          />
-        )
-      )}
+  const onMouseEnterTask = (
+    e: React.MouseEvent<Element, MouseEvent>,
+    taskId: EntityId
+  ) => {
+    if (draggingTask) {
+      const taskIndex = taskIds.indexOf(taskId);
+      taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+      taskPlaceholderNode.dataset.index = taskIndex.toString();
+      const parentEle = e.currentTarget.parentElement;
+      parentEle?.insertBefore(taskPlaceholderNode, e.currentTarget);
+    }
+  };
 
-      <div className="dropzone-padding">
+  const onMouseEnterDropZonePadding: MouseEventHandler = (e) => {
+    if (draggingTask) {
+      const taskIndex = taskIds.length;
+      taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+      taskPlaceholderNode.dataset.index = taskIndex.toString();
+      const parentEle = e.currentTarget.parentElement;
+      parentEle?.insertBefore(taskPlaceholderNode, e.currentTarget);
+    }
+  };
+
+  const onTaskStartDrag = (dragEle: HTMLElement, taskId: EntityId) => {
+    draggingTask = true;
+    const taskIndex = taskIds.indexOf(taskId);
+    taskPlaceholderNode.dataset.taskId = taskId.toString();
+    taskPlaceholderNode.dataset.originSectionId = sectionId.toString();
+    taskPlaceholderNode.dataset.index = taskIndex.toString();
+    taskPlaceholderNode.style.height = `${dragEle.offsetHeight}px`;
+    const parentEle = dragEle.parentElement;
+    parentEle?.insertBefore(taskPlaceholderNode, dragEle.nextSibling);
+  };
+
+  const onTaskEndDrag = () => {
+    draggingTask = false;
+    const dataset = taskPlaceholderNode.dataset;
+    const destionationSectionId = dataset.sectionId;
+    const originSectionId = dataset.originSectionId;
+    const taskId = dataset.taskId;
+    const index = dataset.index;
+    if (destionationSectionId && originSectionId && taskId && index) {
+      dispatch(
+        repositionTask(
+          destionationSectionId,
+          originSectionId,
+          taskId,
+          Number(index)
+        )
+      );
+    }
+    taskPlaceholderNode?.remove();
+  };
+
+  return (
+    <StyledTaskSectionBody className="task-list">
+      {taskIds.map((taskId) => (
+        <Task
+          key={taskId}
+          onClick={openTaskDetailsModal}
+          taskId={taskId}
+          sectionId={sectionId}
+          onMouseEnter={onMouseEnterTask}
+          onDragStart={onTaskStartDrag}
+          onDragEnd={onTaskEndDrag}
+        />
+      ))}
+
+      <div
+        className="dropzone-padding"
+        onMouseEnter={onMouseEnterDropZonePadding}
+      >
         {filterOptions?.showCompletedTask &&
           finishedTaskIds.map((taskId) => (
             <Task

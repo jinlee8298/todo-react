@@ -491,10 +491,6 @@ const repositionTask = {
         const taskIds = [...destinationSection?.taskIds];
         taskIds.splice(index, 0, taskId);
 
-        if (state.tasks.draggingInfo) {
-          state.tasks.draggingInfo.originSectionId = destinationSectionId;
-        }
-
         taskAdapter.updateOne(state.tasks, {
           id: taskId,
           changes: {
@@ -536,97 +532,6 @@ const repositionTask = {
   },
 };
 
-const insertTaskPlaceholder = {
-  prepare: (
-    sectionId: EntityId,
-    taskId: EntityId | null,
-    index: number | null
-  ) => ({
-    payload: {
-      sectionId,
-      index,
-      taskId,
-    },
-  }),
-  reducer: (
-    state: TaskBoardStore,
-    action: PayloadAction<{
-      sectionId: EntityId;
-      index: number | null;
-      taskId: null | EntityId;
-    }>
-  ) => {
-    const { index, taskId, sectionId } = action.payload;
-    const section = sectionAdapter
-      .getSelectors()
-      .selectById(state.sections, sectionId);
-    if (section) {
-      const placeholderIndex = section.taskIds.indexOf("placeholder");
-      const taskIds = [...section.taskIds];
-      let tempIndex = index || 0;
-      if (!tempIndex && taskId) {
-        tempIndex = taskIds.indexOf(taskId);
-      }
-      if (placeholderIndex >= 0) {
-        taskIds.splice(placeholderIndex, 1);
-        taskIds.splice(
-          placeholderIndex > tempIndex ? tempIndex : tempIndex - 1,
-          0,
-          "placeholder"
-        );
-      } else {
-        taskIds.splice(tempIndex, 0, "placeholder");
-      }
-      const draggingInfo = state.tasks.draggingInfo;
-      if (draggingInfo) {
-        draggingInfo.currentPlaceholderSecionId = sectionId;
-      }
-      sectionAdapter.updateOne(state.sections, {
-        id: sectionId,
-        changes: { taskIds },
-      });
-    }
-  },
-};
-
-const removeTaskPlaceholder = (state: TaskBoardStore) => {
-  if (
-    state.tasks.draggingInfo &&
-    state.tasks.draggingInfo.currentPlaceholderSecionId
-  ) {
-    const { currentPlaceholderSecionId } = state.tasks.draggingInfo;
-    const section = sectionAdapter
-      .getSelectors()
-      .selectById(state.sections, currentPlaceholderSecionId);
-    state.tasks.draggingInfo.currentPlaceholderSecionId = null;
-
-    sectionAdapter.updateOne(state.sections, {
-      id: currentPlaceholderSecionId,
-      changes: {
-        taskIds: section?.taskIds.filter((id) => id !== "placeholder"),
-      },
-    });
-  }
-};
-
-const setDraggingTaskData = (
-  state: TaskBoardStore,
-  action: PayloadAction<{
-    draggingTaskId: EntityId;
-    originSectionId: EntityId;
-    placeholderHeight: string;
-  } | null>
-) => {
-  if (action.payload) {
-    state.tasks.draggingInfo = {
-      ...action.payload,
-      currentPlaceholderSecionId: null,
-    };
-  } else {
-    state.tasks.draggingInfo = null;
-  }
-};
-
 const taskReducer = {
   addTask,
   addSubTask,
@@ -635,9 +540,6 @@ const taskReducer = {
   duplicateTask,
   deleteTask,
   repositionTask,
-  insertTaskPlaceholder,
-  removeTaskPlaceholder,
-  setDraggingTaskData,
 };
 
 export default taskReducer;

@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import Placeholder from "../../Placeholder/Placeholder.style";
 import Task from "../../Task/Task.style";
 
 export default styled.div`
@@ -12,12 +11,12 @@ export default styled.div`
     overflow-y: auto;
   }
 
-  ${Task}, ${Placeholder} {
+  ${Task}, .placeholder {
     width: var(--list-width);
     &:not(:first-child) {
       margin-block-start: 0.5rem;
     }
-    &.dragging:first-child + ${Task}, &.dragging:first-child + ${Placeholder} {
+    &.dragging:first-child + ${Task}, &.dragging:first-child + .placeholder {
       margin-block-start: 0;
     }
   }

@@ -12,10 +12,7 @@ export default styled.div`
   position: relative;
   transition: box-shadow 0.2s;
   border: 1px solid var(--gray4);
-
-  &.dragging {
-    display: none;
-  }
+  user-select: none;
   &.medium,
   &.high,
   &.urgent {

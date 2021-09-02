@@ -1,3 +1,4 @@
+import { placeholderStyle } from "common/hooks/useDrag";
 import styled from "styled-components";
 
 export default styled.div`
@@ -13,4 +14,5 @@ export default styled.div`
     flex-basis: 0px;
     overflow: hidden;
   }
+  ${placeholderStyle}
 `;

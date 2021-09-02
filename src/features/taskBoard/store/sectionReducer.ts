@@ -207,93 +207,12 @@ const repositionSection = {
   },
 };
 
-const setDraggingSectionData = (
-  state: TaskBoardStore,
-  action: PayloadAction<{
-    draggingSectionId: EntityId;
-    placeholderHeight: string;
-  } | null>
-) => {
-  state.sections.draggingInfo = action.payload;
-};
-
-const insertSectionPlaceholder = {
-  prepare: (
-    projectId: EntityId,
-    sectionId: EntityId | null,
-    index: number | null
-  ) => ({
-    payload: {
-      projectId,
-      sectionId,
-      index,
-    },
-  }),
-  reducer: (
-    state: TaskBoardStore,
-    action: PayloadAction<{
-      projectId: EntityId;
-      sectionId: EntityId | null;
-      index: number | null;
-    }>
-  ) => {
-    const { index, projectId, sectionId } = action.payload;
-    const project = projectSelector.selectById(state, projectId);
-    if (project) {
-      const placeholderIndex = project.sectionIds.indexOf("placeholder");
-      const sectionIds = [...project.sectionIds];
-
-      let tempIndex = index ?? -1;
-      if (tempIndex < 0 && sectionId) {
-        tempIndex = sectionIds.indexOf(sectionId);
-      }
-
-      if (placeholderIndex >= 0) {
-        sectionIds.splice(placeholderIndex, 1);
-        sectionIds.splice(
-          placeholderIndex > tempIndex ? tempIndex + 1 : tempIndex,
-          0,
-          "placeholder"
-        );
-      } else {
-        sectionIds.splice(tempIndex + 1, 0, "placeholder");
-      }
-
-      projectAdapter.updateOne(state.projects, {
-        id: projectId,
-        changes: { sectionIds },
-      });
-    }
-  },
-};
-
-const removeSectionPlaceholder = (
-  state: TaskBoardStore,
-  action: PayloadAction<EntityId>
-) => {
-  const project = projectSelector.selectById(state, action.payload);
-  if (project) {
-    const placeholderIndex = project.sectionIds.indexOf("placeholder");
-    if (placeholderIndex >= 0) {
-      projectAdapter.updateOne(state.projects, {
-        id: project.id,
-        changes: {
-          sectionIds: project.sectionIds.filter((id) => id !== "placeholder"),
-        },
-      });
-    }
-  }
-};
-
 const sectionReducer = {
   addSection,
   updateSection,
   duplicateSection,
   deleteSection,
   repositionSection,
-  setDraggingSectionData,
-  insertSectionPlaceholder,
-  removeSectionPlaceholder,
 };
 
 export default sectionReducer;

@@ -1,12 +1,7 @@
-import { DragEventHandler, FC, useRef, memo, useState } from "react";
+import { FC, memo, useState, MouseEventHandler } from "react";
 import StyledTaskSection from "./TaskSection.style";
 import { EntityId } from "@reduxjs/toolkit";
-import {
-  insertSectionPlaceholder,
-  removeSectionPlaceholder,
-  setDraggingSectionData,
-} from "../../taskBoardSlice";
-import { useDispatch, useSelector } from "common/hooks";
+import { useDrag, useSelector } from "common/hooks";
 import TaskSectionFooter from "./TaskSectionFooter/TaskSectionFooter";
 import TaskSectionBody from "./TaskSectionBody/TaskSectionBody";
 import TaskSectionMenu from "./TaskSectionMenu/TaskSectionMenu";
@@ -16,103 +11,72 @@ import { sectionSelector } from "features/taskBoard/store/sectionReducer";
 type TaskSectionProps = {
   sectionId: EntityId;
   projectId: EntityId;
+  onMouseEnter?: (
+    e: React.MouseEvent<Element, MouseEvent>,
+    sectionId: EntityId
+  ) => void;
+  onDragStart?: (dragEle: HTMLElement, sectionId: EntityId) => void;
+  onDragEnd?: (dragEle: HTMLElement, sectionId: EntityId) => void;
 };
 
-const TaskSection: FC<TaskSectionProps> = memo((props) => {
-  const section = useSelector((state) =>
-    sectionSelector.selectById(state.taskBoard, props.sectionId)
-  );
-  const containerRef = useRef<HTMLElement>(null);
-  const [editing, setEditing] = useState(false);
-  const dispatch = useDispatch();
+const TaskSection: FC<TaskSectionProps> = memo(
+  ({ sectionId, projectId, onDragStart, onDragEnd, ...props }) => {
+    const section = useSelector((state) =>
+      sectionSelector.selectById(state.taskBoard, sectionId)
+    );
+    const [editing, setEditing] = useState(false);
+    const [, containerRef, dragProps] = useDrag<HTMLElement>({
+      preventDrag: editing,
+      onDragStart: (dragEle) => {
+        onDragStart?.(dragEle, sectionId);
+      },
+      onDragEnd: (dragEle) => {
+        onDragEnd?.(dragEle, sectionId);
+      },
+    });
 
-  const onSectionDragOver: DragEventHandler<HTMLElement> = (e) => {
-    if (e.dataTransfer.types.includes("section")) {
-      e.preventDefault();
-    }
-  };
+    const toggleEditing = () => {
+      setEditing((v) => !v);
+    };
 
-  const onDragStartSection: DragEventHandler<HTMLElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      e.dataTransfer.setData("section", props.sectionId.toString());
-      e.dataTransfer.setData("text/plain", section?.name ?? "");
+    const onMouseEnter: MouseEventHandler = (e) => {
+      props.onMouseEnter?.(e, sectionId);
+    };
 
-      dispatch(
-        setDraggingSectionData({
-          draggingSectionId: props.sectionId,
-          placeholderHeight: `${containerRef.current?.offsetHeight}px`,
-        })
-      );
-
-      setTimeout(() => {
-        dispatch(
-          insertSectionPlaceholder(props.projectId, props.sectionId, null)
-        );
-        containerRef.current?.classList.add("dragging");
-      });
-    }
-  };
-
-  const onDragEndSection: DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      containerRef.current?.classList.remove("dragging");
-      dispatch(removeSectionPlaceholder(props.projectId));
-      dispatch(setDraggingSectionData(null));
-    }
-  };
-
-  const onDragEnterSection: DragEventHandler<HTMLElement> = (e) => {
-    if (e.dataTransfer.types.includes("section")) {
-      dispatch(
-        insertSectionPlaceholder(props.projectId, props.sectionId, null)
-      );
-    }
-  };
-
-  const toggleEditing = () => {
-    setEditing((v) => !v);
-  };
-
-  return (
-    <StyledTaskSection
-      draggable={!editing}
-      ref={containerRef}
-      onDragEnter={onDragEnterSection}
-      onDragStart={onDragStartSection}
-      onDragEnd={onDragEndSection}
-      onDragOver={onSectionDragOver}
-    >
-      <header>
-        {editing ? (
-          <TaskSecitonEditor
-            onCloseHandle={toggleEditing}
-            section={section}
-            projectId={props.projectId}
-          />
-        ) : (
-          <>
-            <h3 onClick={toggleEditing}>{section?.name}</h3>
-            <span>
-              {section?.taskIds.filter((id) => id !== "placeholder").length}
-            </span>
-            {section && (
-              <TaskSectionMenu
-                onEdit={toggleEditing}
-                sectionId={section.id}
-                projectId={props.projectId}
-              />
-            )}
-          </>
-        )}
-      </header>
-      <TaskSectionBody
-        sectionId={props.sectionId}
-        taskIds={section?.taskIds ?? []}
-        finishedTaskIds={section?.finishedTaskIds ?? []}
-      />
-      <TaskSectionFooter sectionId={props.sectionId} />
-    </StyledTaskSection>
-  );
-});
+    return (
+      <StyledTaskSection onMouseEnter={onMouseEnter} ref={containerRef}>
+        <header {...dragProps}>
+          {editing ? (
+            <TaskSecitonEditor
+              onCloseHandle={toggleEditing}
+              section={section}
+              projectId={projectId}
+            />
+          ) : (
+            <>
+              <h3 onClick={toggleEditing}>{section?.name}</h3>
+              <span>
+                {section?.taskIds.filter((id) => id !== "placeholder").length}
+              </span>
+              {section && (
+                <TaskSectionMenu
+                  onEdit={toggleEditing}
+                  sectionId={section.id}
+                  projectId={projectId}
+                />
+              )}
+            </>
+          )}
+        </header>
+        <TaskSectionBody
+          sectionId={sectionId}
+          taskIds={section?.taskIds ?? []}
+          finishedTaskIds={section?.finishedTaskIds ?? []}
+        />
+        <TaskSectionFooter sectionId={sectionId} />
+      </StyledTaskSection>
+    );
+  }
+);
 
 export default TaskSection;

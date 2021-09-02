@@ -23,10 +23,20 @@ const Header: FC<HeaderProps> = ({ navContent }) => {
     <StyledHeader className={showNavBar ? "show-nav" : ""}>
       <NavBar>{navContent}</NavBar>
       <div className="left-group">
-        <button onClick={onToggleNavBar} className="toggle-nav">
+        <button
+          aria-label="Open side navigation tab"
+          title="Open side navigation tab"
+          onClick={onToggleNavBar}
+          className="toggle-nav"
+        >
           <FontAwesomeIcon icon={faBars} fixedWidth />
         </button>
-        <button onClick={onToHomePage} className="toggle-nav">
+        <button
+          aria-label="Go to homepage"
+          title="Go to homepage"
+          onClick={onToHomePage}
+          className="toggle-nav"
+        >
           <FontAwesomeIcon icon={faHome} fixedWidth />
         </button>
       </div>

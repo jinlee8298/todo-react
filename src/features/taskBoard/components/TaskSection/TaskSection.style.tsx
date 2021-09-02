@@ -22,7 +22,7 @@ export default styled.section`
     display: flex;
     align-items: center;
     background: #fff;
-    h3 {
+    h2 {
       font-size: 1rem;
       color: var(--text);
       overflow: hidden;

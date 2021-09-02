@@ -24,6 +24,7 @@ const TaskSectionFooter: FC<TaskSectionFooterProps> = (props) => {
         />
       ) : (
         <Button
+          aria-label="Add task"
           icon={faPlus}
           title="Add task"
           alternative="outline"

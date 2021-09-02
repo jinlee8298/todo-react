@@ -79,7 +79,7 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
   };
 
   return (
-    <div role="listbox">
+    <div className="section-list">
       <div
         className="dropzone-padding"
         onMouseEnter={onMouseEnterDropZonePadding}
@@ -118,6 +118,7 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
           onClick={toggleAddingSection}
           alternative="reverse"
           icon={faPlus}
+          aria-label="Add new section"
         >
           Add new section
         </Button>

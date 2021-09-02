@@ -93,6 +93,7 @@ const LabelMenu: FC<LabelMenuProps> = ({ label, onEdit }) => {
         content={popoverContent}
       >
         <Button
+          aria-label={`Open label ${label.name}'s menu`}
           className="menu-trigger"
           size="sx"
           icon={faEllipsisH}

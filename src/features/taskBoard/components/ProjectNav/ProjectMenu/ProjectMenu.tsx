@@ -124,6 +124,7 @@ const ProjectMenu: FC<ProjectMenuProps> = ({
         content={popoverContent}
       >
         <Button
+          aria-label={`Open project ${project.name}'s menu`}
           className="menu-trigger"
           size="sx"
           icon={faEllipsisH}

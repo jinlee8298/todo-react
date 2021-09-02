@@ -167,6 +167,7 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
         )}
       >
         <Button
+          aria-label={`Open task ${task.title}'s menu`}
           className="menu-trigger"
           size="sx"
           icon={faEllipsisH}

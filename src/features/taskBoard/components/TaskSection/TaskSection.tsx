@@ -44,7 +44,11 @@ const TaskSection: FC<TaskSectionProps> = memo(
     };
 
     return (
-      <StyledTaskSection onMouseEnter={onMouseEnter} ref={containerRef}>
+      <StyledTaskSection
+        role="group"
+        onMouseEnter={onMouseEnter}
+        ref={containerRef}
+      >
         <header {...dragProps}>
           {editing ? (
             <TaskSecitonEditor
@@ -54,7 +58,7 @@ const TaskSection: FC<TaskSectionProps> = memo(
             />
           ) : (
             <>
-              <h3 onClick={toggleEditing}>{section?.name}</h3>
+              <h2 onClick={toggleEditing}>{section?.name}</h2>
               <span>
                 {section?.taskIds.filter((id) => id !== "placeholder").length}
               </span>

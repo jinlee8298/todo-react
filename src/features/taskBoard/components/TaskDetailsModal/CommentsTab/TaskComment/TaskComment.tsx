@@ -94,13 +94,19 @@ const TaskComment: FC<TaskCommentProps> = ({ commentId, taskId, ...props }) => {
               maxRows={10}
             />
             <Button
+              aria-label="Update"
               disabled={!value.trim() || checkError}
               size="sm"
               onClick={onUpdateComment}
             >
               Update
             </Button>
-            <Button size="sm" alternative="reverse" onClick={toggleEdit}>
+            <Button
+              aria-label="Cancel"
+              size="sm"
+              alternative="reverse"
+              onClick={toggleEdit}
+            >
               Cancel
             </Button>
           </>
@@ -112,12 +118,14 @@ const TaskComment: FC<TaskCommentProps> = ({ commentId, taskId, ...props }) => {
             </span>
             <span className="actions">
               <Button
+                aria-label="Edit comment"
                 size="sx"
                 alternative="reverse"
                 icon={faPen}
                 onClick={toggleEdit}
               />
               <Button
+                aria-label="Delete comment"
                 size="sx"
                 alternative="reverse"
                 icon={faTrashAlt}

@@ -14,6 +14,7 @@ import StyledGroup from "./NavGroup.style";
 
 type NavGroupProps = {
   name: string;
+  addButtonTitle?: string;
   addButtonVisible?: boolean;
   expandByDefault?: boolean;
   onAddButtonClick?: () => void;
@@ -23,6 +24,7 @@ const NavGroup: FC<NavGroupProps> = ({
   name,
   addButtonVisible = false,
   expandByDefault = false,
+  addButtonTitle,
   children,
   onAddButtonClick,
   ...rest
@@ -92,6 +94,8 @@ const NavGroup: FC<NavGroupProps> = ({
             onClick={onClick}
             rounded
             icon={faPlus}
+            aria-label={addButtonTitle}
+            title={addButtonTitle}
           />
         )}
       </div>

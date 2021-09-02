@@ -40,6 +40,7 @@ const LabelNav = () => {
 
   return (
     <StyledNavGroup
+      addButtonTitle="Add new label"
       name="Labels"
       onAddButtonClick={toggleLabelModal}
       addButtonVisible

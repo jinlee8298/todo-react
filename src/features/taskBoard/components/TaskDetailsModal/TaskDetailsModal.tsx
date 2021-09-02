@@ -162,6 +162,7 @@ const TaskDetailsModal: FC = memo(() => {
           <span>{task.parentTaskId ? parentTaskTitle : projectName}</span>
         </Link>
         <Button
+          aria-label="Close modal"
           icon={faTimes}
           alternative={"reverse"}
           size="sx"

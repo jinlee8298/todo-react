@@ -282,13 +282,19 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       </div>
       <div className="button-group">
         <Button
+          aria-label={mode === "edit" ? "Save" : "Add task"}
           size="sm"
           disabled={!title.trim() || checkError}
           onClick={mode === "edit" ? onEditTask : onAddTask}
         >
           {mode === "edit" ? "Save" : "Add task"}
         </Button>
-        <Button size="sm" alternative="reverse" onClick={onCloseHandle}>
+        <Button
+          aria-label="Cancel"
+          size="sm"
+          alternative="reverse"
+          onClick={onCloseHandle}
+        >
           Cancel
         </Button>
       </div>

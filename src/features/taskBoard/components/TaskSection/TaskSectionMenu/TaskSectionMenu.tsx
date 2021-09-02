@@ -101,7 +101,13 @@ const TaskSectionMenu: FC<TaskMenuProps> = ({
           </Menu>
         )}
       >
-        <Button icon={faEllipsisH} size="sx" rounded alternative="reverse" />
+        <Button
+          aria-label={`Open section ${section?.name}'s menu`}
+          icon={faEllipsisH}
+          size="sx"
+          rounded
+          alternative="reverse"
+        />
       </Popover>
 
       <ConfirmDialog {...confirmDialogProps} />

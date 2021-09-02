@@ -14,7 +14,7 @@ export default styled.div`
   width: 100%;
   overflow: hidden;
 
-  [role="listbox"] {
+  .section-list {
     flex: 1;
     flex-basis: 0px;
     padding-inline: 2rem;

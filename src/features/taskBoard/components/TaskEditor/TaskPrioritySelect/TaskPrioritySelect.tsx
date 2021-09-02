@@ -101,6 +101,7 @@ const TaskPrioritySelect: ForwardRefRenderFunction<
       closeOnSelect
     >
       <Button
+        aria-label="Select task's priority"
         disabled={disabled}
         size="sx"
         icon={faFlag}

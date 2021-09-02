@@ -7,8 +7,8 @@ export type ConfirmDialogProps = {
   isShown: boolean;
   title?: string;
   message?: string | ReactNode;
-  acceptButtonLabel?: string | ReactNode;
-  rejectButtonLabel?: string | ReactNode;
+  acceptButtonLabel?: string;
+  rejectButtonLabel?: string;
   acceptButtonConfig?: ButtonProps;
   rejectButtonConfig?: ButtonProps;
   backdropClick?: MouseEventHandler;
@@ -42,6 +42,7 @@ const ConfirmDialog: FC<ConfirmDialogProps> = ({
       <div className="message">{message}</div>
       <div className="action-group">
         <Button
+          aria-label={rejectButtonLabel ?? "No"}
           size="sm"
           alternative="reverse"
           {...rejectButtonConfig}
@@ -49,7 +50,12 @@ const ConfirmDialog: FC<ConfirmDialogProps> = ({
         >
           {rejectButtonLabel ?? "No"}
         </Button>
-        <Button size="sm" {...acceptButtonConfig} onClick={onConfirm}>
+        <Button
+          aria-label={acceptButtonLabel ?? "Yes"}
+          size="sm"
+          {...acceptButtonConfig}
+          onClick={onConfirm}
+        >
           {acceptButtonLabel ?? "Yes"}
         </Button>
       </div>

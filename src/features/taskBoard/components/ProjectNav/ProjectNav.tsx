@@ -40,6 +40,7 @@ const ProjectNav = () => {
 
   return (
     <StyledNavGroup
+      addButtonTitle="Add new project"
       name="Projects"
       onAddButtonClick={toggleProjectModal}
       addButtonVisible

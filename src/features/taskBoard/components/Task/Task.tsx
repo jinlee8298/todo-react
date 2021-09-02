@@ -86,7 +86,11 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
       {...containerProps}
     >
       <h3>
-        <Checkbox checked={task.finished ?? false} onChange={onTickCheckbox} />
+        <Checkbox
+          checked={task.finished ?? false}
+          aria-label={`Toggle task ${task.title}`}
+          onChange={onTickCheckbox}
+        />
         <span>{task.title}</span>
       </h3>
       {task.description && <p>{task.description}</p>}

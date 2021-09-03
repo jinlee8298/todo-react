@@ -8,7 +8,11 @@ import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { TaskSection } from "../types";
 import { projectAdapter, projectSelector } from "./projectReducer";
-import { deleteTaskHandler, duplicateTaskHandler } from "./taskReducer";
+import {
+  deleteTaskHandler,
+  duplicateTaskHandler,
+  updateTaskRecursively,
+} from "./taskReducer";
 
 export const sectionAdapter = createEntityAdapter<TaskSection>();
 export const sectionSelector = sectionAdapter.getSelectors(
@@ -28,7 +32,7 @@ export const duplicateSectionHandler = (
   }
 
   const newSection: TaskSection = {
-    name: originSection.name,
+    name: `Copy of ${originSection.name}`,
     taskIds: [],
     finishedTaskIds: [],
     id: generateUID(),
@@ -41,6 +45,10 @@ export const duplicateSectionHandler = (
       taskId,
       false
     );
+    updateTaskRecursively(state, duplicatedTaskId, {
+      sectionId: newSection.id,
+      projectId,
+    });
     newSection.taskIds.push(duplicatedTaskId);
   });
   originSection.finishedTaskIds.forEach((taskId) => {
@@ -51,6 +59,10 @@ export const duplicateSectionHandler = (
       taskId,
       false
     );
+    updateTaskRecursively(state, duplicatedTaskId, {
+      sectionId: newSection.id,
+      projectId,
+    });
     newSection.finishedTaskIds.push(duplicatedTaskId);
   });
   sectionAdapter.addOne(state.sections, newSection);

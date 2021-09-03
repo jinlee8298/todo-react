@@ -101,9 +101,7 @@ export const duplicateTaskHandler = (
 
   if (parentId) {
     duplicatedTask.parentTaskId = parentId;
-  }
-
-  if (sectionId) {
+  } else if (sectionId) {
     const section = sectionSelector.selectById(state, sectionId);
     if (section) {
       const originIndex = section.taskIds.findIndex((id) => id === taskId);
@@ -225,6 +223,28 @@ export const updateTaskHandler = (
   updateObj.changes.updatedAt = new Date().toJSON();
 
   taskAdapter.updateOne(state.tasks, updateObj);
+};
+
+export const updateTaskRecursively = (
+  state: TaskBoardStore,
+  taskId: EntityId,
+  changeObj: Partial<Task>
+) => {
+  const subTask = taskSelector.selectById(state, taskId);
+  if (!subTask) {
+    return;
+  }
+
+  taskAdapter.updateOne(state.tasks, {
+    id: taskId,
+    changes: changeObj,
+  });
+
+  if (subTask.subTaskIds) {
+    subTask.subTaskIds.forEach((subTaskId) =>
+      updateTaskRecursively(state, subTaskId, changeObj)
+    );
+  }
 };
 
 // Reducer section
@@ -404,7 +424,7 @@ const toggleTask = {
       markTaskFinished(state, taskId);
     }
 
-    if (sectionId) {
+    if (sectionId && !task.parentTaskId) {
       const section = sectionSelector.selectById(state, sectionId);
       if (section) {
         sectionAdapter.updateOne(state.sections, {
@@ -598,6 +618,11 @@ const moveTask = {
           },
         });
       }
+    }
+    if (task.subTaskIds) {
+      task.subTaskIds.forEach((subTaskId) => {
+        updateTaskRecursively(state, subTaskId, { sectionId });
+      });
     }
 
     taskAdapter.updateOne(state.tasks, {

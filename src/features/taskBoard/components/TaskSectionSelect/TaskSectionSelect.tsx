@@ -49,7 +49,6 @@ const TaskSectionSelect: FC<TaskSectionSelectProps> = ({ task, disabled }) => {
 
   const onOpen = () => {
     if (task) {
-      console.log(`${task.projectId},${task.sectionId}`);
       const taskSection = sectionEntries[task.sectionId];
       taskSection &&
         setSelected({

@@ -35,10 +35,9 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
 
   const openTaskDetailsModal = useCallback(
     (taskId: EntityId) => {
-      sessionStorage.setItem("currentSectionId", sectionId.toString());
       history.push(`/project/${projectId}/task/${taskId}`);
     },
-    [history, projectId, sectionId]
+    [history, projectId]
   );
 
   const onMouseEnterTask = (

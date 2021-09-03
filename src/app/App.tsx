@@ -10,6 +10,7 @@ import ProjectNav from "features/taskBoard/components/ProjectNav/ProjectNav";
 import LabelNav from "features/taskBoard/components/LabelNav/LabelNav";
 import LabelView from "features/taskBoard/components/LabelView/LabelView";
 import ProjectBoard from "features/taskBoard/components/ProjectBoard/ProjectBoard";
+import TitleHandler from "common/components/DocumentTitleHandler/DocumentTitleHandler";
 
 function App() {
   const navContent = (
@@ -20,6 +21,7 @@ function App() {
   return (
     <ThemeProvider theme={LightTheme}>
       <GlobalStyle />
+      <TitleHandler />
       <StyledApp className="App">
         <Header navContent={navContent} />
         <main>

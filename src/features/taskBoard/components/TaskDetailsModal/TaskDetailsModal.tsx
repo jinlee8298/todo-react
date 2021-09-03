@@ -44,7 +44,7 @@ const TaskDetailsModal: FC = memo(() => {
       return taskSelector.selectById(state.taskBoard, taskId);
     }
   });
-  const projectId = match?.params.projectId || task?.projectId;
+  const projectId = task?.projectId;
   const labelId = match?.params.labelId;
   const labelName = useSelector((state) => {
     if (labelId) {
@@ -134,17 +134,6 @@ const TaskDetailsModal: FC = memo(() => {
     if (!isShown) {
       setIsEdit(false);
     }
-    setTimeout(() => {
-      if (isShown) {
-        document.title = `Task: ${task?.title}`;
-      } else {
-        if (labelName) {
-          document.title = `Label: ${labelName}`;
-        } else {
-          document.title = `Project: ${projectName}`;
-        }
-      }
-    });
   }, [isShown, labelName, projectName, task?.title]);
 
   return task ? (

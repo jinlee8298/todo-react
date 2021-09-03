@@ -39,7 +39,7 @@ const TaskSectionSelect: FC<TaskSectionSelectProps> = ({ task, disabled }) => {
               label: section.name,
               icon: faSitemap,
               iconColor: project.color,
-              value: section.id.toString(),
+              value: `${project.id},${section.id}`,
             });
         });
       }
@@ -49,11 +49,12 @@ const TaskSectionSelect: FC<TaskSectionSelectProps> = ({ task, disabled }) => {
 
   const onOpen = () => {
     if (task) {
+      console.log(`${task.projectId},${task.sectionId}`);
       const taskSection = sectionEntries[task.sectionId];
       taskSection &&
         setSelected({
           label: taskSection.name,
-          value: taskSection.id.toString(),
+          value: `${task.projectId},${task.sectionId}`,
         });
     }
   };
@@ -63,8 +64,12 @@ const TaskSectionSelect: FC<TaskSectionSelectProps> = ({ task, disabled }) => {
   };
 
   const onClose = () => {
-    if (selected && task && selected.value !== task.sectionId) {
-      dispatch(moveTask(selected.value, task.sectionId, task.id));
+    if (selected && task) {
+      // selected.value have value with template: `${projectId},${sectionId}`
+      const [projectId, sectionId] = selected.value.split(",");
+      if (sectionId !== task.sectionId) {
+        dispatch(moveTask(projectId, sectionId, task.id));
+      }
     }
   };
 

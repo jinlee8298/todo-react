@@ -12,6 +12,7 @@ import Select from "./Select/Select";
 import Tabs from "./Tabs/Tabs";
 import TextArea from "./TextArea/TextArea";
 import TextInput from "./TextInput/TextInput";
+import DocumentTitleHandler from "./DocumentTitleHandler/DocumentTitleHandler";
 
 export {
   Button,
@@ -28,4 +29,5 @@ export {
   Tabs,
   TextArea,
   TextInput,
+  DocumentTitleHandler,
 };

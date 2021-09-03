@@ -231,6 +231,7 @@ export const updateTaskHandler = (
 
 const addTask = {
   prepare: (
+    projectId: EntityId,
     sectionId: EntityId,
     task: Omit<
       Task,
@@ -241,13 +242,15 @@ const addTask = {
       | "subTaskIds"
       | "finished"
       | "sectionId"
+      | "projectId"
     >
   ) => ({
-    payload: { sectionId, task },
+    payload: { projectId, sectionId, task },
   }),
   reducer: (
     state: TaskBoardStore,
     action: PayloadAction<{
+      projectId: EntityId;
       sectionId: EntityId;
       task: Omit<
         Task,
@@ -258,10 +261,11 @@ const addTask = {
         | "subTaskIds"
         | "finished"
         | "sectionId"
+        | "projectId"
       >;
     }>
   ) => {
-    const { sectionId, task } = action.payload;
+    const { projectId, sectionId, task } = action.payload;
     const addSection = sectionAdapter
       .getSelectors()
       .selectById(state.sections, sectionId);
@@ -276,6 +280,7 @@ const addTask = {
       subTaskIds: [],
       finished: false,
       sectionId,
+      projectId,
     };
 
     taskAdapter.addOne(state.tasks, newTask);
@@ -315,6 +320,7 @@ const addSubTask = {
       | "subTaskIds"
       | "finished"
       | "sectionId"
+      | "projectId"
     >
   ) => ({
     payload: { parentTaskId, task },
@@ -332,6 +338,7 @@ const addSubTask = {
         | "subTaskIds"
         | "finished"
         | "sectionId"
+        | "projectId"
       >;
     }>
   ) => {
@@ -353,6 +360,7 @@ const addSubTask = {
       subTaskIds: [],
       finished: false,
       sectionId: parentTask.sectionId,
+      projectId: parentTask.projectId,
     };
     const parentSubTaskIds = [...(parentTask.subTaskIds || []), newTask.id];
 
@@ -538,47 +546,42 @@ const repositionTask = {
 };
 
 const moveTask = {
-  prepare: (
-    destinationSectionId: EntityId,
-    originSectionId: EntityId,
-    taskId: EntityId
-  ) => ({
+  prepare: (projectId: EntityId, sectionId: EntityId, taskId: EntityId) => ({
     payload: {
-      destinationSectionId,
-      originSectionId,
+      projectId,
+      sectionId,
       taskId,
     },
   }),
   reducer: (
     state: TaskBoardStore,
     action: PayloadAction<{
-      destinationSectionId: EntityId;
-      originSectionId: EntityId;
+      projectId: EntityId;
+      sectionId: EntityId;
       taskId: EntityId;
     }>
   ) => {
-    const { destinationSectionId, originSectionId, taskId } = action.payload;
-    const desSection = sectionSelector.selectById(state, destinationSectionId);
-    const oriSection = sectionSelector.selectById(state, originSectionId);
+    const { projectId, sectionId, taskId } = action.payload;
     const task = taskSelector.selectById(state, taskId);
-    if (
-      destinationSectionId === originSectionId ||
-      !desSection ||
-      !oriSection ||
-      !task
-    ) {
+    if (!task) {
+      return;
+    }
+
+    const desSection = sectionSelector.selectById(state, sectionId);
+    const oriSection = sectionSelector.selectById(state, task.sectionId);
+    if (!desSection || !oriSection || oriSection.id === desSection.id) {
       return;
     }
 
     sectionAdapter.updateMany(state.sections, [
       {
-        id: destinationSectionId,
+        id: sectionId,
         changes: {
           taskIds: [...desSection.taskIds, taskId],
         },
       },
       {
-        id: originSectionId,
+        id: oriSection.id,
         changes: {
           taskIds: oriSection.taskIds.filter((id) => id !== taskId),
         },
@@ -600,7 +603,8 @@ const moveTask = {
     taskAdapter.updateOne(state.tasks, {
       id: taskId,
       changes: {
-        sectionId: destinationSectionId,
+        projectId: projectId,
+        sectionId: sectionId,
         parentTaskId: undefined,
       },
     });

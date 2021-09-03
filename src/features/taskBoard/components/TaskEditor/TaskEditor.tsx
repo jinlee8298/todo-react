@@ -74,6 +74,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   ) as Label[] | undefined;
   const dispatch = useDispatch();
   const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
+  const projectId = match?.params.projectId;
 
   useLayoutEffect(() => {
     if (titleInputRef.current) {
@@ -184,17 +185,17 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       | "subTaskIds"
       | "finished"
       | "sectionId"
+      | "projectId"
     > = {
       title: title.trim(),
       description: description.trim(),
       priority: selectedPriority,
       labelIds: selectedLabels.map((item) => item.value) || [],
-      projectId: match?.params.projectId,
     };
     if (mode === "add-subtask" && parentTaskId) {
       dispatch(addSubTask(parentTaskId, newTask));
-    } else if (sectionId) {
-      dispatch(addTask(sectionId, newTask));
+    } else if (sectionId && projectId) {
+      dispatch(addTask(projectId, sectionId, newTask));
     }
     resetTitle();
     resetDescription();

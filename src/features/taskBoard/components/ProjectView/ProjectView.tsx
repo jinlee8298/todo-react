@@ -23,12 +23,6 @@ const ProjectView: FC<ProjectProps> = memo(() => {
     }
   }, [match]);
 
-  useEffect(() => {
-    if (project?.name) {
-      document.title = `Project: ${project?.name || ""}`;
-    }
-  }, [project?.name]);
-
   return project ? (
     <StyledTaskBoard>
       <ProjectViewHeader project={project} />

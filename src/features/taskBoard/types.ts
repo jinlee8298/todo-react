@@ -32,7 +32,7 @@ export interface Task {
   title: string;
   updatedAt: string;
   subTaskIds: EntityId[];
-  sectionId?: EntityId;
+  sectionId: EntityId;
   projectId?: EntityId;
 }
 

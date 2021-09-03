@@ -240,6 +240,7 @@ const addTask = {
       | "commentIds"
       | "subTaskIds"
       | "finished"
+      | "sectionId"
     >
   ) => ({
     payload: { sectionId, task },
@@ -256,6 +257,7 @@ const addTask = {
         | "commentIds"
         | "subTaskIds"
         | "finished"
+        | "sectionId"
       >;
     }>
   ) => {
@@ -312,6 +314,7 @@ const addSubTask = {
       | "commentIds"
       | "subTaskIds"
       | "finished"
+      | "sectionId"
     >
   ) => ({
     payload: { parentTaskId, task },
@@ -328,6 +331,7 @@ const addSubTask = {
         | "commentIds"
         | "subTaskIds"
         | "finished"
+        | "sectionId"
       >;
     }>
   ) => {
@@ -348,6 +352,7 @@ const addSubTask = {
       commentIds: [],
       subTaskIds: [],
       finished: false,
+      sectionId: parentTask.sectionId,
     };
     const parentSubTaskIds = [...(parentTask.subTaskIds || []), newTask.id];
 
@@ -532,6 +537,76 @@ const repositionTask = {
   },
 };
 
+const moveTask = {
+  prepare: (
+    destinationSectionId: EntityId,
+    originSectionId: EntityId,
+    taskId: EntityId
+  ) => ({
+    payload: {
+      destinationSectionId,
+      originSectionId,
+      taskId,
+    },
+  }),
+  reducer: (
+    state: TaskBoardStore,
+    action: PayloadAction<{
+      destinationSectionId: EntityId;
+      originSectionId: EntityId;
+      taskId: EntityId;
+    }>
+  ) => {
+    const { destinationSectionId, originSectionId, taskId } = action.payload;
+    const desSection = sectionSelector.selectById(state, destinationSectionId);
+    const oriSection = sectionSelector.selectById(state, originSectionId);
+    const task = taskSelector.selectById(state, taskId);
+    if (
+      destinationSectionId === originSectionId ||
+      !desSection ||
+      !oriSection ||
+      !task
+    ) {
+      return;
+    }
+
+    sectionAdapter.updateMany(state.sections, [
+      {
+        id: destinationSectionId,
+        changes: {
+          taskIds: [...desSection.taskIds, taskId],
+        },
+      },
+      {
+        id: originSectionId,
+        changes: {
+          taskIds: oriSection.taskIds.filter((id) => id !== taskId),
+        },
+      },
+    ]);
+
+    if (task.parentTaskId) {
+      const parentTask = taskSelector.selectById(state, task.parentTaskId);
+      if (parentTask) {
+        taskAdapter.updateOne(state.tasks, {
+          id: parentTask.id,
+          changes: {
+            subTaskIds: parentTask.subTaskIds.filter((id) => id !== taskId),
+          },
+        });
+      }
+    }
+
+    taskAdapter.updateOne(state.tasks, {
+      id: taskId,
+      changes: {
+        sectionId: destinationSectionId,
+        parentTaskId: undefined,
+      },
+    });
+  },
+};
+
 const taskReducer = {
   addTask,
   addSubTask,
@@ -540,6 +615,7 @@ const taskReducer = {
   duplicateTask,
   deleteTask,
   repositionTask,
+  moveTask,
 };
 
 export default taskReducer;

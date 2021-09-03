@@ -16,10 +16,10 @@ import { addSubTask, addTask, updateTask } from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 import TaskPrioritySelect, {
   TaskPrioritySelectRef,
-} from "./TaskPrioritySelect/TaskPrioritySelect";
+} from "../TaskPrioritySelect/TaskPrioritySelect";
 import TaskLabelSelect, {
   TaskLabelSelectRef,
-} from "./TaskLabelSelect/TaskLabelSelect";
+} from "../TaskLabelSelect/TaskLabelSelect";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
 import { shallowEqual } from "react-redux";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
@@ -183,6 +183,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       | "commentIds"
       | "subTaskIds"
       | "finished"
+      | "sectionId"
     > = {
       title: title.trim(),
       description: description.trim(),

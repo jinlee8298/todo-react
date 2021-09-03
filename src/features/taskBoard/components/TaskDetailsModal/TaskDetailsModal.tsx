@@ -22,7 +22,7 @@ import { ConfirmDialog } from "common/components";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { taskSelector } from "features/taskBoard/store/taskReducer";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
-import TaskInfo from "./TaskInfo/TaskInfo";
+import TaskInfo from "./TaskInfo";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 const TaskDetailsModal: FC = memo(() => {

@@ -6,9 +6,11 @@ import { toggleTask, updateTask } from "features/taskBoard/taskBoardSlice";
 import { Label, Task, TaskPriority } from "features/taskBoard/types";
 import { FC, KeyboardEventHandler } from "react";
 import { shallowEqual } from "react-redux";
-import TaskMenu from "../../Task/TaskItemMenu/TaskMenu";
-import TaskLabelSelect from "../../TaskEditor/TaskLabelSelect/TaskLabelSelect";
-import TaskPrioritySelect from "../../TaskEditor/TaskPrioritySelect/TaskPrioritySelect";
+import { useHistory, useRouteMatch } from "react-router-dom";
+import TaskMenu from "../Task/TaskMenu";
+import TaskLabelSelect from "../TaskLabelSelect/TaskLabelSelect";
+import TaskPrioritySelect from "../TaskPrioritySelect/TaskPrioritySelect";
+import TaskSectionSelect from "../TaskSectionSelect/TaskSectionSelect";
 
 type TaskInfoProps = {
   task: Task;
@@ -23,7 +25,14 @@ const TaskInfo: FC<TaskInfoProps> = ({ task, onEdit }) => {
         )
       : [];
   }, shallowEqual) as Label[];
-
+  const match = useRouteMatch<{
+    projectId: string;
+    taskId: string;
+    labelId: string;
+  }>(["/project/:projectId/task/:taskId", "/label/:labelId/task/:taskId"]);
+  const projectId = match?.params.projectId;
+  const labelId = match?.params.labelId;
+  const history = useHistory();
   const dispatch = useDispatch();
 
   const onTickCheckbox = () => {
@@ -44,6 +53,15 @@ const TaskInfo: FC<TaskInfoProps> = ({ task, onEdit }) => {
   const onKeyPressEditable: KeyboardEventHandler = (e) => {
     if (e.key === "Space" || e.key === "Enter" || e.key === "NumpadEnter") {
       onEdit?.();
+    }
+  };
+
+  const onDeleteTask = () => {
+    if (labelId) {
+      history.push(`/label/${labelId}`);
+    }
+    if (projectId) {
+      history.push(`/project/${projectId}`);
     }
   };
 
@@ -76,6 +94,7 @@ const TaskInfo: FC<TaskInfoProps> = ({ task, onEdit }) => {
         ))}
       </div>
       <div className="task-actions">
+        <TaskSectionSelect disabled={task.finished} task={task} />
         <TaskLabelSelect
           disabled={task.finished}
           taskId={task.id}
@@ -86,7 +105,12 @@ const TaskInfo: FC<TaskInfoProps> = ({ task, onEdit }) => {
           onSelect={onSelectPriority}
           taskId={task.id}
         />
-        <TaskMenu onEdit={onEdit} task={task} />
+        <TaskMenu
+          triggerRounded={false}
+          onDelete={onDeleteTask}
+          onEdit={onEdit}
+          task={task}
+        />
       </div>
     </>
   );

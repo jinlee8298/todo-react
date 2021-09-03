@@ -97,16 +97,18 @@ const Select: FC<SelecProps> = ({
     const menuChilds: HTMLLIElement[] = [];
     if (currentMenuRef) {
       currentMenuRef
-        .querySelectorAll<HTMLLIElement>("li:not(:disabled), input")
+        .querySelectorAll<HTMLLIElement>(
+          "li:not(:disabled, .group-label), input"
+        )
         .forEach((child) => menuChilds.push(child));
     }
     childRefs.current = menuChilds;
 
     currentMenuRef?.addEventListener("keydown", onKeypress);
 
-    childRefs.current.forEach((child) =>
-      child.addEventListener("focus", childFocused)
-    );
+    childRefs.current.forEach((child) => {
+      child.addEventListener("focus", childFocused);
+    });
     props.onOpenFinished?.();
   };
 

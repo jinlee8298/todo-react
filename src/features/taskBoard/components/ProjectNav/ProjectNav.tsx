@@ -7,7 +7,7 @@ import { useSelector } from "common/hooks";
 import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import ProjectEditModal from "../ProjectEditModal/ProjectEditModal";
-import ProjectMenu from "./ProjectMenu/ProjectMenu";
+import ProjectMenu from "./ProjectMenu";
 import { Project } from "features/taskBoard/types";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
 

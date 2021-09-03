@@ -4,7 +4,7 @@ import StyledTask from "./Task.style";
 import { useDispatch, useDrag, useSelector } from "common/hooks";
 import { EntityId } from "@reduxjs/toolkit";
 import { toggleTask } from "features/taskBoard/taskBoardSlice";
-import TaskMenu from "./TaskItemMenu/TaskMenu";
+import TaskMenu from "./TaskMenu";
 import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { Label } from "features/taskBoard/types";
 import { shallowEqual } from "react-redux";
@@ -122,7 +122,11 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
           </LabelComponent>
         ))}
       </div>
-      <TaskMenu onEdit={openTaskDetailsModal} task={task} />
+      <TaskMenu
+        triggerRounded={true}
+        onEdit={openTaskDetailsModal}
+        task={task}
+      />
     </StyledTask>
   ) : null;
 });

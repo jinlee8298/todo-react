@@ -41,6 +41,7 @@ export const {
   duplicateTask,
   deleteTask,
   repositionTask,
+  moveTask,
   addSection,
   updateSection,
   duplicateSection,

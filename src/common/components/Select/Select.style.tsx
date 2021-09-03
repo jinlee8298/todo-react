@@ -5,7 +5,7 @@ export default styled.ul`
   ${shadow};
   background: #fff;
   border-radius: 4px;
-  padding: 0.5em 0;
+  padding: 0;
   list-style: none;
   margin: 0;
   width: 18.5rem;
@@ -16,9 +16,9 @@ export default styled.ul`
   > label {
     position: sticky;
     top: 0;
-    margin: 0 0 0.5em 0;
     width: 18.5rem;
-    padding: 0 0.5em;
+    margin: 0;
+    padding: 0.5em;
   }
 
   &:hover,

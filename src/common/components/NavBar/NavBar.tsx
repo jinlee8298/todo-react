@@ -1,4 +1,4 @@
-import { faBars, faHome, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FC } from "react";
 import Button from "../Button/Button";
 import StyledNavModal from "./NavBar.style";

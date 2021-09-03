@@ -1,5 +1,4 @@
 import { faBars, faHome } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StyledHeader from "./Header.style";
 import { FC, ReactElement, useState } from "react";
 import NavBar from "../NavBar/NavBar";

@@ -118,10 +118,12 @@ const useDrag = <ContainerType extends HTMLElement>(
         }
       };
       const endDrag = () => {
-        containerRef.current && handleDragEnd(containerRef.current);
-        isDragging = false;
-        mouseDownInitialPos.current = null;
-        containerRef.current && options.onDragEnd?.(containerRef.current);
+        if (isDragging) {
+          containerRef.current && handleDragEnd(containerRef.current);
+          isDragging = false;
+          mouseDownInitialPos.current = null;
+          containerRef.current && options.onDragEnd?.(containerRef.current);
+        }
       };
       const calculateDragPosition = (
         x: number,

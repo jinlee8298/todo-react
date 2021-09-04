@@ -7,7 +7,7 @@ export default styled(Modal)`
   section {
     height: 100%;
     max-height: 100%;
-    width: 17.5rem;
+    width: min(17.5rem, 100vw);
     transform: translateX(-100%);
     &.showing {
       transform: translateX(0);
@@ -25,7 +25,6 @@ export default styled(Modal)`
   nav {
     font-size: 0.875rem;
     height: 100%;
-    width: 17.5rem;
     overflow: auto;
   }
 `;

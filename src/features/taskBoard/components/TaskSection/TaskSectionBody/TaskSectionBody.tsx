@@ -54,7 +54,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     [history, projectId]
   );
 
-  const handleTouchOrMouseEnter = (
+  const insertPlaceholderBefore = (
     currentTarget: EventTarget & Element,
     taskId: EntityId
   ) => {
@@ -71,14 +71,14 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     e: React.MouseEvent<Element, MouseEvent>,
     taskId: EntityId
   ) => {
-    handleTouchOrMouseEnter(e.currentTarget, taskId);
+    insertPlaceholderBefore(e.currentTarget, taskId);
   };
 
   const onTouchEnterTask = (e: Event, taskId: EntityId) => {
-    handleTouchOrMouseEnter(e.currentTarget as HTMLElement, taskId);
+    insertPlaceholderBefore(e.currentTarget as HTMLElement, taskId);
   };
 
-  const onMouseEnterDropZonePadding: MouseEventHandler = (e) => {
+  const insertPlaceholderBottom: MouseEventHandler = (e) => {
     if (draggingTask) {
       const taskIndex = taskIds.length;
       taskPlaceholderNode.dataset.sectionId = sectionId.toString();
@@ -88,10 +88,12 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     }
   };
 
+  // Insert placeholer immediately at dragging task
   const onTaskStartDrag = (dragEle: HTMLElement, taskId: EntityId) => {
     draggingTask = true;
     const taskIndex = taskIds.indexOf(taskId);
     taskPlaceholderNode.dataset.taskId = taskId.toString();
+    taskPlaceholderNode.dataset.sectionId = sectionId.toString();
     taskPlaceholderNode.dataset.originSectionId = sectionId.toString();
     taskPlaceholderNode.dataset.index = taskIndex.toString();
     taskPlaceholderNode.style.height = `${dragEle.offsetHeight}px`;
@@ -99,6 +101,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     parentEle?.insertBefore(taskPlaceholderNode, dragEle.nextSibling);
   };
 
+  // Reposition task and remove placeholder
   const onTaskEndDrag = () => {
     draggingTask = false;
     const dataset = taskPlaceholderNode.dataset;
@@ -121,7 +124,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
 
   useEffect(() => {
     const ref = dropZonePaddingRef.current;
-    const onTouchEnterDropZonePadding = (e: Event) => {
+    const insertPlaceholderAtBottom = (e: Event) => {
       if (draggingTask && e.currentTarget) {
         const taskIndex = taskIds.length;
         taskPlaceholderNode.dataset.sectionId = sectionId.toString();
@@ -133,11 +136,11 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     };
     if (ref) {
       ref.setAttribute("data-touchable", "true");
-      ref.addEventListener("touchenter", onTouchEnterDropZonePadding);
+      ref.addEventListener("touchenter", insertPlaceholderAtBottom);
     }
     return () => {
       if (ref) {
-        ref.removeEventListener("touchenter", onTouchEnterDropZonePadding);
+        ref.removeEventListener("touchenter", insertPlaceholderAtBottom);
       }
     };
   }, [dropZonePaddingRef, sectionId, taskIds]);
@@ -184,7 +187,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
       <div
         ref={dropZonePaddingRef}
         className="dropzone-padding"
-        onMouseEnter={onMouseEnterDropZonePadding}
+        onMouseEnter={insertPlaceholderBottom}
       >
         {filterOptions?.showCompletedTask &&
           finishedTaskIds.map((taskId) => (

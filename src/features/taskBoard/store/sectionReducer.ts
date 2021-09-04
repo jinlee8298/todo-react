@@ -66,10 +66,15 @@ export const duplicateSectionHandler = (
     newSection.finishedTaskIds.push(duplicatedTaskId);
   });
   sectionAdapter.addOne(state.sections, newSection);
+
+  const projectSectionIds = [...project.sectionIds];
+  const originSectionIndex = projectSectionIds.indexOf(sectionId);
+  projectSectionIds.splice(originSectionIndex, 0, newSection.id);
+
   projectAdapter.updateOne(state.projects, {
     id: projectId,
     changes: {
-      sectionIds: [...project.sectionIds, newSection.id],
+      sectionIds: projectSectionIds,
     },
   });
 };

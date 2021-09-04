@@ -183,9 +183,7 @@ const useDrag = <ContainerType extends HTMLElement>(
               }
             });
             prevTouchedElements.forEach((ele) => {
-              if (!touchedElements.includes(ele)) {
-                ele.dispatchEvent(new CustomEvent("touchleave"));
-              }
+              ele.dispatchEvent(new CustomEvent("touchleave"));
             });
             prevTouchedElements = touchedElements;
           }

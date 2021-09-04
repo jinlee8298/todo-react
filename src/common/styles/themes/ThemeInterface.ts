@@ -12,5 +12,6 @@ declare module "styled-components" {
     gray3: string;
     gray4: string;
     text: string;
+    background: string;
   }
 }

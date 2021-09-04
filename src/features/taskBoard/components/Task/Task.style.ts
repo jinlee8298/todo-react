@@ -5,7 +5,7 @@ import { Checkbox, Label, Button } from "common/components/style";
 export default styled.div`
   ${mediumShadow};
 
-  background: #fff;
+  background: var(--background);
   border-radius: 8px;
   overflow: hidden;
   padding: 1em;

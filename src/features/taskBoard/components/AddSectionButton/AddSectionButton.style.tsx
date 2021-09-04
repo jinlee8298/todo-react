@@ -15,7 +15,7 @@ export default styled.button`
   height: 100%;
 
   svg {
-    background: #fff;
+    background: var(--background);
     color: var(--primary);
     font-size: 1.4rem;
     padding: 0.2em;

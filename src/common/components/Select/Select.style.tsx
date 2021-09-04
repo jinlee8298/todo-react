@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 export default styled.ul`
   ${shadow};
-  background: #fff;
+  background: var(--background);
   border-radius: 4px;
   padding: 0;
   list-style: none;

@@ -17,6 +17,13 @@ export default styled.div`
       display: block;
       border-radius: 2px;
       margin-inline-end: 0.5em;
+      flex-shrink: 0;
+    }
+    span {
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
   ${SubTask} {

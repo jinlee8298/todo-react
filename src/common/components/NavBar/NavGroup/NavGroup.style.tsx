@@ -21,7 +21,7 @@ export default styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1em 1.5em;
+    padding: 1em 1.5rem;
     font-size: 0.875rem;
     font-weight: bold;
     .hide-icon {

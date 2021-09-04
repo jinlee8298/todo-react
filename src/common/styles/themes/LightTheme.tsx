@@ -9,6 +9,7 @@ const lightTheme = {
   gray3: "#EFEFEF",
   gray4: "#FBFBFB",
   text: "#0F172A",
+  background: "#fff",
 };
 
 export default lightTheme;

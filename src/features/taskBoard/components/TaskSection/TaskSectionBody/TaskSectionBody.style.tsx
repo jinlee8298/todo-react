@@ -7,6 +7,7 @@ export default styled.div`
   flex-shrink: 1;
   overflow: hidden;
   position: relative;
+  user-select: none;
   &:hover {
     overflow-y: auto;
   }

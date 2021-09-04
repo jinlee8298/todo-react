@@ -13,7 +13,7 @@ export default styled.section`
   max-height: 100%;
   width: calc(var(--list-width) + 2rem);
   flex-shrink: 0;
-  background: #fff;
+  background: var(--background);
 
   header {
     user-select: none;
@@ -22,7 +22,7 @@ export default styled.section`
     border-bottom: 1px solid var(--gray2);
     display: flex;
     align-items: center;
-    background: #fff;
+    background: var(--background);
     h2 {
       font-size: 1rem;
       color: var(--text);
@@ -57,7 +57,7 @@ export default styled.section`
       border-top: 1px solid var(--gray3);
       border-top-left-radius: 0px;
       border-top-right-radius: 0px;
-      background: #fff;
+      background: var(--background);
       &:focus {
         border: 1px solid var(--primary);
       }

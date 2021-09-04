@@ -79,7 +79,7 @@ export const ColorPickerContainer = styled.div`
 `;
 
 export const ColorPickerPopover = styled.div`
-  background: #fff;
+  background: var(--background);
   ${shadow};
   padding: 0.5em;
   border-radius: 8px;

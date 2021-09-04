@@ -158,8 +158,8 @@ const useDrag = <ContainerType extends HTMLElement>(
         if (!waitingToStartDrag) {
           const clientX = e.touches[0].clientX;
           const clientY = e.touches[0].clientY;
-
           calculateDragPosition(clientX, clientY, true);
+
           if (isDragging) {
             const touchedElements = document
               .elementsFromPoint(clientX, clientY)

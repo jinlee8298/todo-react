@@ -29,6 +29,7 @@ export const GlobalStyle = createGlobalStyle`
     --gray3: ${(props) => props.theme.gray3};
     --gray4: ${(props) => props.theme.gray4};
     --text: ${(props) => props.theme.text};
+    --background: ${(props) => props.theme.background};
     --backdrop: #0000007f;
   }
 `;

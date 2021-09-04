@@ -18,7 +18,7 @@ export default styled.div`
     border: 1px solid var(--gray3);
     margin-bottom: 0.5em;
     padding: 0.5rem;
-    background: #fff;
+    background: var(--background);
 
     &:hover {
       border: 1px solid var(--gray2);

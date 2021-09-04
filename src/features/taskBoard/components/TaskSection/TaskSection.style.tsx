@@ -13,6 +13,7 @@ export default styled.section`
   max-height: 100%;
   width: calc(var(--list-width) + 2rem);
   flex-shrink: 0;
+  background: #fff;
 
   header {
     user-select: none;

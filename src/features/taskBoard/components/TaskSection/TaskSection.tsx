@@ -1,4 +1,4 @@
-import { FC, memo, useState, MouseEventHandler } from "react";
+import { FC, memo, useState, MouseEventHandler, useEffect } from "react";
 import StyledTaskSection from "./TaskSection.style";
 import { EntityId } from "@reduxjs/toolkit";
 import { useDrag, useSelector } from "common/hooks";
@@ -17,6 +17,7 @@ type TaskSectionProps = {
   ) => void;
   onDragStart?: (dragEle: HTMLElement, sectionId: EntityId) => void;
   onDragEnd?: (dragEle: HTMLElement, sectionId: EntityId) => void;
+  onTouchEnter?: (e: Event, sectionId: EntityId) => void;
 };
 
 const TaskSection: FC<TaskSectionProps> = memo(
@@ -42,6 +43,22 @@ const TaskSection: FC<TaskSectionProps> = memo(
     const onMouseEnter: MouseEventHandler = (e) => {
       props.onMouseEnter?.(e, sectionId);
     };
+
+    useEffect(() => {
+      const onTouchEnter = (e: Event) => {
+        props.onTouchEnter?.(e, sectionId);
+      };
+      const ref = containerRef.current;
+      if (props.onTouchEnter && ref) {
+        ref.setAttribute("data-touchable", "true");
+        ref.addEventListener("touchenter", onTouchEnter);
+      }
+      return () => {
+        if (props.onTouchEnter && ref) {
+          ref.removeEventListener("touchenter", onTouchEnter);
+        }
+      };
+    }, [containerRef, sectionId, props]);
 
     return (
       <StyledTaskSection

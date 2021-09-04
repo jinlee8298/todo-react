@@ -1,11 +1,12 @@
 import { EntityId } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "common/hooks";
 import { repositionTask } from "features/taskBoard/taskBoardSlice";
-import { FC, useCallback, MouseEventHandler } from "react";
+import { FC, useCallback, MouseEventHandler, useRef, useEffect } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
 import Task from "../../Task/Task";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
+import useScrollAtEdge from "common/hooks/useScrollAtEdge";
 
 type TaskSectionBodyProps = {
   sectionId: EntityId;
@@ -31,6 +32,19 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
       projectSelector.selectById(state.taskBoard, projectId || "")
         ?.filterOptions
   );
+  const dropZonePaddingRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const disabledTouchAutoScroll = useRef(true);
+  useScrollAtEdge(
+    {
+      scrollY: {
+        threshold: 50,
+        intervalDistance: 50,
+        deactive: disabledTouchAutoScroll,
+      },
+    },
+    containerRef
+  );
   const dispatch = useDispatch();
 
   const openTaskDetailsModal = useCallback(
@@ -40,17 +54,28 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     [history, projectId]
   );
 
+  const handleTouchOrMouseEnter = (
+    currentTarget: EventTarget & Element,
+    taskId: EntityId
+  ) => {
+    if (draggingTask && currentTarget) {
+      const taskIndex = taskIds.indexOf(taskId);
+      taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+      taskPlaceholderNode.dataset.index = taskIndex.toString();
+      const parentEle = currentTarget.parentElement;
+      parentEle?.insertBefore(taskPlaceholderNode, currentTarget);
+    }
+  };
+
   const onMouseEnterTask = (
     e: React.MouseEvent<Element, MouseEvent>,
     taskId: EntityId
   ) => {
-    if (draggingTask) {
-      const taskIndex = taskIds.indexOf(taskId);
-      taskPlaceholderNode.dataset.sectionId = sectionId.toString();
-      taskPlaceholderNode.dataset.index = taskIndex.toString();
-      const parentEle = e.currentTarget.parentElement;
-      parentEle?.insertBefore(taskPlaceholderNode, e.currentTarget);
-    }
+    handleTouchOrMouseEnter(e.currentTarget, taskId);
+  };
+
+  const onTouchEnterTask = (e: Event, taskId: EntityId) => {
+    handleTouchOrMouseEnter(e.currentTarget as HTMLElement, taskId);
   };
 
   const onMouseEnterDropZonePadding: MouseEventHandler = (e) => {
@@ -94,8 +119,55 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     taskPlaceholderNode?.remove();
   };
 
+  useEffect(() => {
+    const ref = dropZonePaddingRef.current;
+    const onTouchEnterDropZonePadding = (e: Event) => {
+      if (draggingTask && e.currentTarget) {
+        const taskIndex = taskIds.length;
+        taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+        taskPlaceholderNode.dataset.index = taskIndex.toString();
+        const currentTarget = e.currentTarget as HTMLElement;
+        const parentEle = currentTarget.parentElement;
+        parentEle?.insertBefore(taskPlaceholderNode, currentTarget);
+      }
+    };
+    if (ref) {
+      ref.setAttribute("data-touchable", "true");
+      ref.addEventListener("touchenter", onTouchEnterDropZonePadding);
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener("touchenter", onTouchEnterDropZonePadding);
+      }
+    };
+  }, [dropZonePaddingRef, sectionId, taskIds]);
+
+  useEffect(() => {
+    const ref = containerRef.current;
+    const onDragStart = () => {
+      disabledTouchAutoScroll.current = false;
+    };
+    const onDragEnd = () => {
+      disabledTouchAutoScroll.current = true;
+    };
+    if (ref) {
+      ref.addEventListener("touchenter", onDragStart);
+      ref.addEventListener("touchleave", onDragEnd);
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener("touchenter", onDragStart);
+        ref.removeEventListener("touchleave", onDragEnd);
+      }
+    };
+  }, [containerRef]);
+
   return (
-    <StyledTaskSectionBody className="task-list">
+    <StyledTaskSectionBody
+      ref={containerRef}
+      data-touchable
+      className="task-list"
+    >
       {taskIds.map((taskId) => (
         <Task
           key={taskId}
@@ -105,10 +177,12 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
           onMouseEnter={onMouseEnterTask}
           onDragStart={onTaskStartDrag}
           onDragEnd={onTaskEndDrag}
+          onTouchEnter={onTouchEnterTask}
         />
       ))}
 
       <div
+        ref={dropZonePaddingRef}
         className="dropzone-padding"
         onMouseEnter={onMouseEnterDropZonePadding}
       >

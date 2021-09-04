@@ -1,4 +1,10 @@
-import { FC, FormEventHandler, memo, MouseEventHandler } from "react";
+import {
+  FC,
+  FormEventHandler,
+  memo,
+  MouseEventHandler,
+  useEffect,
+} from "react";
 import { Checkbox, Label as LabelComponent } from "common/components";
 import StyledTask from "./Task.style";
 import { useDispatch, useDrag, useSelector } from "common/hooks";
@@ -18,6 +24,7 @@ type TaskProps = {
     e: React.MouseEvent<Element, MouseEvent>,
     taskId: EntityId
   ) => void;
+  onTouchEnter?: (e: Event, taskId: EntityId) => void;
   onDragStart?: (dragEle: HTMLElement, taskId: EntityId) => void;
   onDragEnd?: (dragEle: HTMLElement, taskId: EntityId) => void;
   onClick?: (taskId: EntityId) => void;
@@ -59,6 +66,22 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
     },
   });
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const onTouchEnter = (e: Event) => {
+      props.onTouchEnter?.(e, taskId);
+    };
+    const ref = containerRef.current;
+    if (props.onTouchEnter && ref) {
+      ref.setAttribute("data-touchable", "true");
+      ref.addEventListener("touchenter", onTouchEnter);
+    }
+    return () => {
+      if (props.onTouchEnter && ref) {
+        ref.removeEventListener("touchenter", onTouchEnter);
+      }
+    };
+  }, [containerRef, taskId, props]);
 
   const onTickCheckbox: FormEventHandler<HTMLInputElement> = (e) => {
     if (task) {

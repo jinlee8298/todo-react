@@ -1,6 +1,7 @@
 import {
   MouseEventHandler,
   RefObject,
+  TouchEventHandler,
   useEffect,
   useRef,
   useState,
@@ -30,10 +31,19 @@ type DragOption = {
   preventDrag?: boolean;
 };
 
+/**
+ * This hook use to make Element draggable using mouse and touch event
+ * instead of native HTML5 drag&drop api. Why? Because the way HTML5 drag&drop
+ * works is confusing and unexpected.
+ * @param {DragOption} options options obj for drag behavior including event onDragStart, onDragEnd and preventDrag flag
+ * @returns an array that include dragging state, drag element ref object, event props for drag element respectively
+ */
+
 const useDrag = <ContainerType extends HTMLElement>(
   options: DragOption = {}
 ) => {
   const containerRef = useRef<ContainerType>(null);
+  const isTouchRef = useRef(false);
   const [dragging, setDragging] = useState<boolean>(false);
   const mouseDownInitialPos = useRef<{ x: number; y: number } | null>(null);
 
@@ -44,8 +54,20 @@ const useDrag = <ContainerType extends HTMLElement>(
     }
   };
 
-  const onMouseUp: MouseEventHandler = () => {
+  const endDragging = () => {
     setDragging(false);
+    isTouchRef.current = false;
+  };
+
+  const onTouchStart: TouchEventHandler = (e) => {
+    if (!options.preventDrag) {
+      mouseDownInitialPos.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+      setDragging(true);
+      isTouchRef.current = true;
+    }
   };
 
   const handleDragStart = (dragEle: HTMLElement) => {
@@ -62,19 +84,33 @@ const useDrag = <ContainerType extends HTMLElement>(
       dragEle.style.setProperty("height", `${height}px`);
       dragEle.style.setProperty("top", `-${height}px`);
       dragEle.style.setProperty("left", `-${width}px`);
-      dragEle.style.setProperty("transition", `none`);
+      dragEle.style.setProperty("transition", "none");
       dragEle.classList.add("dragging");
+      dragEle.dispatchEvent(
+        new CustomEvent("custom-dragstart", { bubbles: true })
+      );
     }
   };
 
   const handleDragEnd = (dragEle: HTMLElement) => {
     dragEle.classList.remove("dragging");
     dragEle.removeAttribute("style");
+    dragEle.dispatchEvent(new CustomEvent("custom-dragend", { bubbles: true }));
   };
 
   useEffect(() => {
     if (dragging) {
+      let waitingToStartDrag: null | ReturnType<typeof setTimeout> = null;
       let isDragging = false;
+      let prevTouchedElements: Element[] = [];
+
+      if (isTouchRef.current) {
+        waitingToStartDrag = setTimeout(() => {
+          window.navigator.vibrate(20);
+          waitingToStartDrag = null;
+        }, 1000);
+      }
+
       const startDrag = () => {
         if (containerRef.current) {
           options.onDragStart?.(containerRef.current);
@@ -87,45 +123,109 @@ const useDrag = <ContainerType extends HTMLElement>(
         mouseDownInitialPos.current = null;
         containerRef.current && options.onDragEnd?.(containerRef.current);
       };
-      const onBodyMouseMove = (e: MouseEvent) => {
+      const calculateDragPosition = (
+        x: number,
+        y: number,
+        skipThreshold: boolean = false
+      ) => {
         const initialPos = mouseDownInitialPos.current;
         if (initialPos) {
-          const x = e.clientX;
-          const y = e.clientY;
-          const xMoved = initialPos.x >= x + 10 || initialPos.x < x - 10;
-          const yMoved = initialPos.y >= y + 10 || initialPos.y < y - 10;
-          if (xMoved || yMoved) {
-            if (!isDragging) {
-              isDragging = true;
-              startDrag();
+          if (!skipThreshold) {
+            const xMoved = initialPos.x >= x + 10 || initialPos.x < x - 10;
+            const yMoved = initialPos.y >= y + 10 || initialPos.y < y - 10;
+            if (!xMoved && !yMoved) {
+              return;
             }
-            if (isDragging) {
-              containerRef.current?.style.setProperty("--top", `${y}px`);
-              containerRef.current?.style.setProperty("--left", `${x}px`);
-            }
+          }
+          if (!isDragging) {
+            isDragging = true;
+            startDrag();
+          }
+          if (isDragging) {
+            containerRef.current?.style.setProperty("--top", `${y}px`);
+            containerRef.current?.style.setProperty("--left", `${x}px`);
           }
         }
       };
-      const onBodyMouseUp = () => {
+      const onBodyMouseMove = (e: MouseEvent) => {
+        calculateDragPosition(e.clientX, e.clientY);
+      };
+      // Element must have "data-touchable" attr
+      // in order to be detected when touch event move over it
+      const onBodyTouchMove = (e: TouchEvent) => {
+        if (!waitingToStartDrag) {
+          const clientX = e.touches[0].clientX;
+          const clientY = e.touches[0].clientY;
+
+          calculateDragPosition(clientX, clientY, true);
+          if (isDragging) {
+            const touchedElements = document
+              .elementsFromPoint(clientX, clientY)
+              .filter((ele) => ele.getAttribute("data-touchable"));
+            touchedElements.forEach((ele) => {
+              const prevIndex = prevTouchedElements.indexOf(ele);
+              ele.dispatchEvent(
+                new CustomEvent("touchover", {
+                  detail: {
+                    touchPos: {
+                      clientX,
+                      clientY,
+                    },
+                  },
+                })
+              );
+              if (prevIndex === -1) {
+                ele.dispatchEvent(new CustomEvent("touchenter"));
+              } else {
+                prevTouchedElements.splice(prevIndex, 1);
+              }
+            });
+            prevTouchedElements.forEach((ele) => {
+              if (!touchedElements.includes(ele)) {
+                ele.dispatchEvent(new CustomEvent("touchleave"));
+              }
+            });
+            prevTouchedElements = touchedElements;
+          }
+        }
+      };
+
+      const stopDragging = () => {
         endDrag();
         setDragging(false);
       };
 
       document.addEventListener("mousemove", onBodyMouseMove);
-      document.addEventListener("mouseup", onBodyMouseUp);
+      document.addEventListener("mouseup", stopDragging);
+      document.addEventListener("touchmove", onBodyTouchMove);
+      document.addEventListener("touchend", stopDragging);
       return () => {
+        waitingToStartDrag && clearTimeout(waitingToStartDrag);
         document.removeEventListener("mousemove", onBodyMouseMove);
-        document.removeEventListener("mouseup", onBodyMouseUp);
+        document.removeEventListener("mouseup", stopDragging);
+        document.removeEventListener("touchmove", onBodyTouchMove);
+        document.removeEventListener("touchend", stopDragging);
       };
     }
   }, [dragging, containerRef, options]);
 
-  return [dragging, containerRef, { onMouseDown, onMouseUp }] as [
+  return [
+    dragging,
+    containerRef,
+    {
+      onMouseDown,
+      onMouseUp: endDragging,
+      onTouchStart,
+      onTouchEnd: endDragging,
+    },
+  ] as [
     dragging: boolean,
     containerRef: RefObject<ContainerType>,
     containerProps: {
       onMouseDown: MouseEventHandler;
       onMouseUp: MouseEventHandler;
+      onTouchStart: TouchEventHandler;
+      onTouchEnd: TouchEventHandler;
     }
   ];
 };

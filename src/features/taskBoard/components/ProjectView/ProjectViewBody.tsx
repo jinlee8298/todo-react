@@ -1,13 +1,14 @@
 import { useDispatch } from "common/hooks";
 import { repositionSection } from "features/taskBoard/taskBoardSlice";
 import { Project } from "features/taskBoard/types";
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useEffect, useRef, useState } from "react";
 import TaskSection from "../TaskSection/TaskSection";
 import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor";
 import AddSectionTrigger from "../AddSectionButton/AddSectionButton";
 import { Button } from "common/components";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { EntityId } from "@reduxjs/toolkit";
+import { useScrollAtEdge } from "common/hooks";
 
 type ProjectViewBodyProps = {
   project: Project;
@@ -20,6 +21,20 @@ sectionPlaceholderNode.classList.add("placeholder");
 
 const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
   const dispatch = useDispatch();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dropZonePaddingRef = useRef<HTMLDivElement>(null);
+  const disabledTouchAutoScroll = useRef(true);
+  useScrollAtEdge(
+    {
+      scrollX: {
+        threshold: 50,
+        intervalDistance: 50,
+        deactive: disabledTouchAutoScroll,
+      },
+    },
+    containerRef
+  );
+
   const [addingSection, setAddingSection] = useState(false);
   const [addSectionIndex, setAddSectionIndex] = useState(-1);
 
@@ -56,16 +71,26 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
     sectionPlaceholderNode?.remove();
   };
 
-  const onMouseEnterSection = (
-    e: React.MouseEvent<Element, MouseEvent>,
+  const handleTouchOrMouseEnter = (
+    currentTarget: EventTarget & Element,
     sectionId: EntityId
   ) => {
     if (draggingSection) {
       const sectionIndex = project.sectionIds.indexOf(sectionId) + 1;
       sectionPlaceholderNode.dataset.index = sectionIndex.toString();
-      const currentTarget = e.currentTarget;
       currentTarget.insertAdjacentElement("afterend", sectionPlaceholderNode);
     }
+  };
+
+  const onMouseEnterSection = (
+    e: React.MouseEvent<Element, MouseEvent>,
+    sectionId: EntityId
+  ) => {
+    handleTouchOrMouseEnter(e.currentTarget, sectionId);
+  };
+
+  const onTouchEnterSection = (e: Event, sectionId: EntityId) => {
+    handleTouchOrMouseEnter(e.currentTarget as HTMLElement, sectionId);
   };
 
   const onMouseEnterDropZonePadding = (
@@ -78,9 +103,50 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
     }
   };
 
+  useEffect(() => {
+    const ref = dropZonePaddingRef.current;
+    const onTouchEnterDropZonePadding = (e: Event) => {
+      if (draggingSection && e.currentTarget) {
+        sectionPlaceholderNode.dataset.index = "0";
+        const currentTarget = e.currentTarget as HTMLElement;
+        currentTarget.insertAdjacentElement("afterend", sectionPlaceholderNode);
+      }
+    };
+    if (ref) {
+      ref.setAttribute("data-touchable", "true");
+      ref.addEventListener("touchenter", onTouchEnterDropZonePadding);
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener("touchenter", onTouchEnterDropZonePadding);
+      }
+    };
+  }, [dropZonePaddingRef, project.sectionIds]);
+
+  useEffect(() => {
+    const ref = containerRef.current;
+    const onDragStart = () => {
+      disabledTouchAutoScroll.current = false;
+    };
+    const onDragEnd = () => {
+      disabledTouchAutoScroll.current = true;
+    };
+    if (ref) {
+      ref.addEventListener("custom-dragstart", onDragStart);
+      ref.addEventListener("custom-dragend", onDragEnd);
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener("custom-dragstart", onDragStart);
+        ref.removeEventListener("custom-dragend", onDragEnd);
+      }
+    };
+  }, [containerRef]);
+
   return (
-    <div className="section-list">
+    <div ref={containerRef} className="section-list">
       <div
+        ref={dropZonePaddingRef}
         className="dropzone-padding"
         onMouseEnter={onMouseEnterDropZonePadding}
       ></div>
@@ -90,6 +156,7 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
             onDragStart={onSectionDragStart}
             onDragEnd={onSectionDragEnd}
             onMouseEnter={onMouseEnterSection}
+            onTouchEnter={onTouchEnterSection}
             key={id}
             sectionId={id}
             projectId={project.id}

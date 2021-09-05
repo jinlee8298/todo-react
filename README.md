@@ -3,9 +3,15 @@
 This project was my attempt at cloning Todoist website (part of...).
 My main goal was to understand react, redux further.
 Therefore, I limited the use of external libraries as much as possible.
-Almost everything builds from scratch so it took a lot of time to develop this project.
-Currently this project works offline only, I'll add firebase to it later.
+Almost everything builds from scratch so it took a lot of time to develop.
+This project works offline only, I'll add firebase to it later in the future.
 
+I think the highlight of this project is drag and drop system builds based on touch and mouse events.
+At first, I use HTML5 APIs for drag and drop but it works oddly and doesn't support mobile => I decided to build from scratch as a chance to practice.
+And I tried to apply best practices as much as possible.
+
+Currently hosting at: [Vercel](https://todo-react-lovat.vercel.app/)
+Give it a look and give me some feedback about it.
 
 ## Available Scripts
 

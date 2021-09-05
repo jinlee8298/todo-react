@@ -147,20 +147,20 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
 
   useEffect(() => {
     const ref = containerRef.current;
-    const onDragStart = () => {
+    const onDragEnterSection = () => {
       disabledTouchAutoScroll.current = false;
     };
-    const onDragEnd = () => {
+    const onDragLeaveSection = () => {
       disabledTouchAutoScroll.current = true;
     };
     if (ref) {
-      ref.addEventListener("touchenter", onDragStart);
-      ref.addEventListener("touchleave", onDragEnd);
+      ref.addEventListener("touchenter", onDragEnterSection);
+      ref.addEventListener("touchleave", onDragLeaveSection);
     }
     return () => {
       if (ref) {
-        ref.removeEventListener("touchenter", onDragStart);
-        ref.removeEventListener("touchleave", onDragEnd);
+        ref.removeEventListener("touchenter", onDragEnterSection);
+        ref.removeEventListener("touchleave", onDragLeaveSection);
       }
     };
   }, [containerRef]);

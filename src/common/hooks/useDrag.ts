@@ -45,11 +45,36 @@ const useDrag = <ContainerType extends HTMLElement>(
   const containerRef = useRef<ContainerType>(null);
   const isTouchRef = useRef(false);
   const [dragging, setDragging] = useState<boolean>(false);
-  const mouseDownInitialPos = useRef<{ x: number; y: number } | null>(null);
+  const mouseDownInitialPos = useRef<{
+    x: number;
+    y: number;
+    xPosRelativeToEle: number;
+    yPosRelativeToEle: number;
+  } | null>(null);
+
+  const calculateInitialPos = (
+    clientX: number,
+    clientY: number,
+    currentTarget: Element
+  ) => {
+    const rect = currentTarget.getBoundingClientRect();
+    const offsetX = clientX - rect.left;
+    const offsetY = clientY - rect.top;
+    return {
+      x: clientX,
+      y: clientY,
+      xPosRelativeToEle: offsetX,
+      yPosRelativeToEle: offsetY,
+    };
+  };
 
   const onMouseDown: MouseEventHandler = (e) => {
     if (!options.preventDrag) {
-      mouseDownInitialPos.current = { x: e.clientX, y: e.clientY };
+      mouseDownInitialPos.current = calculateInitialPos(
+        e.clientX,
+        e.clientY,
+        e.currentTarget
+      );
       setDragging(true);
     }
   };
@@ -61,10 +86,12 @@ const useDrag = <ContainerType extends HTMLElement>(
 
   const onTouchStart: TouchEventHandler = (e) => {
     if (!options.preventDrag) {
-      mouseDownInitialPos.current = {
-        x: e.touches[0].clientX,
-        y: e.touches[0].clientY,
-      };
+      const initialPos = e.touches[0];
+      mouseDownInitialPos.current = calculateInitialPos(
+        initialPos.clientX,
+        initialPos.clientY,
+        e.currentTarget
+      );
       setDragging(true);
       isTouchRef.current = true;
     }
@@ -73,14 +100,17 @@ const useDrag = <ContainerType extends HTMLElement>(
   const handleDragStart = (dragEle: HTMLElement) => {
     const initialPos = mouseDownInitialPos.current;
     if (initialPos) {
-      const rect = dragEle.getBoundingClientRect();
-      const x = initialPos.x - rect.left;
-      const y = initialPos.y - rect.top;
       const height = dragEle.offsetHeight;
       const width = dragEle.offsetWidth;
 
-      dragEle.style.setProperty("--offset-x", `${width - x}px`);
-      dragEle.style.setProperty("--offset-y", `${height - y}px`);
+      dragEle.style.setProperty(
+        "--offset-x",
+        `${width - initialPos.xPosRelativeToEle}px`
+      );
+      dragEle.style.setProperty(
+        "--offset-y",
+        `${height - initialPos.yPosRelativeToEle}px`
+      );
       dragEle.style.setProperty("height", `${height}px`);
       dragEle.style.setProperty("top", `-${height}px`);
       dragEle.style.setProperty("left", `-${width}px`);
@@ -161,11 +191,11 @@ const useDrag = <ContainerType extends HTMLElement>(
           calculateDragPosition(clientX, clientY, true);
 
           if (isDragging) {
-            const touchedElements = document
-              .elementsFromPoint(clientX, clientY)
-              .filter((ele) => ele.getAttribute("data-touchable"));
-            touchedElements.forEach((ele) => {
-              const prevIndex = prevTouchedElements.indexOf(ele);
+            const touchedElements = document.elementsFromPoint(
+              clientX,
+              clientY
+            );
+            touchedElements.forEach((ele) =>
               ele.dispatchEvent(
                 new CustomEvent("touchover", {
                   detail: {
@@ -174,16 +204,20 @@ const useDrag = <ContainerType extends HTMLElement>(
                       clientY,
                     },
                   },
+                  bubbles: true,
                 })
-              );
+              )
+            );
+            touchedElements.forEach((ele) => {
+              const prevIndex = prevTouchedElements.indexOf(ele);
               if (prevIndex === -1) {
                 ele.dispatchEvent(new CustomEvent("touchenter"));
               } else {
                 prevTouchedElements.splice(prevIndex, 1);
               }
             });
-            prevTouchedElements.forEach((ele) => {
-              ele.dispatchEvent(new CustomEvent("touchleave"));
+            prevTouchedElements.forEach((untouchedEle) => {
+              untouchedEle.dispatchEvent(new CustomEvent("touchleave"));
             });
             prevTouchedElements = touchedElements;
           }

@@ -11,6 +11,7 @@ At first, I use HTML5 APIs for drag and drop but it works oddly and doesn't supp
 And I tried to apply best practices as much as possible.
 
 Currently hosting at: [Vercel](https://todo-react-lovat.vercel.app/)
+
 Give it a look and give me some feedback about it.
 
 ## Available Scripts

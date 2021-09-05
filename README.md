@@ -1,6 +1,6 @@
 # My first ever serious project
 
-This project was my attempt at cloning Todoist website (part of...).
+This project was my attempt at cloning Todoist website (part of it, currently only basic features).
 My main goal was to understand react, redux further.
 Therefore, I limited the use of external libraries as much as possible.
 Almost everything builds from scratch so it took a lot of time to develop.

@@ -52,21 +52,15 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     [history, projectId]
   );
 
-  const insertPlaceholderBefore = (
-    currentTarget: EventTarget & Element,
-    taskId: EntityId
-  ) => {
-    if (draggingTask && currentTarget) {
+  const onDragEnterTask = (e: Event, taskId: EntityId) => {
+    if (draggingTask) {
       const taskIndex = taskIds.indexOf(taskId);
       taskPlaceholderNode.dataset.sectionId = sectionId.toString();
       taskPlaceholderNode.dataset.index = taskIndex.toString();
+      const currentTarget = e.currentTarget as HTMLElement;
       const parentEle = currentTarget.parentElement;
       parentEle?.insertBefore(taskPlaceholderNode, currentTarget);
     }
-  };
-
-  const onDragEnterTask = (e: Event, taskId: EntityId) => {
-    insertPlaceholderBefore(e.currentTarget as HTMLElement, taskId);
   };
 
   const insertPlaceholderBottom: MouseEventHandler = (e) => {

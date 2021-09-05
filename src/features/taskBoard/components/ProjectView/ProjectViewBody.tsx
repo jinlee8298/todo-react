@@ -69,28 +69,14 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
     sectionPlaceholderNode?.remove();
   };
 
-  const handleTouchOrMouseEnter = (
-    currentTarget: EventTarget & Element,
-    sectionId: EntityId
-  ) => {
+  const onDragEnterSection = (e: Event, sectionId: EntityId) => {
     if (draggingSection) {
       const sectionIndex = project.sectionIds.indexOf(sectionId) + 1;
       sectionPlaceholderNode.dataset.index = sectionIndex.toString();
-      currentTarget.insertAdjacentElement("afterend", sectionPlaceholderNode);
-    }
-  };
-
-  const onDragEnterSection = (e: Event, sectionId: EntityId) => {
-    handleTouchOrMouseEnter(e.currentTarget as HTMLElement, sectionId);
-  };
-
-  const onMouseEnterDropZonePadding = (
-    e: React.MouseEvent<Element, MouseEvent>
-  ) => {
-    if (draggingSection) {
-      sectionPlaceholderNode.dataset.index = "0";
-      const currentTarget = e.currentTarget;
-      currentTarget.insertAdjacentElement("afterend", sectionPlaceholderNode);
+      (e.currentTarget as HTMLElement).insertAdjacentElement(
+        "afterend",
+        sectionPlaceholderNode
+      );
     }
   };
 

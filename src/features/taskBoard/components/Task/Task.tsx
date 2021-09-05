@@ -70,7 +70,6 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
       props.onDragOver?.(e, taskId);
     };
     const onDragEnter = (e: Event) => {
-      console.log("enter");
       props.onDragEnter?.(e, taskId);
     };
     const ref = containerRef.current;

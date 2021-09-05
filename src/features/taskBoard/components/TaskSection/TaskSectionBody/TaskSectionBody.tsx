@@ -34,13 +34,11 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
   );
   const dropZonePaddingRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const disabledTouchAutoScroll = useRef(true);
   useScrollAtEdge(
     {
       scrollY: {
         threshold: 50,
         intervalDistance: 50,
-        deactive: disabledTouchAutoScroll,
       },
     },
     containerRef
@@ -67,14 +65,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
     }
   };
 
-  const onMouseEnterTask = (
-    e: React.MouseEvent<Element, MouseEvent>,
-    taskId: EntityId
-  ) => {
-    insertPlaceholderBefore(e.currentTarget, taskId);
-  };
-
-  const onTouchEnterTask = (e: Event, taskId: EntityId) => {
+  const onDragEnterTask = (e: Event, taskId: EntityId) => {
     insertPlaceholderBefore(e.currentTarget as HTMLElement, taskId);
   };
 
@@ -135,34 +126,14 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
       }
     };
     if (ref) {
-      ref.addEventListener("touchenter", insertPlaceholderAtBottom);
+      ref.addEventListener("custom-dragenter", insertPlaceholderAtBottom);
     }
     return () => {
       if (ref) {
-        ref.removeEventListener("touchenter", insertPlaceholderAtBottom);
+        ref.removeEventListener("custom-dragenter", insertPlaceholderAtBottom);
       }
     };
   }, [dropZonePaddingRef, sectionId, taskIds]);
-
-  useEffect(() => {
-    const ref = containerRef.current;
-    const onDragEnterSection = () => {
-      disabledTouchAutoScroll.current = false;
-    };
-    const onDragLeaveSection = () => {
-      disabledTouchAutoScroll.current = true;
-    };
-    if (ref) {
-      ref.addEventListener("touchenter", onDragEnterSection);
-      ref.addEventListener("touchleave", onDragLeaveSection);
-    }
-    return () => {
-      if (ref) {
-        ref.removeEventListener("touchenter", onDragEnterSection);
-        ref.removeEventListener("touchleave", onDragLeaveSection);
-      }
-    };
-  }, [containerRef]);
 
   return (
     <StyledTaskSectionBody ref={containerRef} className="task-list">
@@ -172,10 +143,9 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
           onClick={openTaskDetailsModal}
           taskId={taskId}
           sectionId={sectionId}
-          onMouseEnter={onMouseEnterTask}
           onDragStart={onTaskStartDrag}
           onDragEnd={onTaskEndDrag}
-          onTouchEnter={onTouchEnterTask}
+          onDragEnter={onDragEnterTask}
         />
       ))}
 

@@ -1,12 +1,11 @@
 import { throttle } from "common/utilitites";
-import { RefObject, useEffect } from "react";
+import { RefObject, useEffect, useRef } from "react";
 
 // deactive properties is RefObject in order to
 // prevent rerender when it change value
 type ScrollOptions = {
   threshold: number;
   intervalDistance: number;
-  deactive?: RefObject<boolean>;
 };
 
 type OptionType = {
@@ -22,6 +21,8 @@ const useScrollAtEdge = <ContainerType extends HTMLElement>(
   options: OptionType = {},
   containerRef: RefObject<ContainerType> | null = null
 ) => {
+  const autoScrollActive = useRef(true);
+
   useEffect(() => {
     if (!containerRef || !containerRef.current) {
       return;
@@ -29,20 +30,22 @@ const useScrollAtEdge = <ContainerType extends HTMLElement>(
 
     const ref = containerRef.current;
 
-    const onTouchEnd = () => {
+    const disableAutoScroll = () => {
+      autoScrollActive.current = false;
       ref.removeAttribute("style");
     };
 
-    const onTouchMove = throttle((e: CustomEvent) => {
-      const touch = e.detail.touchPos;
-      const deactiveX = !options.scrollX || options.scrollX.deactive?.current;
-      const deactiveY = !options.scrollY || options.scrollY.deactive?.current;
-      const deactive = deactiveX && deactiveY;
-      if (touch && !deactive) {
+    const enableAutoScroll = () => {
+      autoScrollActive.current = true;
+    };
+
+    const autoScrollHandler = throttle((e: CustomEvent) => {
+      const touch = e.detail.position;
+      if (touch && autoScrollActive.current) {
         const { left, top, width, height } = ref.getBoundingClientRect();
         ref.style.overflow = "hidden";
 
-        if (options.scrollX && !deactiveX) {
+        if (options.scrollX) {
           const scrollOption = options.scrollX;
           const x = touch.clientX - left;
 
@@ -54,7 +57,7 @@ const useScrollAtEdge = <ContainerType extends HTMLElement>(
           }
         }
 
-        if (options.scrollY && !deactiveY) {
+        if (options.scrollY) {
           const scrollOption = options.scrollY;
           const y = touch.clientY - top;
 
@@ -68,11 +71,17 @@ const useScrollAtEdge = <ContainerType extends HTMLElement>(
       }
     }, 50);
 
-    ref.addEventListener("touchend", onTouchEnd);
-    ref.addEventListener("touchover", onTouchMove);
+    ref.addEventListener("custom-dragend", disableAutoScroll);
+    ref.addEventListener("custom-dragleave", disableAutoScroll);
+    ref.addEventListener("custom-dragstart", enableAutoScroll);
+    ref.addEventListener("custom-dragenter", enableAutoScroll);
+    ref.addEventListener("custom-dragover", autoScrollHandler);
     return () => {
-      ref.removeEventListener("touchend", onTouchEnd);
-      ref.removeEventListener("touchover", onTouchMove);
+      ref.removeEventListener("custom-dragend", disableAutoScroll);
+      ref.removeEventListener("custom-dragleave", disableAutoScroll);
+      ref.removeEventListener("custom-dragstart", enableAutoScroll);
+      ref.removeEventListener("custom-dragenter", enableAutoScroll);
+      ref.removeEventListener("custom-dragover", autoScrollHandler);
     };
   }, [containerRef, options]);
 };

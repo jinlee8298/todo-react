@@ -23,13 +23,11 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
   const dispatch = useDispatch();
   const containerRef = useRef<HTMLDivElement>(null);
   const dropZonePaddingRef = useRef<HTMLDivElement>(null);
-  const disabledTouchAutoScroll = useRef(true);
   useScrollAtEdge(
     {
       scrollX: {
         threshold: 50,
         intervalDistance: 50,
-        deactive: disabledTouchAutoScroll,
       },
     },
     containerRef
@@ -105,7 +103,7 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
 
   useEffect(() => {
     const ref = dropZonePaddingRef.current;
-    const onTouchEnterDropZonePadding = (e: Event) => {
+    const onDragEnterDropzonePadding = (e: Event) => {
       if (draggingSection && e.currentTarget) {
         sectionPlaceholderNode.dataset.index = "0";
         const currentTarget = e.currentTarget as HTMLElement;
@@ -113,34 +111,14 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
       }
     };
     if (ref) {
-      ref.addEventListener("touchenter", onTouchEnterDropZonePadding);
+      ref.addEventListener("custom-dragenter", onDragEnterDropzonePadding);
     }
     return () => {
       if (ref) {
-        ref.removeEventListener("touchenter", onTouchEnterDropZonePadding);
+        ref.removeEventListener("custom-dragenter", onDragEnterDropzonePadding);
       }
     };
   }, [dropZonePaddingRef, project.sectionIds]);
-
-  useEffect(() => {
-    const ref = containerRef.current;
-    const onDragStart = () => {
-      disabledTouchAutoScroll.current = false;
-    };
-    const onDragEnd = () => {
-      disabledTouchAutoScroll.current = true;
-    };
-    if (ref) {
-      ref.addEventListener("custom-dragstart", onDragStart);
-      ref.addEventListener("custom-dragend", onDragEnd);
-    }
-    return () => {
-      if (ref) {
-        ref.removeEventListener("custom-dragstart", onDragStart);
-        ref.removeEventListener("custom-dragend", onDragEnd);
-      }
-    };
-  }, [containerRef]);
 
   return (
     <div ref={containerRef} className="section-list">

@@ -1,10 +1,4 @@
-import {
-  FC,
-  FormEventHandler,
-  memo,
-  MouseEventHandler,
-  useEffect,
-} from "react";
+import { FC, FormEventHandler, memo, useEffect } from "react";
 import { Checkbox, Label as LabelComponent } from "common/components";
 import StyledTask from "./Task.style";
 import { useDispatch, useDrag, useSelector } from "common/hooks";
@@ -20,11 +14,11 @@ import { labelSelector } from "features/taskBoard/store/labelReducer";
 type TaskProps = {
   taskId: EntityId;
   sectionId: EntityId;
-  onMouseEnter?: (
-    e: React.MouseEvent<Element, MouseEvent>,
+  onDragOver?: (
+    e: CustomEvent<{ position: { clientX: number; clientY: number } }>,
     taskId: EntityId
   ) => void;
-  onTouchEnter?: (e: Event, taskId: EntityId) => void;
+  onDragEnter?: (e: Event, taskId: EntityId) => void;
   onDragStart?: (dragEle: HTMLElement, taskId: EntityId) => void;
   onDragEnd?: (dragEle: HTMLElement, taskId: EntityId) => void;
   onClick?: (taskId: EntityId) => void;
@@ -68,16 +62,38 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const onTouchEnter = (e: Event) => {
-      props.onTouchEnter?.(e, taskId);
+    const onDragOver = (
+      e: CustomEvent<{
+        position: { clientX: number; clientY: number };
+      }>
+    ) => {
+      props.onDragOver?.(e, taskId);
+    };
+    const onDragEnter = (e: Event) => {
+      console.log("enter");
+      props.onDragEnter?.(e, taskId);
     };
     const ref = containerRef.current;
-    if (props.onTouchEnter && ref) {
-      ref.addEventListener("touchenter", onTouchEnter);
+    if (ref) {
+      if (props.onDragEnter) {
+        ref.addEventListener("custom-dragenter", onDragEnter);
+      }
+      if (props.onDragOver) {
+        ref.addEventListener("custom-dragover", onDragOver as EventListener);
+      }
     }
+
     return () => {
-      if (props.onTouchEnter && ref) {
-        ref.removeEventListener("touchenter", onTouchEnter);
+      if (ref) {
+        if (props.onDragEnter) {
+          ref.removeEventListener("custom-dragenter", onDragEnter);
+        }
+        if (props.onDragOver) {
+          ref.removeEventListener(
+            "custom-dragover",
+            onDragOver as EventListener
+          );
+        }
       }
     };
   }, [containerRef, taskId, props]);
@@ -92,14 +108,9 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
     props.onClick?.(taskId);
   };
 
-  const onMouseEnter: MouseEventHandler = (e) => {
-    props.onMouseEnter?.(e, taskId);
-  };
-
   return task ? (
     <StyledTask
       onClick={openTaskDetailsModal}
-      onMouseEnter={onMouseEnter}
       className={[
         task.priority !== "low" ? task.priority : "",
         task.finished ? "finished" : "",

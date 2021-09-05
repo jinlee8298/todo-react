@@ -128,11 +128,39 @@ const useDrag = <ContainerType extends HTMLElement>(
     dragEle.dispatchEvent(new CustomEvent("custom-dragend", { bubbles: true }));
   };
 
+  const dispatchEventHandler = (
+    prevDragOverElements: Element[],
+    currentDragOverElements: Element[],
+    position: { clientX: number; clientY: number }
+  ) => {
+    currentDragOverElements.forEach((ele) => {
+      ele.dispatchEvent(
+        new CustomEvent("custom-dragover", {
+          detail: {
+            position: { clientX: position.clientX, clientY: position.clientY },
+          },
+          bubbles: true,
+        })
+      );
+
+      const prevIndex = prevDragOverElements.indexOf(ele as HTMLElement);
+      if (prevIndex === -1) {
+        ele.dispatchEvent(new CustomEvent("custom-dragenter"));
+      } else {
+        prevDragOverElements.splice(prevIndex, 1);
+      }
+    });
+    prevDragOverElements.forEach((dragLeaveEle) =>
+      dragLeaveEle.dispatchEvent(new CustomEvent("custom-dragleave"))
+    );
+    return currentDragOverElements as Element[];
+  };
+
   useEffect(() => {
     if (dragging) {
       let waitingToStartDrag: null | ReturnType<typeof setTimeout> = null;
       let isDragging = false;
-      let prevTouchedElements: Element[] = [];
+      let prevDragOverElements: Element[] = [];
 
       if (isTouchRef.current) {
         waitingToStartDrag = setTimeout(() => {
@@ -183,6 +211,14 @@ const useDrag = <ContainerType extends HTMLElement>(
       };
       const onBodyMouseMove = (e: MouseEvent) => {
         calculateDragPosition(e.clientX, e.clientY);
+        if (isDragging) {
+          const dragOverElements = e.composedPath();
+          prevDragOverElements = dispatchEventHandler(
+            prevDragOverElements,
+            dragOverElements as Element[],
+            { clientX: e.clientX, clientY: e.clientY }
+          );
+        }
       };
       const onBodyTouchMove = (e: TouchEvent) => {
         if (!waitingToStartDrag) {
@@ -191,35 +227,15 @@ const useDrag = <ContainerType extends HTMLElement>(
           calculateDragPosition(clientX, clientY, true);
 
           if (isDragging) {
-            const touchedElements = document.elementsFromPoint(
+            const dragOverElements = document.elementsFromPoint(
               clientX,
               clientY
             );
-            touchedElements.forEach((ele) =>
-              ele.dispatchEvent(
-                new CustomEvent("touchover", {
-                  detail: {
-                    touchPos: {
-                      clientX,
-                      clientY,
-                    },
-                  },
-                  bubbles: true,
-                })
-              )
+            prevDragOverElements = dispatchEventHandler(
+              prevDragOverElements,
+              dragOverElements as Element[],
+              { clientX, clientY }
             );
-            touchedElements.forEach((ele) => {
-              const prevIndex = prevTouchedElements.indexOf(ele);
-              if (prevIndex === -1) {
-                ele.dispatchEvent(new CustomEvent("touchenter"));
-              } else {
-                prevTouchedElements.splice(prevIndex, 1);
-              }
-            });
-            prevTouchedElements.forEach((untouchedEle) => {
-              untouchedEle.dispatchEvent(new CustomEvent("touchleave"));
-            });
-            prevTouchedElements = touchedElements;
           }
         }
       };

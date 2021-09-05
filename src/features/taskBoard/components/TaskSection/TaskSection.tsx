@@ -11,13 +11,9 @@ import { sectionSelector } from "features/taskBoard/store/sectionReducer";
 type TaskSectionProps = {
   sectionId: EntityId;
   projectId: EntityId;
-  onMouseEnter?: (
-    e: React.MouseEvent<Element, MouseEvent>,
-    sectionId: EntityId
-  ) => void;
   onDragStart?: (dragEle: HTMLElement, sectionId: EntityId) => void;
   onDragEnd?: (dragEle: HTMLElement, sectionId: EntityId) => void;
-  onTouchEnter?: (e: Event, sectionId: EntityId) => void;
+  onDragEnter?: (e: Event, sectionId: EntityId) => void;
 };
 
 const TaskSection: FC<TaskSectionProps> = memo(
@@ -40,31 +36,23 @@ const TaskSection: FC<TaskSectionProps> = memo(
       setEditing((v) => !v);
     };
 
-    const onMouseEnter: MouseEventHandler = (e) => {
-      props.onMouseEnter?.(e, sectionId);
-    };
-
     useEffect(() => {
-      const onTouchEnter = (e: Event) => {
-        props.onTouchEnter?.(e, sectionId);
+      const onDragEnter = (e: Event) => {
+        props.onDragEnter?.(e, sectionId);
       };
       const ref = containerRef.current;
-      if (props.onTouchEnter && ref) {
-        ref.addEventListener("touchenter", onTouchEnter);
+      if (props.onDragEnter && ref) {
+        ref.addEventListener("custom-dragenter", onDragEnter);
       }
       return () => {
-        if (props.onTouchEnter && ref) {
-          ref.removeEventListener("touchenter", onTouchEnter);
+        if (props.onDragEnter && ref) {
+          ref.removeEventListener("custom-dragenter", onDragEnter);
         }
       };
     }, [containerRef, sectionId, props]);
 
     return (
-      <StyledTaskSection
-        role="group"
-        onMouseEnter={onMouseEnter}
-        ref={containerRef}
-      >
+      <StyledTaskSection role="group" ref={containerRef}>
         <header {...dragProps}>
           {editing ? (
             <TaskSecitonEditor

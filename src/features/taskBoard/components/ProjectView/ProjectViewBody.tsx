@@ -80,14 +80,7 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
     }
   };
 
-  const onMouseEnterSection = (
-    e: React.MouseEvent<Element, MouseEvent>,
-    sectionId: EntityId
-  ) => {
-    handleTouchOrMouseEnter(e.currentTarget, sectionId);
-  };
-
-  const onTouchEnterSection = (e: Event, sectionId: EntityId) => {
+  const onDragEnterSection = (e: Event, sectionId: EntityId) => {
     handleTouchOrMouseEnter(e.currentTarget as HTMLElement, sectionId);
   };
 
@@ -122,18 +115,13 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
 
   return (
     <div ref={containerRef} className="section-list">
-      <div
-        ref={dropZonePaddingRef}
-        className="dropzone-padding"
-        onMouseEnter={onMouseEnterDropZonePadding}
-      ></div>
+      <div ref={dropZonePaddingRef} className="dropzone-padding"></div>
       {project.sectionIds.map((id, index) => (
         <Fragment key={id}>
           <TaskSection
             onDragStart={onSectionDragStart}
             onDragEnd={onSectionDragEnd}
-            onMouseEnter={onMouseEnterSection}
-            onTouchEnter={onTouchEnterSection}
+            onDragEnter={onDragEnterSection}
             key={id}
             sectionId={id}
             projectId={project.id}

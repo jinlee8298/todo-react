@@ -211,7 +211,6 @@ const useDrag = <ContainerType extends HTMLElement>(
         }
       };
       const onBodyMouseMove = throttle((e: MouseEvent) => {
-        console.log("moved");
         calculateDragPosition(e.clientX, e.clientY);
         if (isDragging) {
           const dragOverElements = e.composedPath();

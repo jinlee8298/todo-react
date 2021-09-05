@@ -1,3 +1,4 @@
+import { throttle } from "common/utilitites";
 import {
   MouseEventHandler,
   RefObject,
@@ -209,7 +210,8 @@ const useDrag = <ContainerType extends HTMLElement>(
           }
         }
       };
-      const onBodyMouseMove = (e: MouseEvent) => {
+      const onBodyMouseMove = throttle((e: MouseEvent) => {
+        console.log("moved");
         calculateDragPosition(e.clientX, e.clientY);
         if (isDragging) {
           const dragOverElements = e.composedPath();
@@ -219,8 +221,8 @@ const useDrag = <ContainerType extends HTMLElement>(
             { clientX: e.clientX, clientY: e.clientY }
           );
         }
-      };
-      const onBodyTouchMove = (e: TouchEvent) => {
+      }, 16);
+      const onBodyTouchMove = throttle((e: TouchEvent) => {
         if (!waitingToStartDrag) {
           const clientX = e.touches[0].clientX;
           const clientY = e.touches[0].clientY;
@@ -238,7 +240,7 @@ const useDrag = <ContainerType extends HTMLElement>(
             );
           }
         }
-      };
+      }, 16);
 
       const stopDragging = () => {
         endDrag();

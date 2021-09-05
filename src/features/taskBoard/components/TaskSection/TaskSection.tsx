@@ -1,4 +1,4 @@
-import { FC, memo, useState, MouseEventHandler, useEffect } from "react";
+import { FC, memo, useState, useEffect } from "react";
 import StyledTaskSection from "./TaskSection.style";
 import { EntityId } from "@reduxjs/toolkit";
 import { useDrag, useSelector } from "common/hooks";

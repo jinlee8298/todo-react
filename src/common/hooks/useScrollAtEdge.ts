@@ -1,8 +1,6 @@
 import { throttle } from "common/utilitites";
 import { RefObject, useEffect, useRef } from "react";
 
-// deactive properties is RefObject in order to
-// prevent rerender when it change value
 type ScrollOptions = {
   threshold: number;
   intervalDistance: number;

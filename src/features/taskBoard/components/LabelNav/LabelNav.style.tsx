@@ -4,6 +4,8 @@ import styled from "styled-components";
 
 export default styled(NavBar.NavGroup)`
   .nav-item {
+    padding-block: 0.5em;
+    padding-inline: 1.5rem 3.5em;
     &:hover,
     &:focus-within {
       ${Button} {
@@ -13,7 +15,7 @@ export default styled(NavBar.NavGroup)`
     ${Button} {
       display: none;
       position: absolute;
-      right: 1.3125rem; // 0.875rem * 1.5rem
+      right: 1.5rem;
       top: 50%;
       transform: translateY(-50%);
       &.showing {

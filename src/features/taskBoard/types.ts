@@ -32,8 +32,8 @@ export interface Task {
   title: string;
   updatedAt: string;
   subTaskIds: EntityId[];
-  sectionId?: EntityId;
-  projectId?: EntityId;
+  sectionId: EntityId;
+  projectId: EntityId;
 }
 
 export interface TaskSection {

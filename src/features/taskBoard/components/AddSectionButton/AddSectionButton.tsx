@@ -9,7 +9,10 @@ type AddSectionButtonProps = {
 
 const AddSectionButton: FC<AddSectionButtonProps> = (props) => {
   return (
-    <StyledAddSectionButton onClick={props.onClick}>
+    <StyledAddSectionButton
+      title="Add new section at this position"
+      onClick={props.onClick}
+    >
       <FontAwesomeIcon icon={faPlus} fixedWidth />
     </StyledAddSectionButton>
   );

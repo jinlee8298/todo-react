@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { Label } from "features/taskBoard/types";
 import LabelEditModal from "../LabelEditModal/LabelEditModal";
-import LabelMenu from "./LabelMenu/LabelMenu";
+import LabelMenu from "./LabelMenu";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 const LabelNav = () => {
@@ -40,6 +40,7 @@ const LabelNav = () => {
 
   return (
     <StyledNavGroup
+      addButtonTitle="Add new label"
       name="Labels"
       onAddButtonClick={toggleLabelModal}
       addButtonVisible

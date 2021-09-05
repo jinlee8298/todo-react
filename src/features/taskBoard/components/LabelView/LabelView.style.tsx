@@ -3,6 +3,7 @@ import SubTask from "../TaskDetailsModal/SubTasksTab/SubTask/SubTask.style";
 
 export default styled.div`
   max-width: 50rem;
+  min-width: 20rem;
   margin-inline: auto;
   h1 {
     font-size: 1.5rem;
@@ -16,6 +17,13 @@ export default styled.div`
       display: block;
       border-radius: 2px;
       margin-inline-end: 0.5em;
+      flex-shrink: 0;
+    }
+    span {
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
   ${SubTask} {

@@ -60,13 +60,19 @@ const TaskSecitonEditor: FC<TaskSectionEditorProps> = ({
         onChange={onNameChange}
       />
       <Button
+        aria-label="Save"
         onClick={section ? saveChange : addNewSection}
         disabled={!sectionName.trim()}
         size="sm"
       >
         Save
       </Button>
-      <Button onClick={onCloseHandle} alternative="reverse" size="sm">
+      <Button
+        aria-label="Cancel"
+        onClick={onCloseHandle}
+        alternative="reverse"
+        size="sm"
+      >
         Cancel
       </Button>
     </StyledEditor>

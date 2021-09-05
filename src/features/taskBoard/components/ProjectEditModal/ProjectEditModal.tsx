@@ -101,6 +101,7 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
       <div className="header">
         <h2>{project ? "Edit" : "Add"} project</h2>
         <Button
+          aria-label="Close modal"
           onClick={onCloseHandle}
           icon={faTimes}
           size="sx"
@@ -122,10 +123,16 @@ const AddProjectModal: FC<AddProjectModalProps> = ({
         label="Color"
       />
       <div className="action">
-        <Button onClick={onCloseHandle} size="sm" alternative="reverse">
+        <Button
+          aria-label="Cancel"
+          onClick={onCloseHandle}
+          size="sm"
+          alternative="reverse"
+        >
           Cancel
         </Button>
         <Button
+          aria-label={project ? "Update" : "Add"}
           disabled={!projectName.trim() || isError}
           onClick={project ? updateProjectHandler : addNewProject}
           size="sm"

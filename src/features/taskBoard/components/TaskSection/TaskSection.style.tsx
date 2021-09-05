@@ -13,19 +13,17 @@ export default styled.section`
   max-height: 100%;
   width: calc(var(--list-width) + 2rem);
   flex-shrink: 0;
-
-  &.dragging {
-    display: none;
-  }
+  background: var(--background);
 
   header {
+    user-select: none;
     border-radius: 8px 8px 0 0;
     padding: 0.5em 1em;
     border-bottom: 1px solid var(--gray2);
     display: flex;
     align-items: center;
-    background: #fff;
-    h3 {
+    background: var(--background);
+    h2 {
       font-size: 1rem;
       color: var(--text);
       overflow: hidden;
@@ -45,6 +43,7 @@ export default styled.section`
       background: var(--gray3);
       border-radius: 100rem;
       margin-inline-start: auto;
+      word-break: normal;
     }
     ${TaskSectionEditor} {
       padding: 0.5em 0;
@@ -58,7 +57,7 @@ export default styled.section`
       border-top: 1px solid var(--gray3);
       border-top-left-radius: 0px;
       border-top-right-radius: 0px;
-      background: #fff;
+      background: var(--background);
       &:focus {
         border: 1px solid var(--primary);
       }

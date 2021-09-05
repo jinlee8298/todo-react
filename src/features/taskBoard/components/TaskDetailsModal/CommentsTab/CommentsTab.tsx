@@ -62,11 +62,12 @@ const CommentsTab: FC<CommentsTabProps> = memo(({ taskId }) => {
         ))}
         <div className="button-group">
           <Button
+            aria-label="Add Comment"
             onClick={onAddComment}
             disabled={checkError || !value.trim()}
             size="sm"
           >
-            AddComment
+            Add Comment
           </Button>
         </div>
       </div>

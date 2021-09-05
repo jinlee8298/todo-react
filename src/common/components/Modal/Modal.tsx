@@ -16,12 +16,18 @@ type ModalProps = {
   backdropClick?: MouseEventHandler;
 };
 
-const Modal: FC<ModalProps> = (props) => {
+const Modal: FC<ModalProps> = ({
+  isShown,
+  children,
+  onKeyDown,
+  backdropClick,
+  ...props
+}) => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [render, setRender] = useState(false);
 
   useEffect(() => {
-    if (props.isShown) {
+    if (isShown) {
       setTimeout(() => {
         sectionRef.current?.classList.add("showing");
       });
@@ -30,7 +36,7 @@ const Modal: FC<ModalProps> = (props) => {
       sectionRef.current?.classList.remove("showing");
       setTimeout(() => setRender(false), 200);
     }
-  }, [props.isShown]);
+  }, [isShown]);
 
   const stopPropagation: MouseEventHandler = (e) => {
     e.stopPropagation();
@@ -39,13 +45,13 @@ const Modal: FC<ModalProps> = (props) => {
     ? createPortal(
         <FocusTrap>
           <StyledModal
-            onKeyDown={props.onKeyDown}
+            onKeyDown={onKeyDown}
             {...props}
             onClick={stopPropagation}
             ref={sectionRef}
           >
-            <div className="backdrop" onClick={props.backdropClick}></div>
-            <section>{props.children}</section>
+            <div className="backdrop" onClick={backdropClick}></div>
+            <section>{children}</section>
           </StyledModal>
         </FocusTrap>,
         document.getElementById("modal-container") || document.body

@@ -14,7 +14,6 @@ export default styled.label`
     margin: 0;
     opacity: 0;
     padding: 0;
-    z-index: 1;
     position: absolute;
     &:checked ~ .decoration {
       border: 1px solid var(--primary);

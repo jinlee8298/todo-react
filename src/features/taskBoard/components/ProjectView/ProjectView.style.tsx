@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { Button } from "common/components/style";
 import TaskList from "../TaskSection/TaskSection.style";
-import Placeholder from "../Placeholder/Placeholder.style";
 import AddSectionButton from "../AddSectionButton/AddSectionButton.style";
 import TaskSectionEditor from "../TaskSection/TaskSectionEditor/TaskSectionEditor.style";
 
@@ -15,7 +14,7 @@ export default styled.div`
   width: 100%;
   overflow: hidden;
 
-  [role="listbox"] {
+  .section-list {
     flex: 1;
     flex-basis: 0px;
     padding-inline: 2rem;
@@ -23,10 +22,11 @@ export default styled.div`
     display: flex;
     align-items: flex-start;
     overflow: auto;
-    > ${TaskList}, > ${Placeholder}, > ${TaskSectionEditor} {
+    > ${TaskList}, > .placeholder,
+    > ${TaskSectionEditor} {
       margin-inline-end: 1.5rem;
     }
-    > ${Placeholder} {
+    > .placeholder {
       width: calc(var(--list-width) + 2rem);
       flex-shrink: 0;
     }

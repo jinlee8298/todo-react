@@ -8,7 +8,11 @@ import { generateUID } from "common/utilitites";
 import { TaskBoardStore } from "../taskBoardSlice";
 import { TaskSection } from "../types";
 import { projectAdapter, projectSelector } from "./projectReducer";
-import { deleteTaskHandler, duplicateTaskHandler } from "./taskReducer";
+import {
+  deleteTaskHandler,
+  duplicateTaskHandler,
+  updateTaskRecursively,
+} from "./taskReducer";
 
 export const sectionAdapter = createEntityAdapter<TaskSection>();
 export const sectionSelector = sectionAdapter.getSelectors(
@@ -28,7 +32,7 @@ export const duplicateSectionHandler = (
   }
 
   const newSection: TaskSection = {
-    name: originSection.name,
+    name: `Copy of ${originSection.name}`,
     taskIds: [],
     finishedTaskIds: [],
     id: generateUID(),
@@ -41,6 +45,10 @@ export const duplicateSectionHandler = (
       taskId,
       false
     );
+    updateTaskRecursively(state, duplicatedTaskId, {
+      sectionId: newSection.id,
+      projectId,
+    });
     newSection.taskIds.push(duplicatedTaskId);
   });
   originSection.finishedTaskIds.forEach((taskId) => {
@@ -51,13 +59,22 @@ export const duplicateSectionHandler = (
       taskId,
       false
     );
+    updateTaskRecursively(state, duplicatedTaskId, {
+      sectionId: newSection.id,
+      projectId,
+    });
     newSection.finishedTaskIds.push(duplicatedTaskId);
   });
   sectionAdapter.addOne(state.sections, newSection);
+
+  const projectSectionIds = [...project.sectionIds];
+  const originSectionIndex = projectSectionIds.indexOf(sectionId);
+  projectSectionIds.splice(originSectionIndex, 0, newSection.id);
+
   projectAdapter.updateOne(state.projects, {
     id: projectId,
     changes: {
-      sectionIds: [...project.sectionIds, newSection.id],
+      sectionIds: projectSectionIds,
     },
   });
 };
@@ -207,93 +224,12 @@ const repositionSection = {
   },
 };
 
-const setDraggingSectionData = (
-  state: TaskBoardStore,
-  action: PayloadAction<{
-    draggingSectionId: EntityId;
-    placeholderHeight: string;
-  } | null>
-) => {
-  state.sections.draggingInfo = action.payload;
-};
-
-const insertSectionPlaceholder = {
-  prepare: (
-    projectId: EntityId,
-    sectionId: EntityId | null,
-    index: number | null
-  ) => ({
-    payload: {
-      projectId,
-      sectionId,
-      index,
-    },
-  }),
-  reducer: (
-    state: TaskBoardStore,
-    action: PayloadAction<{
-      projectId: EntityId;
-      sectionId: EntityId | null;
-      index: number | null;
-    }>
-  ) => {
-    const { index, projectId, sectionId } = action.payload;
-    const project = projectSelector.selectById(state, projectId);
-    if (project) {
-      const placeholderIndex = project.sectionIds.indexOf("placeholder");
-      const sectionIds = [...project.sectionIds];
-
-      let tempIndex = index ?? -1;
-      if (tempIndex < 0 && sectionId) {
-        tempIndex = sectionIds.indexOf(sectionId);
-      }
-
-      if (placeholderIndex >= 0) {
-        sectionIds.splice(placeholderIndex, 1);
-        sectionIds.splice(
-          placeholderIndex > tempIndex ? tempIndex + 1 : tempIndex,
-          0,
-          "placeholder"
-        );
-      } else {
-        sectionIds.splice(tempIndex + 1, 0, "placeholder");
-      }
-
-      projectAdapter.updateOne(state.projects, {
-        id: projectId,
-        changes: { sectionIds },
-      });
-    }
-  },
-};
-
-const removeSectionPlaceholder = (
-  state: TaskBoardStore,
-  action: PayloadAction<EntityId>
-) => {
-  const project = projectSelector.selectById(state, action.payload);
-  if (project) {
-    const placeholderIndex = project.sectionIds.indexOf("placeholder");
-    if (placeholderIndex >= 0) {
-      projectAdapter.updateOne(state.projects, {
-        id: project.id,
-        changes: {
-          sectionIds: project.sectionIds.filter((id) => id !== "placeholder"),
-        },
-      });
-    }
-  }
-};
-
 const sectionReducer = {
   addSection,
   updateSection,
   duplicateSection,
   deleteSection,
   repositionSection,
-  setDraggingSectionData,
-  insertSectionPlaceholder,
-  removeSectionPlaceholder,
 };
 
 export default sectionReducer;

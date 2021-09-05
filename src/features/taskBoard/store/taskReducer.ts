@@ -101,9 +101,7 @@ export const duplicateTaskHandler = (
 
   if (parentId) {
     duplicatedTask.parentTaskId = parentId;
-  }
-
-  if (sectionId) {
+  } else if (sectionId) {
     const section = sectionSelector.selectById(state, sectionId);
     if (section) {
       const originIndex = section.taskIds.findIndex((id) => id === taskId);
@@ -227,10 +225,33 @@ export const updateTaskHandler = (
   taskAdapter.updateOne(state.tasks, updateObj);
 };
 
+export const updateTaskRecursively = (
+  state: TaskBoardStore,
+  taskId: EntityId,
+  changeObj: Partial<Task>
+) => {
+  const subTask = taskSelector.selectById(state, taskId);
+  if (!subTask) {
+    return;
+  }
+
+  taskAdapter.updateOne(state.tasks, {
+    id: taskId,
+    changes: changeObj,
+  });
+
+  if (subTask.subTaskIds) {
+    subTask.subTaskIds.forEach((subTaskId) =>
+      updateTaskRecursively(state, subTaskId, changeObj)
+    );
+  }
+};
+
 // Reducer section
 
 const addTask = {
   prepare: (
+    projectId: EntityId,
     sectionId: EntityId,
     task: Omit<
       Task,
@@ -240,13 +261,16 @@ const addTask = {
       | "commentIds"
       | "subTaskIds"
       | "finished"
+      | "sectionId"
+      | "projectId"
     >
   ) => ({
-    payload: { sectionId, task },
+    payload: { projectId, sectionId, task },
   }),
   reducer: (
     state: TaskBoardStore,
     action: PayloadAction<{
+      projectId: EntityId;
       sectionId: EntityId;
       task: Omit<
         Task,
@@ -256,10 +280,12 @@ const addTask = {
         | "commentIds"
         | "subTaskIds"
         | "finished"
+        | "sectionId"
+        | "projectId"
       >;
     }>
   ) => {
-    const { sectionId, task } = action.payload;
+    const { projectId, sectionId, task } = action.payload;
     const addSection = sectionAdapter
       .getSelectors()
       .selectById(state.sections, sectionId);
@@ -274,6 +300,7 @@ const addTask = {
       subTaskIds: [],
       finished: false,
       sectionId,
+      projectId,
     };
 
     taskAdapter.addOne(state.tasks, newTask);
@@ -312,6 +339,8 @@ const addSubTask = {
       | "commentIds"
       | "subTaskIds"
       | "finished"
+      | "sectionId"
+      | "projectId"
     >
   ) => ({
     payload: { parentTaskId, task },
@@ -328,6 +357,8 @@ const addSubTask = {
         | "commentIds"
         | "subTaskIds"
         | "finished"
+        | "sectionId"
+        | "projectId"
       >;
     }>
   ) => {
@@ -348,6 +379,8 @@ const addSubTask = {
       commentIds: [],
       subTaskIds: [],
       finished: false,
+      sectionId: parentTask.sectionId,
+      projectId: parentTask.projectId,
     };
     const parentSubTaskIds = [...(parentTask.subTaskIds || []), newTask.id];
 
@@ -391,7 +424,7 @@ const toggleTask = {
       markTaskFinished(state, taskId);
     }
 
-    if (sectionId) {
+    if (sectionId && !task.parentTaskId) {
       const section = sectionSelector.selectById(state, sectionId);
       if (section) {
         sectionAdapter.updateOne(state.sections, {
@@ -491,10 +524,6 @@ const repositionTask = {
         const taskIds = [...destinationSection?.taskIds];
         taskIds.splice(index, 0, taskId);
 
-        if (state.tasks.draggingInfo) {
-          state.tasks.draggingInfo.originSectionId = destinationSectionId;
-        }
-
         taskAdapter.updateOne(state.tasks, {
           id: taskId,
           changes: {
@@ -536,95 +565,75 @@ const repositionTask = {
   },
 };
 
-const insertTaskPlaceholder = {
-  prepare: (
-    sectionId: EntityId,
-    taskId: EntityId | null,
-    index: number | null
-  ) => ({
+const moveTask = {
+  prepare: (projectId: EntityId, sectionId: EntityId, taskId: EntityId) => ({
     payload: {
+      projectId,
       sectionId,
-      index,
       taskId,
     },
   }),
   reducer: (
     state: TaskBoardStore,
     action: PayloadAction<{
+      projectId: EntityId;
       sectionId: EntityId;
-      index: number | null;
-      taskId: null | EntityId;
+      taskId: EntityId;
     }>
   ) => {
-    const { index, taskId, sectionId } = action.payload;
-    const section = sectionAdapter
-      .getSelectors()
-      .selectById(state.sections, sectionId);
-    if (section) {
-      const placeholderIndex = section.taskIds.indexOf("placeholder");
-      const taskIds = [...section.taskIds];
-      let tempIndex = index || 0;
-      if (!tempIndex && taskId) {
-        tempIndex = taskIds.indexOf(taskId);
-      }
-      if (placeholderIndex >= 0) {
-        taskIds.splice(placeholderIndex, 1);
-        taskIds.splice(
-          placeholderIndex > tempIndex ? tempIndex : tempIndex - 1,
-          0,
-          "placeholder"
-        );
-      } else {
-        taskIds.splice(tempIndex, 0, "placeholder");
-      }
-      const draggingInfo = state.tasks.draggingInfo;
-      if (draggingInfo) {
-        draggingInfo.currentPlaceholderSecionId = sectionId;
-      }
-      sectionAdapter.updateOne(state.sections, {
+    const { projectId, sectionId, taskId } = action.payload;
+    const task = taskSelector.selectById(state, taskId);
+    if (!task) {
+      return;
+    }
+
+    const desSection = sectionSelector.selectById(state, sectionId);
+    const oriSection = sectionSelector.selectById(state, task.sectionId);
+    if (!desSection || !oriSection || oriSection.id === desSection.id) {
+      return;
+    }
+
+    sectionAdapter.updateMany(state.sections, [
+      {
         id: sectionId,
-        changes: { taskIds },
+        changes: {
+          taskIds: [...desSection.taskIds, taskId],
+        },
+      },
+      {
+        id: oriSection.id,
+        changes: {
+          taskIds: oriSection.taskIds.filter((id) => id !== taskId),
+        },
+      },
+    ]);
+
+    if (task.parentTaskId) {
+      const parentTask = taskSelector.selectById(state, task.parentTaskId);
+      if (parentTask) {
+        taskAdapter.updateOne(state.tasks, {
+          id: parentTask.id,
+          changes: {
+            subTaskIds: parentTask.subTaskIds.filter((id) => id !== taskId),
+          },
+        });
+      }
+    }
+    if (task.subTaskIds) {
+      task.subTaskIds.forEach((subTaskId) => {
+        updateTaskRecursively(state, subTaskId, { sectionId });
       });
     }
-  },
-};
 
-const removeTaskPlaceholder = (state: TaskBoardStore) => {
-  if (
-    state.tasks.draggingInfo &&
-    state.tasks.draggingInfo.currentPlaceholderSecionId
-  ) {
-    const { currentPlaceholderSecionId } = state.tasks.draggingInfo;
-    const section = sectionAdapter
-      .getSelectors()
-      .selectById(state.sections, currentPlaceholderSecionId);
-    state.tasks.draggingInfo.currentPlaceholderSecionId = null;
-
-    sectionAdapter.updateOne(state.sections, {
-      id: currentPlaceholderSecionId,
+    taskAdapter.updateOne(state.tasks, {
+      id: taskId,
       changes: {
-        taskIds: section?.taskIds.filter((id) => id !== "placeholder"),
+        projectId: projectId,
+        sectionId: sectionId,
+        parentTaskId: undefined,
       },
     });
-  }
-};
-
-const setDraggingTaskData = (
-  state: TaskBoardStore,
-  action: PayloadAction<{
-    draggingTaskId: EntityId;
-    originSectionId: EntityId;
-    placeholderHeight: string;
-  } | null>
-) => {
-  if (action.payload) {
-    state.tasks.draggingInfo = {
-      ...action.payload,
-      currentPlaceholderSecionId: null,
-    };
-  } else {
-    state.tasks.draggingInfo = null;
-  }
+  },
 };
 
 const taskReducer = {
@@ -635,9 +644,7 @@ const taskReducer = {
   duplicateTask,
   deleteTask,
   repositionTask,
-  insertTaskPlaceholder,
-  removeTaskPlaceholder,
-  setDraggingTaskData,
+  moveTask,
 };
 
 export default taskReducer;

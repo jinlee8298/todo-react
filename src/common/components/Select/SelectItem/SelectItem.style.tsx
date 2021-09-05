@@ -7,15 +7,34 @@ export default styled.li`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  &:hover,
-  &:focus,
-  &.selected {
-    color: var(--primary);
-    background: ${(props) => `${props.theme.primary}0D`};
-    outline: none;
-    cursor: pointer;
+  &:not(.group-label) {
+    &:hover,
+    &:focus,
+    &.selected {
+      color: var(--primary);
+      outline: none;
+      cursor: pointer;
+    }
+    &:hover,
+    &:focus {
+      background: ${(props) => `${props.theme.primary}0D`};
+    }
   }
+
+  &.group-label {
+    font-weight: bold;
+    color: var(--gray1);
+    padding: 0.5em 1rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
+
   span {
     svg {
       margin-inline-end: 0.8em;

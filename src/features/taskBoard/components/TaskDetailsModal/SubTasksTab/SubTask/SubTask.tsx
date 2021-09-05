@@ -1,7 +1,7 @@
 import { faCodeBranch, faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { Checkbox, Label as LabelComponent } from "common/components";
 import { useDispatch, useSelector } from "common/hooks";
-import TaskMenu from "features/taskBoard/components/Task/TaskItemMenu/TaskMenu";
+import TaskMenu from "features/taskBoard/components/Task/TaskMenu";
 import TaskEditor from "features/taskBoard/components/TaskEditor/TaskEditor";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
 import { taskSelector } from "features/taskBoard/store/taskReducer";
@@ -40,7 +40,13 @@ const SubTask: FC<SubTaskProps> = memo(({ task }) => {
     });
     return labels;
   }, shallowEqual);
-  const match = useRouteMatch<{ projectId: string; labelId: string }>([
+  const match = useRouteMatch<{
+    projectId: string;
+    labelId: string;
+    taskId: string;
+  }>([
+    "/project/:projectId/task/:taskId",
+    "/label/:labelId/task/:taskId",
     "/project/:projectId",
     "/label/:labelId",
   ]);
@@ -125,7 +131,7 @@ const SubTask: FC<SubTaskProps> = memo(({ task }) => {
               </LabelComponent>
             ))}
           </div>
-          <TaskMenu onEdit={toggleEditing} task={task} />
+          <TaskMenu triggerRounded={true} onEdit={toggleEditing} task={task} />
         </>
       )}
     </StyledSubTask>

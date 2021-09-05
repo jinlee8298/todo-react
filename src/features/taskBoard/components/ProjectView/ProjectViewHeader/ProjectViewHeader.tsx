@@ -5,7 +5,7 @@ import { updateProject } from "features/taskBoard/taskBoardSlice";
 import { Project } from "features/taskBoard/types";
 import { FC, useState } from "react";
 import ProjectEditModal from "../../ProjectEditModal/ProjectEditModal";
-import ProjectMenu from "../../ProjectNav/ProjectMenu/ProjectMenu";
+import ProjectMenu from "../../ProjectNav/ProjectMenu";
 import StyledHeader from "./ProjectViewHeader.style";
 
 type ProjectViewHeaderProps = {

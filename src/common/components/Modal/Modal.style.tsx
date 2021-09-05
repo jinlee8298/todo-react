@@ -42,7 +42,7 @@ export default styled.div`
     max-width: 650px;
     max-height: 690px;
     overflow: hidden;
-    background: #fff;
+    background: var(--background);
     transition: transform 0.2s, opacity 0.2s;
     opacity: 0;
     transform: scale(0.9);

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export type ButtonProps = {
-  variant?: "primary" | "success" | "danger" | "warning" | "info" | "gray1";
+  variant?: "primary" | "success" | "danger" | "warning" | "info" | "white";
   size?: "sx" | "sm" | "md" | "lg";
   icon?: IconProp;
   alternative?: "outline" | "reverse";
@@ -40,7 +40,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <StyledButton
-        mainColor={themeContext[variant]}
+        mainColor={variant === "white" ? "#ffffff" : themeContext[variant]}
         textColor={"white"}
         size={SIZE_MAPPING[size]}
         className={[

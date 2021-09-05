@@ -4,7 +4,7 @@ import { shadow } from "common/styles/common";
 export default styled.ul`
   ${shadow};
 
-  background: #fff;
+  background: var(--background);
   border-radius: 4px;
   list-style: none;
   margin: 0;

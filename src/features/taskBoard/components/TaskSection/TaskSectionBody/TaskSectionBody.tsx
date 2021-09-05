@@ -1,16 +1,12 @@
 import { EntityId } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "common/hooks";
-import {
-  insertTaskPlaceholder,
-  removeTaskPlaceholder,
-  repositionTask,
-} from "features/taskBoard/taskBoardSlice";
-import { FC, DragEventHandler, DragEvent, useCallback } from "react";
+import { repositionTask } from "features/taskBoard/taskBoardSlice";
+import { FC, useCallback, MouseEventHandler, useRef, useEffect } from "react";
 import StyledTaskSectionBody from "./TaskSectionBody.style";
-import Placeholder from "../../Placeholder/Placeholder";
 import Task from "../../Task/Task";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
+import useScrollAtEdge from "common/hooks/useScrollAtEdge";
 
 type TaskSectionBodyProps = {
   sectionId: EntityId;
@@ -18,14 +14,16 @@ type TaskSectionBodyProps = {
   finishedTaskIds: EntityId[];
 };
 
+let draggingTask = false;
+
+const taskPlaceholderNode: HTMLElement = document.createElement("div");
+taskPlaceholderNode.classList.add("placeholder");
+
 const TaskSectionBody: FC<TaskSectionBodyProps> = ({
   sectionId,
   taskIds,
   finishedTaskIds,
 }) => {
-  const draggingInfo = useSelector(
-    (state) => state.taskBoard.tasks.draggingInfo
-  );
   const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
   const history = useHistory();
   const projectId = match?.params.projectId;
@@ -34,86 +32,122 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
       projectSelector.selectById(state.taskBoard, projectId || "")
         ?.filterOptions
   );
+  const dropZonePaddingRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  useScrollAtEdge(
+    {
+      scrollY: {
+        threshold: 50,
+        intervalDistance: 50,
+      },
+    },
+    containerRef
+  );
   const dispatch = useDispatch();
-
-  const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      e.preventDefault();
-    }
-  };
-
-  const onTaskDrop: DragEventHandler<HTMLElement> = (e) => {
-    e.preventDefault();
-
-    const taskId = draggingInfo?.draggingTaskId;
-    const originSectionId = draggingInfo?.originSectionId;
-    const taskIndex = taskIds.indexOf("placeholder");
-    if (originSectionId && taskId) {
-      dispatch(repositionTask(sectionId, originSectionId, taskId, taskIndex));
-    }
-
-    if (originSectionId !== draggingInfo?.currentPlaceholderSecionId) {
-      dispatch(removeTaskPlaceholder());
-    }
-  };
-
-  const onDragEnterTaskList: DragEventHandler<HTMLElement> = (e) => {
-    if (e.dataTransfer.types.includes("task")) {
-      e.preventDefault();
-
-      const nonDraggingTaskIds = taskIds.filter(
-        (id) => id !== draggingInfo?.draggingTaskId
-      );
-      if (nonDraggingTaskIds?.length === 0) {
-        dispatch(insertTaskPlaceholder(sectionId, null, 0));
-        return;
-      }
-
-      const targetEl = e.target as HTMLDivElement;
-      if (targetEl.classList.contains("dropzone-padding")) {
-        dispatch(insertTaskPlaceholder(sectionId, null, taskIds.length));
-      }
-    }
-  };
-
-  const onDragOverTaskList = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault();
-  };
 
   const openTaskDetailsModal = useCallback(
     (taskId: EntityId) => {
-      sessionStorage.setItem("currentSectionId", sectionId.toString());
       history.push(`/project/${projectId}/task/${taskId}`);
     },
-    [history, projectId, sectionId]
+    [history, projectId]
   );
 
-  return (
-    <StyledTaskSectionBody
-      className="task-list"
-      draggable
-      onDrop={onTaskDrop}
-      onDragStart={preventDrag}
-      onDragOver={onDragOverTaskList}
-      onDragEnter={onDragEnterTaskList}
-    >
-      {taskIds.map((taskId) =>
-        taskId === "placeholder" ? (
-          <Placeholder
-            key="placeholder"
-            height={draggingInfo ? draggingInfo.placeholderHeight : "0px"}
-          />
-        ) : (
-          <Task
-            key={taskId}
-            onClick={openTaskDetailsModal}
-            taskId={taskId}
-            sectionId={sectionId}
-          />
-        )
-      )}
+  const onDragEnterTask = (e: Event, taskId: EntityId) => {
+    if (draggingTask) {
+      const taskIndex = taskIds.indexOf(taskId);
+      taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+      taskPlaceholderNode.dataset.index = taskIndex.toString();
+      const currentTarget = e.currentTarget as HTMLElement;
+      const parentEle = currentTarget.parentElement;
+      parentEle?.insertBefore(taskPlaceholderNode, currentTarget);
+    }
+  };
 
-      <div className="dropzone-padding">
+  const insertPlaceholderBottom: MouseEventHandler = (e) => {
+    if (draggingTask) {
+      const taskIndex = taskIds.length;
+      taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+      taskPlaceholderNode.dataset.index = taskIndex.toString();
+      const parentEle = e.currentTarget.parentElement;
+      parentEle?.insertBefore(taskPlaceholderNode, e.currentTarget);
+    }
+  };
+
+  // Insert placeholer immediately at dragging task
+  const onTaskStartDrag = (dragEle: HTMLElement, taskId: EntityId) => {
+    draggingTask = true;
+    const taskIndex = taskIds.indexOf(taskId);
+    taskPlaceholderNode.dataset.taskId = taskId.toString();
+    taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+    taskPlaceholderNode.dataset.originSectionId = sectionId.toString();
+    taskPlaceholderNode.dataset.index = taskIndex.toString();
+    taskPlaceholderNode.style.height = `${dragEle.offsetHeight}px`;
+    const parentEle = dragEle.parentElement;
+    parentEle?.insertBefore(taskPlaceholderNode, dragEle.nextSibling);
+  };
+
+  // Reposition task and remove placeholder
+  const onTaskEndDrag = () => {
+    draggingTask = false;
+    const dataset = taskPlaceholderNode.dataset;
+    const destionationSectionId = dataset.sectionId;
+    const originSectionId = dataset.originSectionId;
+    const taskId = dataset.taskId;
+    const index = dataset.index;
+    if (destionationSectionId && originSectionId && taskId && index) {
+      dispatch(
+        repositionTask(
+          destionationSectionId,
+          originSectionId,
+          taskId,
+          Number(index)
+        )
+      );
+    }
+    taskPlaceholderNode?.remove();
+  };
+
+  useEffect(() => {
+    const ref = dropZonePaddingRef.current;
+    const insertPlaceholderAtBottom = (e: Event) => {
+      if (draggingTask && e.currentTarget) {
+        const taskIndex = taskIds.length;
+        taskPlaceholderNode.dataset.sectionId = sectionId.toString();
+        taskPlaceholderNode.dataset.index = taskIndex.toString();
+        const currentTarget = e.currentTarget as HTMLElement;
+        const parentEle = currentTarget.parentElement;
+        parentEle?.insertBefore(taskPlaceholderNode, currentTarget);
+      }
+    };
+    if (ref) {
+      ref.addEventListener("custom-dragenter", insertPlaceholderAtBottom);
+    }
+    return () => {
+      if (ref) {
+        ref.removeEventListener("custom-dragenter", insertPlaceholderAtBottom);
+      }
+    };
+  }, [dropZonePaddingRef, sectionId, taskIds]);
+
+  return (
+    <StyledTaskSectionBody ref={containerRef} className="task-list">
+      {taskIds.map((taskId) => (
+        <Task
+          key={taskId}
+          onClick={openTaskDetailsModal}
+          taskId={taskId}
+          sectionId={sectionId}
+          onDragStart={onTaskStartDrag}
+          onDragEnd={onTaskEndDrag}
+          onDragEnter={onDragEnterTask}
+        />
+      ))}
+
+      <div
+        ref={dropZonePaddingRef}
+        className="dropzone-padding"
+        onMouseEnter={insertPlaceholderBottom}
+      >
         {filterOptions?.showCompletedTask &&
           finishedTaskIds.map((taskId) => (
             <Task

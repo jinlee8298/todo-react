@@ -23,7 +23,7 @@ export default styled.label`
       .label {
         font-size: 0.75rem;
         top: -0.375rem;
-        background: #fff;
+        background: var(--background);
         left: calc(0.4rem - 2px);
         border-inline: 2px solid #fff;
       }

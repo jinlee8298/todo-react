@@ -16,10 +16,10 @@ import { addSubTask, addTask, updateTask } from "../../taskBoardSlice";
 import { updateTextareaHeight } from "common/components/TextArea/TextArea";
 import TaskPrioritySelect, {
   TaskPrioritySelectRef,
-} from "./TaskPrioritySelect/TaskPrioritySelect";
+} from "../TaskPrioritySelect/TaskPrioritySelect";
 import TaskLabelSelect, {
   TaskLabelSelectRef,
-} from "./TaskLabelSelect/TaskLabelSelect";
+} from "../TaskLabelSelect/TaskLabelSelect";
 import { SelectItem } from "common/components/Select/SelectItem/SelectItem";
 import { shallowEqual } from "react-redux";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
@@ -74,6 +74,7 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
   ) as Label[] | undefined;
   const dispatch = useDispatch();
   const match = useRouteMatch<{ projectId: string }>("/project/:projectId");
+  const projectId = match?.params.projectId;
 
   useLayoutEffect(() => {
     if (titleInputRef.current) {
@@ -183,17 +184,18 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       | "commentIds"
       | "subTaskIds"
       | "finished"
+      | "sectionId"
+      | "projectId"
     > = {
       title: title.trim(),
       description: description.trim(),
       priority: selectedPriority,
       labelIds: selectedLabels.map((item) => item.value) || [],
-      projectId: match?.params.projectId,
     };
     if (mode === "add-subtask" && parentTaskId) {
       dispatch(addSubTask(parentTaskId, newTask));
-    } else if (sectionId) {
-      dispatch(addTask(sectionId, newTask));
+    } else if (sectionId && projectId) {
+      dispatch(addTask(projectId, sectionId, newTask));
     }
     resetTitle();
     resetDescription();
@@ -282,13 +284,19 @@ const TaskEditor: React.FC<TaskEditorProps> = ({
       </div>
       <div className="button-group">
         <Button
+          aria-label={mode === "edit" ? "Save" : "Add task"}
           size="sm"
           disabled={!title.trim() || checkError}
           onClick={mode === "edit" ? onEditTask : onAddTask}
         >
           {mode === "edit" ? "Save" : "Add task"}
         </Button>
-        <Button size="sm" alternative="reverse" onClick={onCloseHandle}>
+        <Button
+          aria-label="Cancel"
+          size="sm"
+          alternative="reverse"
+          onClick={onCloseHandle}
+        >
           Cancel
         </Button>
       </div>

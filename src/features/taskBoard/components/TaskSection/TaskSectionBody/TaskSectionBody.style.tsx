@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import Placeholder from "../../Placeholder/Placeholder.style";
 import Task from "../../Task/Task.style";
 
 export default styled.div`
@@ -8,16 +7,17 @@ export default styled.div`
   flex-shrink: 1;
   overflow: hidden;
   position: relative;
+  user-select: none;
   &:hover {
     overflow-y: auto;
   }
 
-  ${Task}, ${Placeholder} {
+  ${Task}, .placeholder {
     width: var(--list-width);
     &:not(:first-child) {
       margin-block-start: 0.5rem;
     }
-    &.dragging:first-child + ${Task}, &.dragging:first-child + ${Placeholder} {
+    &.dragging:first-child + ${Task}, &.dragging:first-child + .placeholder {
       margin-block-start: 0;
     }
   }
@@ -33,5 +33,8 @@ export default styled.div`
         margin-block-start: 0;
       }
     }
+  }
+  @media (pointer: coarse) {
+    overflow: auto;
   }
 `;

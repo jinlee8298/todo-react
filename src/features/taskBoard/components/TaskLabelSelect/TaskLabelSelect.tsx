@@ -169,6 +169,7 @@ const TaskLabelSelect: ForwardRefRenderFunction<
       {filterValue.trim() && (
         <p className="add-label" onClick={createNewLabel}>
           <Button
+            aria-label={`Add new label: ${filterValue.trim()}`}
             onClick={createNewLabel}
             size="sx"
             alternative="reverse"
@@ -195,6 +196,7 @@ const TaskLabelSelect: ForwardRefRenderFunction<
       hasFilter
     >
       <Button
+        aria-label="Select task's labels"
         disabled={disabled}
         size="sx"
         icon={faTag}

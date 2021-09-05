@@ -10,26 +10,23 @@ import { Button, Menu, ConfirmDialog, Popover } from "common/components";
 import { useDispatch, useConfirmDialog } from "common/hooks";
 import { Task } from "features/taskBoard/types";
 import { deleteTask, duplicateTask } from "features/taskBoard/taskBoardSlice";
-import { useHistory, useRouteMatch } from "react-router-dom";
 
 type TaskMenuProps = {
   task: Task;
+  triggerRounded?: boolean;
   onEdit: () => void;
+  onDelete?: () => void;
 };
 
-const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
+const TaskMenu: FC<TaskMenuProps> = ({
+  task,
+  triggerRounded,
+  onEdit,
+  onDelete,
+}) => {
   const [showConfirm, closeConfirm, confirmDialogProps] = useConfirmDialog();
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const triggerButtonRef = useRef<HTMLElement | null>(null);
-  const history = useHistory();
-  const match = useRouteMatch<{
-    projectId: string;
-    taskId: string;
-    labelId: string;
-  }>(["/project/:projectId/task/:taskId", "/label/:labelId/task/:taskId"]);
-  const projectId = match?.params.projectId;
-  const labelId = match?.params.labelId;
-  const isOnModal = !!match?.params.taskId;
   const dispatch = useDispatch();
 
   const duplicateTaskHandler = () => {
@@ -65,14 +62,7 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
       onReject: closeConfirm,
       onEsc: closeConfirm,
       onConfirm: () => {
-        if (isOnModal) {
-          if (labelId) {
-            history.push(`/label/${labelId}`);
-          }
-          if (projectId) {
-            history.push(`/project/${projectId}`);
-          }
-        }
+        onDelete?.();
 
         dispatch(deleteTask(task.sectionId, task.id));
       },
@@ -167,11 +157,12 @@ const TaskMenu: FC<TaskMenuProps> = ({ task, onEdit }) => {
         )}
       >
         <Button
+          aria-label={`Open task ${task.title}'s menu`}
           className="menu-trigger"
           size="sx"
           icon={faEllipsisH}
           alternative="reverse"
-          rounded={!isOnModal}
+          rounded={triggerRounded}
         />
       </Popover>
 

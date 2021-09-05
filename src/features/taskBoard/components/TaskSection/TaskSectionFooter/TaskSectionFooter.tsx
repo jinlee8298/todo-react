@@ -1,5 +1,5 @@
 import { EntityId } from "@reduxjs/toolkit";
-import { DragEventHandler, FC, useState } from "react";
+import { FC, useState } from "react";
 import { Button } from "common/components";
 import StyledFooter from "./TaskSectionFooter.style";
 import TaskEditor from "../../TaskEditor/TaskEditor";
@@ -11,17 +11,11 @@ type TaskSectionFooterProps = {
 const TaskSectionFooter: FC<TaskSectionFooterProps> = (props) => {
   const [showTaskEditor, setShowTaskEditor] = useState(false);
 
-  const preventDrag: DragEventHandler<HTMLDivElement> = (e) => {
-    if (e.target === e.currentTarget) {
-      e.preventDefault();
-    }
-  };
-
   const toggleTaskEditor = () => {
     setShowTaskEditor((showing) => !showing);
   };
   return (
-    <StyledFooter draggable onDragStart={preventDrag}>
+    <StyledFooter>
       {showTaskEditor ? (
         <TaskEditor
           mode="add"
@@ -30,6 +24,7 @@ const TaskSectionFooter: FC<TaskSectionFooterProps> = (props) => {
         />
       ) : (
         <Button
+          aria-label="Add task"
           icon={faPlus}
           title="Add task"
           alternative="outline"

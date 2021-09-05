@@ -95,6 +95,7 @@ const LabelEditModal: FC<LabelEditModalProps> = ({
       <div className="header">
         <h2>{label ? "Edit" : "Add"} label</h2>
         <Button
+          aria-label={"Close modal"}
           onClick={onCloseHandle}
           icon={faTimes}
           size="sx"
@@ -116,10 +117,16 @@ const LabelEditModal: FC<LabelEditModalProps> = ({
         label="Color"
       />
       <div className="action">
-        <Button onClick={onCloseHandle} size="sm" alternative="reverse">
+        <Button
+          aria-label="Cancel"
+          onClick={onCloseHandle}
+          size="sm"
+          alternative="reverse"
+        >
           Cancel
         </Button>
         <Button
+          aria-label={label ? "Update" : "Add"}
           disabled={!labelName.trim() || isError}
           onClick={label ? updateLabelHandler : addNewLabel}
           size="sm"

@@ -9,6 +9,7 @@ export type SelectItem = {
   value: string;
   icon?: IconProp;
   iconColor?: string;
+  isGroupLabel?: boolean;
 };
 
 type SelectItemProps = {
@@ -30,7 +31,11 @@ const Item: FC<SelectItemProps> = memo(
         isSelected ? onDeselect?.(value) : onSelect?.(value);
       }
     };
-    return (
+    return value.isGroupLabel ? (
+      <StyledItem className="group-label" tabIndex={-1}>
+        {value.label}
+      </StyledItem>
+    ) : (
       <StyledItem
         className={isSelected ? "selected" : ""}
         onClick={onClick}

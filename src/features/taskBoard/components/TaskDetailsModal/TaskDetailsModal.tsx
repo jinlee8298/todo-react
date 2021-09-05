@@ -22,7 +22,7 @@ import { ConfirmDialog } from "common/components";
 import { Link, useHistory, useRouteMatch } from "react-router-dom";
 import { taskSelector } from "features/taskBoard/store/taskReducer";
 import { projectSelector } from "features/taskBoard/store/projectReducer";
-import TaskInfo from "./TaskInfo/TaskInfo";
+import TaskInfo from "./TaskInfo";
 import { labelSelector } from "features/taskBoard/store/labelReducer";
 
 const TaskDetailsModal: FC = memo(() => {
@@ -44,7 +44,7 @@ const TaskDetailsModal: FC = memo(() => {
       return taskSelector.selectById(state.taskBoard, taskId);
     }
   });
-  const projectId = match?.params.projectId || task?.projectId;
+  const projectId = task?.projectId;
   const labelId = match?.params.labelId;
   const labelName = useSelector((state) => {
     if (labelId) {
@@ -134,17 +134,6 @@ const TaskDetailsModal: FC = memo(() => {
     if (!isShown) {
       setIsEdit(false);
     }
-    setTimeout(() => {
-      if (isShown) {
-        document.title = `Task: ${task?.title}`;
-      } else {
-        if (labelName) {
-          document.title = `Label: ${labelName}`;
-        } else {
-          document.title = `Project: ${projectName}`;
-        }
-      }
-    });
   }, [isShown, labelName, projectName, task?.title]);
 
   return task ? (
@@ -162,6 +151,7 @@ const TaskDetailsModal: FC = memo(() => {
           <span>{task.parentTaskId ? parentTaskTitle : projectName}</span>
         </Link>
         <Button
+          aria-label="Close modal"
           icon={faTimes}
           alternative={"reverse"}
           size="sx"

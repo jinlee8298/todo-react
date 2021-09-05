@@ -5,17 +5,14 @@ import { Checkbox, Label, Button } from "common/components/style";
 export default styled.div`
   ${mediumShadow};
 
-  background: #fff;
+  background: var(--background);
   border-radius: 8px;
   overflow: hidden;
   padding: 1em;
   position: relative;
   transition: box-shadow 0.2s;
   border: 1px solid var(--gray4);
-
-  &.dragging {
-    display: none;
-  }
+  user-select: none;
   &.medium,
   &.high,
   &.urgent {

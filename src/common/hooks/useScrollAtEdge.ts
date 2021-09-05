@@ -68,11 +68,9 @@ const useScrollAtEdge = <ContainerType extends HTMLElement>(
       }
     }, 50);
 
-    ref.setAttribute("data-touchable", "true");
     ref.addEventListener("touchend", onTouchEnd);
     ref.addEventListener("touchover", onTouchMove);
     return () => {
-      ref.removeAttribute("data-touchable");
       ref.removeEventListener("touchend", onTouchEnd);
       ref.removeEventListener("touchover", onTouchMove);
     };

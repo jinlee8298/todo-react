@@ -135,7 +135,6 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
       }
     };
     if (ref) {
-      ref.setAttribute("data-touchable", "true");
       ref.addEventListener("touchenter", insertPlaceholderAtBottom);
     }
     return () => {
@@ -166,11 +165,7 @@ const TaskSectionBody: FC<TaskSectionBodyProps> = ({
   }, [containerRef]);
 
   return (
-    <StyledTaskSectionBody
-      ref={containerRef}
-      data-touchable
-      className="task-list"
-    >
+    <StyledTaskSectionBody ref={containerRef} className="task-list">
       {taskIds.map((taskId) => (
         <Task
           key={taskId}

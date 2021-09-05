@@ -113,7 +113,6 @@ const ProjectViewBody: FC<ProjectViewBodyProps> = ({ project }) => {
       }
     };
     if (ref) {
-      ref.setAttribute("data-touchable", "true");
       ref.addEventListener("touchenter", onTouchEnterDropZonePadding);
     }
     return () => {

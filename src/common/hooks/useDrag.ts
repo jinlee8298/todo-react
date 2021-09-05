@@ -136,7 +136,7 @@ const useDrag = <ContainerType extends HTMLElement>(
 
       if (isTouchRef.current) {
         waitingToStartDrag = setTimeout(() => {
-          window.navigator.vibrate(20);
+          window.navigator.vibrate(50);
           waitingToStartDrag = null;
         }, 1000);
       }
@@ -149,10 +149,12 @@ const useDrag = <ContainerType extends HTMLElement>(
       };
       const endDrag = () => {
         if (isDragging) {
-          containerRef.current && handleDragEnd(containerRef.current);
+          if (containerRef.current) {
+            handleDragEnd(containerRef.current);
+            options.onDragEnd?.(containerRef.current);
+          }
           isDragging = false;
           mouseDownInitialPos.current = null;
-          containerRef.current && options.onDragEnd?.(containerRef.current);
         }
       };
       const calculateDragPosition = (
@@ -182,8 +184,6 @@ const useDrag = <ContainerType extends HTMLElement>(
       const onBodyMouseMove = (e: MouseEvent) => {
         calculateDragPosition(e.clientX, e.clientY);
       };
-      // Element must have "data-touchable" attr
-      // in order to be detected when touch event move over it
       const onBodyTouchMove = (e: TouchEvent) => {
         if (!waitingToStartDrag) {
           const clientX = e.touches[0].clientX;

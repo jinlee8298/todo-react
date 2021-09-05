@@ -34,4 +34,7 @@ export default styled.div`
       }
     }
   }
+  @media (pointer: coarse) {
+    overflow: auto;
+  }
 `;

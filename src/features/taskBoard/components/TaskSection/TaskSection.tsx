@@ -50,7 +50,6 @@ const TaskSection: FC<TaskSectionProps> = memo(
       };
       const ref = containerRef.current;
       if (props.onTouchEnter && ref) {
-        ref.setAttribute("data-touchable", "true");
         ref.addEventListener("touchenter", onTouchEnter);
       }
       return () => {

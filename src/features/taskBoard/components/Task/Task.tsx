@@ -73,7 +73,6 @@ const Task: FC<TaskProps> = memo(({ taskId, sectionId, ...props }) => {
     };
     const ref = containerRef.current;
     if (props.onTouchEnter && ref) {
-      ref.setAttribute("data-touchable", "true");
       ref.addEventListener("touchenter", onTouchEnter);
     }
     return () => {

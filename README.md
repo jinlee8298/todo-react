@@ -1,6 +1,11 @@
-# Getting Started with Create React App
+# My first ever serious project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was my attempt at cloning Todoist website (part of...).
+My main goal was to understand react, redux further.
+Therefore, I limited the use of external libraries as much as possible.
+Almost everything builds from scratch so it took a lot of time to develop this project.
+Currently this project works offline only, I'll add firebase to it later.
+
 
 ## Available Scripts
 
